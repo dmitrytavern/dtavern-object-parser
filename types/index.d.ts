@@ -7,6 +7,7 @@ export type OptionPropertyConstructor<T> =
 	| { new (...args: string[]): any }
 
 export type OptionPropertyTypes<T> =
+	| null
 	| OptionPropertyConstructor<T>
 	| OptionPropertyConstructor<T>[]
 
@@ -33,9 +34,7 @@ export type OptionProperties<Properties> = {
 		| OptionProperty<Properties[Property]>
 }
 
-export type OptionSettings<Properties> =
-	| (keyof Properties)[]
-	| OptionProperties<Properties>
+export type OptionSettings<Properties> = string[] | OptionProperties<Properties>
 
 export function defineOptions<Properties>(
 	properties: Properties,
