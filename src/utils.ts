@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const isArray = Array.isArray
 
 export function isObject(obj: any): boolean {
@@ -8,6 +9,6 @@ export function isFunction(value: any): value is (...args: any[]) => any {
 	return typeof value === 'function'
 }
 
-export function hasOwn(obj: object | Array<any>, key: string): boolean {
+export function hasOwn(obj: any | Array<any>, key: string): boolean {
 	return Object.prototype.hasOwnProperty.call(obj, key)
 }

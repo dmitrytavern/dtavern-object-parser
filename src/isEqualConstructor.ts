@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { OptionPropertyTypes } from '@types'
 import { isArray } from './utils'
 
