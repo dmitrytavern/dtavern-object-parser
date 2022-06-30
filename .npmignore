@@ -1,0 +1,16 @@
+.husky/
+node_modules/
+src/
+tests/
+.babelrc
+.env
+.env.example
+.eslintignore
+.eslintrc
+.gitignore
+.prettierignore
+.prettierrc
+jest.config.js
+rollup.config.js
+package-lock.json
+tsconfig.json
