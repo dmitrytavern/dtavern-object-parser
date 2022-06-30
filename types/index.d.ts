@@ -34,7 +34,10 @@ export type OptionProperties<Properties> = {
 		| OptionProperty<Properties[Property]>
 }
 
-export type OptionSettings<Properties> = string[] | OptionProperties<Properties>
+export type OptionSettings<Properties> =
+	| string[]
+	| (keyof Properties)[]
+	| OptionProperties<Properties>
 
 export function defineOptions<Properties>(
 	properties: Properties,

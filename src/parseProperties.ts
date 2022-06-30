@@ -8,11 +8,11 @@ export const parseProperties = <Properties>(
 	propertiesSettings: OptionSettings<Properties>
 ): Required<Properties> => {
 	if (isArray(propertiesSettings)) {
+		// @ts-ignore
 		return parsePropertiesArray(properties, propertiesSettings)
 	}
 
 	if (isObject(propertiesSettings)) {
-		// @ts-ignore
 		return parsePropertiesObject(properties, propertiesSettings)
 	}
 
