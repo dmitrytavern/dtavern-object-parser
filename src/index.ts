@@ -1,17 +1,24 @@
 import { OptionSettings } from '@types'
-import { isObject } from './utils'
-
+import { isObject, isArray } from './utils'
 import { parseProperties } from './parseProperties'
 
 export function defineOptions<Properties>(
 	properties: Properties,
 	propertiesSettings: OptionSettings<Properties>
 ): Required<Properties> {
-	if (!(properties && propertiesSettings))
-		throw new Error('First or second function argument is not defined')
+	try {
+		if (!(properties && propertiesSettings))
+			throw (
+				'first or second argument is not defined. ' +
+				'The first argument must be an object and the ' +
+				'second argument must be an array or object'
+			)
 
-	if (!isObject(properties))
-		throw new Error('Properties is not object argument')
+		if (isArray(properties) || !isObject(properties))
+			throw 'the first argument is not an object. Please, use the type of object'
 
-	return parseProperties(properties, propertiesSettings)
+		return parseProperties(properties, propertiesSettings)
+	} catch (e) {
+		throw new Error(e)
+	}
 }

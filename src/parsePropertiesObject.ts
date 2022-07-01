@@ -23,7 +23,7 @@ export const parsePropertiesObject = <Properties>(
 		 */
 		if (!propertyExists && hasOwn(propertySetting, 'required'))
 			if (propertySetting['required'])
-				throw new Error(`Property "${propertyKey}" not exists`)
+				throw `property "${propertyKey}" not exists`
 
 		/**
 		 * If property not exists, set default value, if it exists
@@ -52,7 +52,7 @@ export const parsePropertiesObject = <Properties>(
 				: (propertySetting as OptionPropertyTypes<any>)
 
 			if (!isEqualConstructor(propertyValue, types))
-				throw new Error(`Property "${propertyKey}" is not "${propertySetting}"`)
+				throw `property "${propertyKey}" is not "${propertySetting}" type`
 		}
 
 		/**
@@ -63,7 +63,7 @@ export const parsePropertiesObject = <Properties>(
 			isFunction(propertySetting['validator'])
 		) {
 			if (!propertySetting['validator'].call(null, propertyValue))
-				throw new Error(`Property "${propertyKey}" did not pass the validator`)
+				throw `property "${propertyKey}" did not pass the validator. Value: ${propertyValue}`
 		}
 	}
 

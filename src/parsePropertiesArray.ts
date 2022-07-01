@@ -12,11 +12,15 @@ export const parsePropertiesArray = <Properties>(
 		propertiesSettings.splice(index, 1)
 	}
 
-	if (propertiesSettings.length > 0)
-		throw new Error(`Have not "${propertiesSettings.join(' | ')}" properties`)
+	if (propertiesSettings.length > 0) {
+		const s = propertiesSettings.join(' | ')
+		throw `options have no "${s}" properties`
+	}
 
-	if (errorPropertyKeys.length > 0)
-		throw new Error(`Have not "${errorPropertyKeys.join(' | ')}" settings`)
+	if (errorPropertyKeys.length > 0) {
+		const s = errorPropertyKeys.join(' | ')
+		throw `properties "${s}" have not in the settings`
+	}
 
 	return properties as Required<Properties>
 }

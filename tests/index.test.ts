@@ -5,6 +5,8 @@ it('Function properties exists', () => {
 	expect(() => defineOptions('hello', ['hello'])).toThrow()
 	expect(() => defineOptions(null, ['hello'])).toThrow()
 	expect(() => defineOptions(undefined, ['hello'])).toThrow()
+	expect(() => defineOptions([], ['hello'])).toThrow()
+	expect(() => defineOptions([], {})).toThrow()
 })
 
 describe('Plugin settings as array', () => {

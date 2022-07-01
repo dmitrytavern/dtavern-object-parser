@@ -16,5 +16,5 @@ export const parseProperties = <Properties>(
 		return parsePropertiesObject(properties, propertiesSettings)
 	}
 
-	throw new Error('Settings is not array or object.')
+	throw 'the second argument is not an object or array'
 }
