@@ -17,38 +17,37 @@ const {
 const input = path.join(APP_SRC_DIRNAME, `${APP_FILENAME}.ts`)
 const output = path.join(APP_BUILD_DIRNAME, `${APP_BUILD_FILENAME}`)
 
-const rollupConfig = [
-	{
-		input,
-		output: [{ file: `${output}.js`, format: 'cjs' }],
-		plugins: [
-			del({ targets: `${APP_BUILD_DIRNAME}/*` }),
-			alias({
-				entries: [
-					{
-						find: '@utilities',
-						replacement: path.resolve(__dirname, 'src/utilities/index'),
-					},
-					{
-						find: '@types',
-						replacement: path.resolve(__dirname, 'types/index'),
-					},
-				],
-			}),
-			typescript(),
-		],
-	},
-]
+const rollupConfig = {
+	input,
+	output: [{ file: `${output}.js`, format: 'cjs', exports: 'named' }],
+	plugins: [
+		del({ targets: `${APP_BUILD_DIRNAME}/*` }),
+		alias({
+			entries: [
+				{
+					find: '@types',
+					replacement: path.resolve(__dirname, 'types/index'),
+				},
+			],
+		}),
+		typescript(),
+	],
+}
 
 if (NODE_ENV === 'production') {
-	rollupConfig[0].output.push(
+	rollupConfig.output.push(
 		...[
-			{ file: `${output}.esm.js`, format: 'esm' },
-			{ file: `${output}.umd.js`, format: 'umd', name: APP_BUILD_UMD_NAME },
+			{ file: `${output}.esm.js`, format: 'esm', exports: 'named' },
+			{
+				file: `${output}.umd.js`,
+				format: 'umd',
+				exports: 'named',
+				name: APP_BUILD_UMD_NAME,
+			},
 		]
 	)
 
-	rollupConfig[0].plugins.push(
+	rollupConfig.plugins.push(
 		babel({
 			babelHelpers: 'bundled',
 			exclude: 'node_modules/**',
