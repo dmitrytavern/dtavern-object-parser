@@ -24,10 +24,10 @@ export const parsePropertiesObject = <Properties>(
 		let propertyValue = properties[propertyKey]
 		let propertyExists = hasOwn(properties, propertyKey)
 
-		/**
-		 * If property setting is null, skip other checkers
-		 */
-		if (propertySetting === null) continue
+		if (propertySetting === null) {
+			if (!propertyExists) throw `option "${propertyKey}" not exists`
+			continue
+		}
 
 		/**
 		 * If property setting is object, and this object have no

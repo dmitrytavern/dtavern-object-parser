@@ -65,7 +65,10 @@ describe('Plugin settings as object', () => {
 
 	it('property have any type', () => {
 		const object = defineOptions({ anyType: undefined }, { anyType: null })
+		const fn = () => defineOptions({}, { anyType: null })
+
 		expect(object).toEqual({ anyType: undefined })
+		expect(fn).toThrow()
 	})
 })
 
