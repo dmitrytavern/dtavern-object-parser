@@ -19,7 +19,9 @@ export function defineOptions<Props, Return extends Required<Props>>(
 		if (isArray(properties) || !isObject(properties))
 			throw 'the first argument is not an object. Please, use the type of object'
 
-		return parseProperties(properties, propertiesSettings)
+		const props = config && config.clone ? { ...properties } : properties
+
+		return parseProperties(props, propertiesSettings)
 	} catch (e) {
 		errorLog(e, config ? config.mode : 'strict')
 	}

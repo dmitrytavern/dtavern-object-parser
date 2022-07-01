@@ -8,3 +8,16 @@ it('Check plugin arguments', () => {
 	expect(() => defineOptions([], ['hello'])).toThrow()
 	expect(() => defineOptions([], {})).toThrow()
 })
+
+it('Check plugin config', () => {
+	const object = {}
+
+	const newObject = defineOptions(
+		object,
+		{ name: { required: false, default: 'hello' } },
+		{ clone: true }
+	)
+
+	expect(object).toEqual({})
+	expect(newObject).toEqual({ name: 'hello' })
+})
