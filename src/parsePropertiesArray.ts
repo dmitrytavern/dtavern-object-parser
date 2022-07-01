@@ -14,12 +14,12 @@ export const parsePropertiesArray = <Properties>(
 
 	if (propertiesSettings.length > 0) {
 		const s = propertiesSettings.join(' | ')
-		throw `options have no "${s}" properties`
+		throw `options "${s}" not found`
 	}
 
 	if (errorPropertyKeys.length > 0) {
 		const s = errorPropertyKeys.join(' | ')
-		throw `properties "${s}" have not in the settings`
+		throw `settings for "${s}" options not found`
 	}
 
 	return properties as Required<Properties>

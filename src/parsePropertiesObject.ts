@@ -7,6 +7,18 @@ export const parsePropertiesObject = <Properties>(
 	properties: Properties,
 	propertiesSettings: OptionProperties<Properties>
 ): Required<Properties> => {
+	const errorSettingKeys = []
+
+	for (const propertyKey in properties) {
+		if (!hasOwn(propertiesSettings, propertyKey))
+			errorSettingKeys.push(propertyKey)
+	}
+
+	if (errorSettingKeys.length > 0) {
+		const s = errorSettingKeys.join(' | ')
+		throw `settings for "${s}" options not found`
+	}
+
 	for (const propertyKey in propertiesSettings) {
 		const propertySetting = propertiesSettings[propertyKey]
 		let propertyValue = properties[propertyKey]
@@ -23,7 +35,7 @@ export const parsePropertiesObject = <Properties>(
 		 */
 		if (!propertyExists && hasOwn(propertySetting, 'required'))
 			if (propertySetting['required'])
-				throw `property "${propertyKey}" not exists`
+				throw `option "${propertyKey}" not exists`
 
 		/**
 		 * If property not exists, set default value, if it exists
@@ -52,7 +64,7 @@ export const parsePropertiesObject = <Properties>(
 				: (propertySetting as OptionPropertyTypes<any>)
 
 			if (!isEqualConstructor(propertyValue, types))
-				throw `property "${propertyKey}" is not "${propertySetting}" type`
+				throw `option "${propertyKey}" is not "${propertySetting}" type`
 		}
 
 		/**
@@ -63,7 +75,7 @@ export const parsePropertiesObject = <Properties>(
 			isFunction(propertySetting['validator'])
 		) {
 			if (!propertySetting['validator'].call(null, propertyValue))
-				throw `property "${propertyKey}" did not pass the validator. Value: ${propertyValue}`
+				throw `option "${propertyKey}" did not pass the validator. Value: ${propertyValue}`
 		}
 	}
 

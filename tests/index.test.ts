@@ -53,6 +53,11 @@ describe('Plugin settings as object', () => {
 		expect(fn).toThrow()
 	})
 
+	it('property have no settings', () => {
+		const fn = () => defineOptions({ name: 'Dmitry' }, {})
+		expect(fn).toThrow()
+	})
+
 	it('property have some types as array', () => {
 		const object = defineOptions({ age: 13 }, { age: [Number, String] })
 		expect(object).toEqual({ age: 13 })
