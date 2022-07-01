@@ -63,8 +63,13 @@ export const parsePropertiesObject = <Properties>(
 				? (propertySetting as OptionProperty<any>).type
 				: (propertySetting as OptionPropertyTypes<any>)
 
-			if (!isEqualConstructor(propertyValue, types))
-				throw `option "${propertyKey}" is not "${propertySetting}" type`
+			if (!isEqualConstructor(propertyValue, types)) {
+				const constructors = isArray(types)
+					? `[${types.map((x) => x.prototype.constructor.name).join(', ')}]`
+					: types.prototype.constructor.name
+
+				throw `option "${propertyKey}" is not "${constructors}" type`
+			}
 		}
 
 		/**
