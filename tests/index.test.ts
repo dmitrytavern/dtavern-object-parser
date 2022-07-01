@@ -75,9 +75,37 @@ describe('Plugin property settings as object', () => {
 		return { validator: (value) => value === checkValue }
 	}
 
+	it('property setting is empty', () => {
+		const fn = () => defineOptions(opt, { name: {} })
+		expect(fn).toThrow()
+	})
+
 	it('property setting have only type', () => {
 		expect(() => defineOptions(opt, { name: { type: String } })).not.toThrow()
 		expect(() => defineOptions(opt, { name: { type: Number } })).toThrow()
+	})
+
+	it('property setting have null type', () => {
+		const object = defineOptions(opt, { name: { type: null } })
+		expect(object).toEqual(opt)
+	})
+
+	it('property setting have only wrong type', () => {
+		const fn = () => defineOptions(opt, { name: { type: 'hello' } })
+		expect(fn).toThrow()
+	})
+
+	it('property setting have only wrong type as empty array', () => {
+		const fn = () => defineOptions(opt, { name: { type: [] } })
+		expect(fn).toThrow()
+	})
+
+	it('property setting have only wrong type as array', () => {
+		const fn = () =>
+			defineOptions(opt, {
+				name: { type: [Number, 'string', false, undefined] },
+			})
+		expect(fn).toThrow()
 	})
 
 	it('property setting have validator', () => {

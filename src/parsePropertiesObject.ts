@@ -30,6 +30,25 @@ export const parsePropertiesObject = <Properties>(
 		if (propertySetting === null) continue
 
 		/**
+		 * If property setting is object, and this object have no
+		 * type option or type is wrong - throw error
+		 */
+		if (!isArray(propertySetting) && isObject(propertySetting)) {
+			if (!hasOwn(propertySetting, 'type'))
+				throw `setting "${propertyKey}" have no "type" option`
+
+			const type = (propertySetting as OptionProperty<any>).type
+
+			if (type !== null) {
+				const _classes = isArray(type) ? type : [type]
+
+				for (const _class of _classes)
+					if (!isFunction(_class))
+						throw `type of "${propertyKey}" setting have no function type. No-function: ${_class}`
+			}
+		}
+
+		/**
 		 * If property setting have false required option,
 		 * skip checker of exists in properties
 		 */
@@ -63,12 +82,14 @@ export const parsePropertiesObject = <Properties>(
 				? (propertySetting as OptionProperty<any>).type
 				: (propertySetting as OptionPropertyTypes<any>)
 
-			if (!isEqualConstructor(propertyValue, types)) {
-				const constructors = isArray(types)
-					? `[${types.map((x) => x.prototype.constructor.name).join(', ')}]`
-					: types.prototype.constructor.name
+			if (types !== null) {
+				if (!isEqualConstructor(propertyValue, types)) {
+					const constructors = isArray(types)
+						? `[${types.map((x) => x.prototype.constructor.name).join(', ')}]`
+						: types.prototype.constructor.name
 
-				throw `option "${propertyKey}" is not "${constructors}" type`
+					throw `option "${propertyKey}" is not "${constructors}" type`
+				}
 			}
 		}
 
