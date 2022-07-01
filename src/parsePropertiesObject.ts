@@ -24,83 +24,92 @@ export const parsePropertiesObject = <Properties>(
 		let propertyValue = properties[propertyKey]
 		let propertyExists = hasOwn(properties, propertyKey)
 
-		if (propertySetting === null) {
-			if (!propertyExists) throw `option "${propertyKey}" not exists`
-			continue
-		}
+		const type =
+			propertySetting === null
+				? null
+				: isArray(propertySetting)
+				? propertySetting
+				: isObject(propertySetting)
+				? (propertySetting as OptionProperty<any>).type
+				: (propertySetting as OptionPropertyTypes<any>)
+
+		const required =
+			propertySetting !== null && hasOwn(propertySetting, 'required')
+				? propertySetting['required']
+				: true
+
+		const defaultValue =
+			propertySetting !== null && hasOwn(propertySetting, 'default')
+				? propertySetting['default']
+				: null
+
+		const validator =
+			propertySetting !== null && hasOwn(propertySetting, 'validator')
+				? propertySetting['validator']
+				: null
 
 		/**
-		 * If property setting is object, and this object have no
-		 * type option or type is wrong - throw error
+		 * Exists checker
+		 * -------------------------------------------------------
+		 * Checking if property does not exist in options and this
+		 * option is required - throw error.
 		 */
-		if (!isArray(propertySetting) && isObject(propertySetting)) {
-			if (!hasOwn(propertySetting, 'type'))
-				throw `setting "${propertyKey}" have no "type" option`
-
-			const type = (propertySetting as OptionProperty<any>).type
-
-			if (type !== null) {
-				const _classes = isArray(type) ? type : [type]
-
-				for (const _class of _classes)
-					if (!isFunction(_class))
-						throw `type of "${propertyKey}" setting have no function type. No-function: ${_class}`
-			}
-		}
+		if (!propertyExists && required) throw `option "${propertyKey}" not exists`
 
 		/**
-		 * If property setting have false required option,
-		 * skip checker of exists in properties
+		 * Default setter
+		 * -------------------------------------------------------
+		 * Checking If the property does not exist in options,
+		 * set default value, if it exists in the setting
 		 */
-		if (!propertyExists && hasOwn(propertySetting, 'required'))
-			if (propertySetting['required'])
-				throw `option "${propertyKey}" not exists`
-
-		/**
-		 * If property not exists, set default value, if it exists
-		 * in setting
-		 */
-		if (!propertyExists && hasOwn(propertySetting, 'default')) {
-			const settings = propertySetting as OptionProperty<any>
-
-			properties[propertyKey] = isFunction(settings.default)
-				? settings.default.apply(null)
-				: settings.default
+		if (!propertyExists && defaultValue !== null) {
+			properties[propertyKey] = isFunction(defaultValue)
+				? defaultValue.apply(null)
+				: defaultValue
 
 			propertyExists = true
 			propertyValue = properties[propertyKey]
 		}
 
 		/**
-		 * If property exists, check property types form
-		 * setting
+		 * Type option checker
+		 * -------------------------------------------------------
+		 * Checking if the option type does exist in settings and
+		 * check if the type option is correct.
 		 */
-		if (propertyExists) {
-			const types = isArray(propertySetting)
-				? propertySetting
-				: isObject(propertySetting)
-				? (propertySetting as OptionProperty<any>).type
-				: (propertySetting as OptionPropertyTypes<any>)
+		if (type === undefined) {
+			throw `setting "${propertyKey}" have no "type" option`
+		} else if (type !== null) {
+			const _classes = isArray(type) ? type : [type]
 
-			if (types !== null) {
-				if (!isEqualConstructor(propertyValue, types)) {
-					const constructors = isArray(types)
-						? `[${types.map((x) => x.prototype.constructor.name).join(', ')}]`
-						: types.prototype.constructor.name
+			for (const _class of _classes)
+				if (!isFunction(_class))
+					throw `type of "${propertyKey}" setting have no function type. No-function: ${_class}`
+		}
 
-					throw `option "${propertyKey}" is not "${constructors}" type`
-				}
+		/**
+		 * Type checker
+		 * -------------------------------------------------------
+		 * Checking If the property does exist, check property types
+		 * form setting
+		 */
+		if (propertyExists && type !== null) {
+			if (!isEqualConstructor(propertyValue, type)) {
+				const constructors = isArray(type)
+					? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`
+					: type.prototype.constructor.name
+
+				throw `option "${propertyKey}" is not "${constructors}" type`
 			}
 		}
 
 		/**
+		 * Validator
+		 * -------------------------------------------------------
 		 * If setting have custom validator, call this function
 		 */
-		if (
-			hasOwn(propertySetting, 'validator') &&
-			isFunction(propertySetting['validator'])
-		) {
-			if (!propertySetting['validator'].call(null, propertyValue))
+		if (propertyExists && validator !== null) {
+			if (!validator.call(null, propertyValue))
 				throw `option "${propertyKey}" did not pass the validator. Value: ${propertyValue}`
 		}
 	}
