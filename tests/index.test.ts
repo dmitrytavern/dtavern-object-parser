@@ -79,8 +79,8 @@ describe('Plugin property settings as object', () => {
 	}
 
 	it('property setting is empty', () => {
-		const fn = () => defineOptions(opt, { name: {} })
-		expect(fn).toThrow()
+		const object = defineOptions(opt, { name: {} })
+		expect(object).toEqual(opt)
 	})
 
 	it('property setting have only type', () => {

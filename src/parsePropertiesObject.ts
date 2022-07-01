@@ -30,7 +30,7 @@ export const parsePropertiesObject = <Properties>(
 				: isArray(propertySetting)
 				? propertySetting
 				: isObject(propertySetting)
-				? (propertySetting as OptionProperty<any>).type
+				? (propertySetting as OptionProperty<any>).type || null
 				: (propertySetting as OptionPropertyTypes<any>)
 
 		const required =
@@ -74,12 +74,9 @@ export const parsePropertiesObject = <Properties>(
 		/**
 		 * Type option checker
 		 * -------------------------------------------------------
-		 * Checking if the option type does exist in settings and
-		 * check if the type option is correct.
+		 * Checking if the option type is correct.
 		 */
-		if (type === undefined) {
-			throw `setting "${propertyKey}" have no "type" option`
-		} else if (type !== null) {
+		if (type !== null) {
 			const _classes = isArray(type) ? type : [type]
 
 			for (const _class of _classes)
@@ -93,7 +90,7 @@ export const parsePropertiesObject = <Properties>(
 		 * Checking If the property does exist, check property types
 		 * form setting
 		 */
-		if (propertyExists && type !== null) {
+		if (type !== null && propertyExists) {
 			if (!isEqualConstructor(propertyValue, type)) {
 				const constructors = isArray(type)
 					? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`

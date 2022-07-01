@@ -22,7 +22,7 @@ export interface OptionPropertyValidator<T> {
 }
 
 export type OptionProperty<T> = {
-	type: OptionPropertyTypes<T>
+	type?: OptionPropertyTypes<T>
 	default?: OptionPropertyDefault<T>
 	required?: OptionPropertyRequired
 	validator?: OptionPropertyValidator<T>
