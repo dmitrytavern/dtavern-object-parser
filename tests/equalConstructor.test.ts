@@ -46,6 +46,16 @@ describe('Check not primitive constructors', () => {
 		expect(isEqualConstructor({}, Object)).toBeTruthy()
 		expect(isEqualConstructor([], Object)).toBeFalsy()
 	})
+
+	it('Check function constructor', () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		expect(isEqualConstructor(() => {}, Function)).toBeTruthy()
+
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		expect(isEqualConstructor(function () {}, Function)).toBeTruthy()
+
+		expect(isEqualConstructor(class Animal {}, Function)).toBeTruthy()
+	})
 })
 
 describe('Check custom constructors', () => {
