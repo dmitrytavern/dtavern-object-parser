@@ -67,6 +67,7 @@ If you need clone object, use spread operator.
       1. [Type option checker](#3-type-option-checker)
       1. [Type checker](#4-type-checker)
       1. [Validator](#5-validator)
+1. [Using typescript](#using-typescript)
 
 ## **Settings as array**
 
@@ -259,6 +260,40 @@ If the validator does exist in options, the script calls it.
 If the validator returns `true` - the script moves to the
 next property or ends work. But if returns `false` - this
 will result in an error
+
+## **Using typescript**
+
+If you using typescript, you can use generic type in plugin:
+
+```ts
+defineOptions<Options, Return>(options: Options, settings): Return;
+```
+
+Example:
+
+```ts
+import { defineOptions } from '@dtavern/options'
+
+interface Options {
+	name?: string
+}
+
+function someFunction(options: Options = {}) {
+	// Returns { name: 'hello' }
+	const newOptions = defineOptions<Options>(options, {
+		name: {
+			type: String,
+			required: false,
+			default: 'Dmitry',
+		},
+	})
+
+	// Valid
+	console.log(newOptions.name)
+}
+
+someFunction()
+```
 
 # **License**
 

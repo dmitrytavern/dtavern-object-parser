@@ -3,11 +3,11 @@ import { isObject, isArray } from './utils'
 import { parseProperties } from './parseProperties'
 import { errorLog } from './errorLog'
 
-export function defineOptions<Properties>(
-	properties: Properties,
-	propertiesSettings: OptionSettings<Properties>,
+export function defineOptions<Props, Return extends Required<Props>>(
+	properties: Props,
+	propertiesSettings: OptionSettings<Props>,
 	config?: Config
-): Required<Properties> {
+): Return {
 	try {
 		if (!(properties && propertiesSettings))
 			throw (

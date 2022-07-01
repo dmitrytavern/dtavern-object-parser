@@ -3,10 +3,10 @@ import { isArray, isObject } from './utils'
 import { parsePropertiesArray } from './parsePropertiesArray'
 import { parsePropertiesObject } from './parsePropertiesObject'
 
-export const parseProperties = <Properties>(
-	properties: Properties,
-	propertiesSettings: OptionSettings<Properties>
-): Required<Properties> => {
+export const parseProperties = <Props, Return = Required<Props>>(
+	properties: Props,
+	propertiesSettings: OptionSettings<Props>
+): Return => {
 	if (isArray(propertiesSettings)) {
 		// @ts-ignore
 		return parsePropertiesArray(properties, propertiesSettings)

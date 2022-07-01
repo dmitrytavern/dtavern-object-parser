@@ -3,10 +3,10 @@ import { OptionProperties, OptionProperty, OptionPropertyTypes } from '@types'
 import { hasOwn, isFunction, isArray, isObject } from './utils'
 import { isEqualConstructor } from './isEqualConstructor'
 
-export const parsePropertiesObject = <Properties>(
-	properties: Properties,
-	propertiesSettings: OptionProperties<Properties>
-): Required<Properties> => {
+export const parsePropertiesObject = <Props, Return = Required<Props>>(
+	properties: Props,
+	propertiesSettings: OptionProperties<Props>
+): Return => {
 	const errorSettingKeys = []
 
 	for (const propertyKey in properties) {
@@ -111,5 +111,6 @@ export const parsePropertiesObject = <Properties>(
 		}
 	}
 
-	return properties as Required<Properties>
+	// @ts-ignore
+	return properties as Return
 }

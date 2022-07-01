@@ -1,7 +1,7 @@
-export const parsePropertiesArray = <Properties>(
-	properties: Properties,
+export const parsePropertiesArray = <Props, Return = Required<Props>>(
+	properties: Props,
 	propertiesSettings: string[]
-): Required<Properties> => {
+): Return => {
 	const errorPropertyKeys = []
 
 	for (const propertyKey in properties) {
@@ -22,5 +22,6 @@ export const parsePropertiesArray = <Properties>(
 		throw `settings for "${s}" options not found`
 	}
 
-	return properties as Required<Properties>
+	// @ts-ignore
+	return properties as Return
 }

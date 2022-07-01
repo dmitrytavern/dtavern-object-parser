@@ -44,8 +44,8 @@ export interface Config {
 	mode?: ConfigMode
 }
 
-export function defineOptions<Properties>(
+export function defineOptions<Properties, Return = Required<Properties>>(
 	properties: Properties,
 	propertiesSettings: OptionSettings<Properties>,
 	config?: Config
-): Required<Properties>
+): Return
