@@ -1,10 +1,12 @@
-import { OptionSettings } from '@types'
+import { Config, OptionSettings } from '@types'
 import { isObject, isArray } from './utils'
 import { parseProperties } from './parseProperties'
+import { errorLog } from './errorLog'
 
 export function defineOptions<Properties>(
 	properties: Properties,
-	propertiesSettings: OptionSettings<Properties>
+	propertiesSettings: OptionSettings<Properties>,
+	config?: Config
 ): Required<Properties> {
 	try {
 		if (!(properties && propertiesSettings))
@@ -19,7 +21,7 @@ export function defineOptions<Properties>(
 
 		return parseProperties(properties, propertiesSettings)
 	} catch (e) {
-		throw new Error(e)
+		errorLog(e, config ? config.mode : 'strict')
 	}
 }
 

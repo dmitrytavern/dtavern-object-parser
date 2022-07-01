@@ -39,7 +39,13 @@ export type OptionSettings<Properties> =
 	| (keyof Properties)[]
 	| OptionProperties<Properties>
 
+export type ConfigMode = 'strict' | 'log' | 'disabled'
+export interface Config {
+	mode?: ConfigMode
+}
+
 export function defineOptions<Properties>(
 	properties: Properties,
-	settings: OptionSettings<Properties>
+	propertiesSettings: OptionSettings<Properties>,
+	config?: Config
 ): Required<Properties>
