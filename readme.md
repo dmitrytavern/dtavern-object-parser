@@ -1,14 +1,14 @@
 # JS Options Parser
 
 A very light-weight options parser for node or web. How props in
-vue.js. With:
+vue.js. Includes:
 
-- **Exists checker**
-- **Type checker**
+- **Checking for options existence**
+- **Checking for options types**
+- **Default value setter**
 - **Custom validator**
-- **Default setter**
 
-## Usage
+## **Usage**
 
 ```
 npm i @dtavern/options
@@ -17,31 +17,61 @@ npm i @dtavern/options
 ```js
 const { defineOptions } = require('@dtavern/options')
 
-class Animal {
-	constructor(options) {
-		defineOptions(options, {
-			name: String,
-		})
+function someFunction(options) {
+	defineOptions(options, {
+		name: String,
+		age: [String, Number],
+		colors: {
+			type: Array,
+			required: false,
+			default: () => ['red', 'blue'],
+			validator: (value) => value.length > 0,
+		},
+	})
 
-		console.log(options)
-	}
+	console.log(options)
 }
 
-new Animal({
+someFunction({
 	name: 'Rocket',
+	age: '17',
 })
 
-// output: {name: 'Rocket'}
+/* Output:
+{
+	name: 'Rocket',
+	age: '17',
+	colors: ['red', 'blue']
+}
+*/
 ```
 
-How you can see, `defineOptions` **overwrite original object**. If you need
-clone object, use spread operator.
+How you can see, `defineOptions` **overwrite original object**.
+If you need clone object, use spread operator.
 
-## API
+# Documentation
 
-### **Settings as array**
+## **Table of Contents**
 
-If you need to use only existing checkers, you can use settings as an array.
+1. [Set plugin settings as array](#settings-as-array)
+1. [Set plugin settings as object](#settings-as-object)
+1. [Set options settings as object](#options-settings-as-object)
+   1. [Option setting API](#option-setting-api)
+      1. [type](#type)
+      1. [required](#required)
+      1. [default](#default)
+      1. [validator](#validator)
+   1. [Checkers execution order](#checkers-execution-order)
+      1. [Exists checker](#1-exists-checker)
+      1. [Default setter](#2-default-setter)
+      1. [Type option checker](#3-type-option-checker)
+      1. [Type checker](#4-type-checker)
+      1. [Validator](#5-validator)
+
+## **Settings as array**
+
+If you need to use only existing checkers, you can use settings
+as an array.
 
 Example:
 
@@ -58,10 +88,10 @@ defineOptions({ name: 'any type' }, [])
 defineOptions({ name: 'any type' }, ['name'])
 ```
 
-### **Settings as object**
+## **Settings as object**
 
-If you need to use checkers of existing and typing, you can use settings
-as an object.
+If you need to use checkers of existing and typing, you can
+use settings as an object.
 
 Example:
 
@@ -80,9 +110,10 @@ defineOptions({ _null: 17 }, { _null: null })
 
 You need to use **classes** as the value of settings.
 
-### **Option settings as object**
+## **Options settings as object**
 
-if you need more fine tuning you can use option settings as object.
+if you need more fine tuning you can use option settings as
+object.
 
 Example:
 
@@ -103,16 +134,23 @@ defineOptions(
 )
 ```
 
-Options:
+### **Option setting API**
 
 #### **type**
 
-Type: `class` | `array` of classes\
+Type: `class` | `array` of Classes | `null`\
 Default: `null`
 
-Use for checking property value with the class constructor.
+Use for checking property value on the class constructor.
+
+Note: If the type is `null` - this property will skip **only**
+type checking. But if your options have no this property -
+this will result in an error. To prevent it use the `required`
+option.
 
 ```js
+name: {} // skip type checker
+
 name: {
   type: String,
 }
@@ -134,32 +172,31 @@ throw error will not happen
 
 ```js
 root: {
-  type: Boolean,
-  required: false
+	required: false
 }
 ```
 
 #### **default**
 
 Type: `function` | `any`\
+Arguments: `null`\
+Returns: `any`\
 Default: `null`
 
-If required is false and properties have no needs key, you can
-set default value. It can be both primitives and objects.
+If required is false and properties have no needs key, you
+can set a default value. It can be both primitives and objects.
 
-Note: for objects, I recommend using the function. Also, if
-the default the value will not be the correct type or if the
-validator doesn't miss it, this will result in an error.
+Note: for objects, I recommend using the function. Also,
+if the default value will not be the correct type or if
+the validator doesn't miss it, this will result in an error.
 
 ```js
 color: {
-  type: String,
   required: false,
   default: 'red'
 }
 
 colors: {
-  type: Array,
   required: false,
   default: () => ['red', 'blue']
 }
@@ -172,14 +209,59 @@ Arguments: `(value: any)`\
 Returns: `boolean`\
 Default: `null`
 
-If you need to check property value to allowable values, you
-can use custom validator.
+If you need to check property value to allowable values,
+you can use a custom validator.
 
 ```js
 colors: {
-  type: String,
   required: false,
   default: () => 'red',
   validator: (value) => ['red', 'blue'].includes(value)
 }
 ```
+
+### **Checkers execution order**
+
+If you use settings as object, script complicates option checking.
+
+#### **1. Exists checker**
+
+The script checks if a property does exist in options and
+is it necessary.
+
+If the property does not exist but the setting `required`
+is `false` verification will be completed successfully.
+Otherwise, it will result in an error.
+
+#### **2. Default setter**
+
+The script checks if a property does not exist in options
+and has its default value.
+
+If the property does not exist, the script set the default
+value if it exists.
+
+#### **3. Type option checker**
+
+Before the type checker, the script checks if the type input
+is correct in the setting. If the type is `null` - skip,
+if another type - check.
+
+#### **4. Type checker**
+
+The script checks the property value on the correct type if
+the type does not equal to `null` and the property does exist
+in options.
+
+#### **5. Validator**
+
+If the validator does exist in options, the script calls it.
+If the validator returns `true` - the script moves to the
+next property or ends work. But if returns `false` - this
+will result in an error
+
+# **License**
+
+MIT - check repo files
+
+Copyright (c) 2022-present, Dmitry Tavern
