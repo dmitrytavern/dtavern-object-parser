@@ -24,6 +24,11 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		let propertyValue = properties[propertyKey]
 		let propertyExists = hasOwn(properties, propertyKey)
 
+		if (!isArray(propertySetting) && isObject(propertySetting))
+			for (const key of Object.keys(propertySetting))
+				if (!['type', 'required', 'default', 'validator'].includes(key))
+					throw `unknown setting key "${key}" in "${propertyKey}"`
+
 		const type =
 			propertySetting === null
 				? null

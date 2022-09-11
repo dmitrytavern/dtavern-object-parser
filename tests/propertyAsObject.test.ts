@@ -162,3 +162,20 @@ describe('Check property default of setting option', () => {
 		expect(object).toEqual({ name: { test: true } })
 	})
 })
+
+it('Check unknown object key', () => {
+	const fn = () =>
+		defineOptions(
+			{
+				name: 'Hello',
+			},
+			{
+				name: {
+					type: String,
+					require: true,
+				},
+			}
+		)
+
+	expect(fn).toThrow()
+})
