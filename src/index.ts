@@ -3,6 +3,8 @@ import { isObject, isArray } from './utils'
 import { parseProperties } from './parseProperties'
 import { errorLog } from './errorLog'
 
+export { AsyncFunction } from './isEqualConstructor'
+
 export function defineOptions<Props, Return extends Required<Props>>(
 	properties: Props,
 	propertiesSettings: OptionSettings<Props>,

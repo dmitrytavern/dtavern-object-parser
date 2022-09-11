@@ -1,4 +1,4 @@
-import { isEqualConstructor } from '../src/isEqualConstructor'
+import { isEqualConstructor, AsyncFunction } from '../src/isEqualConstructor'
 
 describe('Check primitive constructors', () => {
 	it('Check string constructor', () => {
@@ -51,8 +51,28 @@ describe('Check not primitive constructors', () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		expect(isEqualConstructor(() => {}, Function)).toBeTruthy()
 
+		expect(
+			isEqualConstructor(new Function(`return async () => {}`)(), Function)
+		).toBeFalsy()
+		expect(
+			isEqualConstructor(new Function(`return async () => {}`)(), AsyncFunction)
+		).toBeTruthy()
+
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		expect(isEqualConstructor(function () {}, Function)).toBeTruthy()
+
+		expect(
+			isEqualConstructor(
+				new Function(`return async function () {}`)(),
+				Function
+			)
+		).toBeFalsy()
+		expect(
+			isEqualConstructor(
+				new Function(`return async function () {}`)(),
+				AsyncFunction
+			)
+		).toBeTruthy()
 
 		expect(isEqualConstructor(class Animal {}, Function)).toBeTruthy()
 	})

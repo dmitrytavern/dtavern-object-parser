@@ -163,9 +163,19 @@ name: {
 age: {
   type: [String, Number],
 }
+
+someAsyncFunction: {
+  type: AsyncFunction
+}
 ```
 
-You can use any classes.
+You can use any classes. If you use the async function, import constructor form lib:
+
+```js
+const { AsyncFunction } = require('@dtavern/options')
+```
+
+**Note for async:** babel converting your async function to the simple function which returns Promise. If you use babel on your project, use **[Function, AsyncFunction]** for type option. For dev - AsyncFunction, for bundle - Function.
 
 #### **required**
 

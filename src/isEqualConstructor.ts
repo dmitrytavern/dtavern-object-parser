@@ -2,6 +2,9 @@
 import { OptionPropertyTypes } from '@types'
 import { isArray } from './utils'
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const AsyncFunction = new Function(`return async () => {}`)().constructor
+
 export const isEqualConstructor = (
 	propertyValue: any,
 	types: OptionPropertyTypes<any>
