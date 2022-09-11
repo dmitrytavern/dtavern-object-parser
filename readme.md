@@ -7,6 +7,7 @@ vue.js. Includes:
 - **Checking for options types**
 - **Default value setter**
 - **Custom validator**
+- **No dependencies**
 
 ## **Usage**
 
@@ -71,6 +72,7 @@ in config.
 1. [Config API](#config-api)
    1. [mode](#mode)
    1. [clone](#clone)
+1. [Nested objects](#nested-objects)
 1. [Using typescript](#using-typescript)
 
 ## **Settings as array**
@@ -103,8 +105,8 @@ Example:
 ```js
 const { defineOptions } = require('@dtavern/options')
 
-// Returns { name: 'any type' }
-defineOptions({ name: 'any type' }, { name: String })
+// Returns { name: 'only string type' }
+defineOptions({ name: 'only string type' }, { name: String })
 
 // Returns { age: 17 }
 defineOptions({ age: 17 }, { age: [String, Number] })
@@ -314,6 +316,64 @@ const newObject = defineOptions(
 
 console.log(originalObject) // Returns: {}
 console.log(newObject) // Returns: { name: 'Dmitry' }
+```
+
+## **Nested objects**
+
+When you have a difficult object, use:
+
+```js
+const difficultObjects = {
+  user: {
+    name: 'Dmitry',
+    age: 20,
+    tags: {
+      public: ['developer'],
+      private: []
+    }
+  },
+  some: {
+    function: () => {},
+  }
+}
+
+defineOptions(difficultObjects, {
+  user: Object,
+  some: Object,
+})
+defineOptions(difficultObjects.user, {
+  name: String,
+  age: [Number, String],
+  tags: Object
+})
+defineOptions(difficultObjects.user.tags, {
+  public: Array,
+  private: Array,
+})
+defineOptions(difficultObjects.some, {
+  function: Function,
+  test: {
+    type: String,
+    required: false,
+    default: 'hello_world'
+  }
+})
+
+// Returns:
+// {
+//  user: {
+//    name: 'Dmitry', 
+//    age: 20,
+//    tags: {
+//      public: [Array],
+//      private: []
+//    }
+//  },
+//  some: {
+//    function: [Function: function],
+//    test: 'hello_world'
+//  }
+// }
 ```
 
 ## **Using typescript**
