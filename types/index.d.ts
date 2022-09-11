@@ -45,8 +45,15 @@ export interface Config {
 	clone?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
+
+export const AsyncFunction: AsyncFunctionType
+
 export function defineOptions<Properties, Return = Required<Properties>>(
 	properties: Properties,
 	propertiesSettings: OptionSettings<Properties>,
 	config?: Config
 ): Return
+
+export default defineOptions

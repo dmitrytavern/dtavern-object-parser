@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { OptionPropertyTypes } from '@types'
+import { OptionPropertyTypes, AsyncFunctionType } from '@types'
 import { isArray } from './utils'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-export const AsyncFunction = new Function(`return async () => {}`)().constructor
+export const AsyncFunction: AsyncFunctionType = new Function(
+	`return async () => {}`
+)().constructor
 
 export const isEqualConstructor = (
 	propertyValue: any,
