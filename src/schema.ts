@@ -9,6 +9,14 @@ export const schemaProperty = <Type>(
 	if (hasOwn(schemaPropertySettings, settingsFlagName))
 		throw 'Object already have settings flag name'
 
+	for (const key of Object.keys(schemaPropertySettings))
+		if (
+			!['type', 'required', 'default', 'validator', settingsFlagName].includes(
+				key
+			)
+		)
+			throw `unknown Schema key "${key}"`
+
 	schemaPropertySettings[settingsFlagName] = true
 
 	return schemaPropertySettings

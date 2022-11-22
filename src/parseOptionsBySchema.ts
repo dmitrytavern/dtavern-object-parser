@@ -5,8 +5,8 @@ import {
 	SchemaPropertyTypes,
 } from '@types'
 import { hasOwn, isFunction, isArray, isObject } from './utils'
-import { isSchemaProperty, settingsFlagName } from './schema'
 import { isEqualConstructor } from './isEqualConstructor'
+import { isSchemaProperty } from './schema'
 
 export const parseOptionsBySchema = <Options, Return = Required<Options>>(
 	options: Options,
@@ -37,18 +37,6 @@ export const parseOptionsBySchema = <Options, Return = Required<Options>>(
 				parseOptionsBySchema(optionValue, propertySchema as any)
 				continue
 			}
-
-			for (const key of Object.keys(propertySchema))
-				if (
-					![
-						'type',
-						'required',
-						'default',
-						'validator',
-						settingsFlagName,
-					].includes(key)
-				)
-					throw `unknown Schema key "${key}" in "${schemaKey}"`
 		}
 
 		const type =
