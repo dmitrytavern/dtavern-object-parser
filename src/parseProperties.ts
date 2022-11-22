@@ -1,19 +1,19 @@
-import { OptionSettings } from '@types'
+import { Schema } from '@types'
 import { isArray, isObject } from './utils'
 import { parsePropertiesArray } from './parsePropertiesArray'
 import { parsePropertiesObject } from './parsePropertiesObject'
 
 export const parseProperties = <Props, Return = Required<Props>>(
 	properties: Props,
-	propertiesSettings: OptionSettings<Props>
+	propertiesSchema: Schema<Props>
 ): Return => {
-	if (isArray(propertiesSettings)) {
+	if (isArray(propertiesSchema)) {
 		// @ts-ignore
-		return parsePropertiesArray(properties, propertiesSettings)
+		return parsePropertiesArray(properties, propertiesSchema)
 	}
 
-	if (isObject(propertiesSettings)) {
-		return parsePropertiesObject(properties, propertiesSettings)
+	if (isObject(propertiesSchema)) {
+		return parsePropertiesObject(properties, propertiesSchema)
 	}
 
 	throw 'the second argument is not an object or array'

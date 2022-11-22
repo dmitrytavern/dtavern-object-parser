@@ -7,11 +7,25 @@ describe('Check plugin settings as object', () => {
 				name: 'Dmitry',
 				age: 13,
 				root: false,
+				contacts: {
+					email: {
+						name: 'helloworld',
+						domain: 'gmail.com',
+					},
+					twitter: false,
+				},
 			},
 			{
 				name: String,
 				age: Number,
 				root: Boolean,
+				contacts: {
+					email: {
+						name: String,
+						domain: String,
+					},
+					twitter: [Boolean, String],
+				},
 			}
 		)
 
@@ -19,6 +33,13 @@ describe('Check plugin settings as object', () => {
 			name: 'Dmitry',
 			age: 13,
 			root: false,
+			contacts: {
+				email: {
+					name: 'helloworld',
+					domain: 'gmail.com',
+				},
+				twitter: false,
+			},
 		})
 	})
 

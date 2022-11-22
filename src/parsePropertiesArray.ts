@@ -1,19 +1,19 @@
 export const parsePropertiesArray = <Props, Return = Required<Props>>(
 	properties: Props,
-	propertiesSettings: string[]
+	propertiesSchema: string[]
 ): Return => {
 	const errorPropertyKeys = []
 
 	for (const propertyKey in properties) {
-		const index = propertiesSettings.indexOf(propertyKey)
+		const index = propertiesSchema.indexOf(propertyKey)
 
 		if (index === -1) errorPropertyKeys.push(propertyKey)
 
-		propertiesSettings.splice(index, 1)
+		propertiesSchema.splice(index, 1)
 	}
 
-	if (propertiesSettings.length > 0) {
-		const s = propertiesSettings.join(' | ')
+	if (propertiesSchema.length > 0) {
+		const s = propertiesSchema.join(' | ')
 		throw `options "${s}" not found`
 	}
 

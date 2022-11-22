@@ -1,43 +1,42 @@
-export type OptionPropertyRequired = boolean
+export type SchemaPropertyRequired = boolean
 
-export type OptionPropertyConstructor<T> =
+export type SchemaPropertyConstructor<T> =
 	| { (): T }
 	| { new (...args: never[]): T & object }
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	| { new (...args: string[]): any }
 
-export type OptionPropertyTypes<T> =
+export type SchemaPropertyTypes<T> =
 	| null
-	| OptionPropertyConstructor<T>
-	| OptionPropertyConstructor<T>[]
+	| SchemaPropertyConstructor<T>
+	| SchemaPropertyConstructor<T>[]
 
-export type OptionPropertyDefault<T> =
+export type SchemaPropertyDefault<T> =
 	| T
 	| null
 	| undefined
 	| (() => T | null | undefined)
 
-export interface OptionPropertyValidator<T> {
+export interface SchemaPropertyValidator<T> {
 	(value: T): boolean
 }
 
-export type OptionProperty<T> = {
-	type?: OptionPropertyTypes<T>
-	default?: OptionPropertyDefault<T>
-	required?: OptionPropertyRequired
-	validator?: OptionPropertyValidator<T>
+export type SchemaPropertySettings<T> = {
+	type?: SchemaPropertyTypes<T>
+	default?: SchemaPropertyDefault<T>
+	required?: SchemaPropertyRequired
+	validator?: SchemaPropertyValidator<T>
 }
 
-export type OptionProperties<Properties> = {
-	[Property in keyof Properties]:
-		| OptionPropertyTypes<Properties[Property]>
-		| OptionProperty<Properties[Property]>
-}
+export type SchemaProperty<Property> = SchemaPropertyTypes<Property>
 
-export type OptionSettings<Properties> =
+export type SchemaObject<Properties> = {
+	[Property in keyof Properties]: SchemaProperty<Property>
+}
+export type Schema<Properties> =
 	| string[]
 	| (keyof Properties)[]
-	| OptionProperties<Properties>
+	| SchemaObject<Properties>
 
 export type ConfigMode = 'strict' | 'log' | 'disabled'
 export interface Config {
@@ -50,9 +49,13 @@ export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
 
 export const AsyncFunction: AsyncFunctionType
 
+export function schemaProperty<Type>(
+	schemaPropertySettings: SchemaPropertySettings<Type>
+): SchemaPropertySettings<Type>
+
 export function defineOptions<Properties, Return = Required<Properties>>(
 	properties: Properties,
-	propertiesSettings: OptionSettings<Properties>,
+	propertiesSchema: Schema<Properties>,
 	config?: Config
 ): Return
 

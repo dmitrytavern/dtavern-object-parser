@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { OptionPropertyTypes, AsyncFunctionType } from '@types'
+import { SchemaPropertyTypes, AsyncFunctionType } from '@types'
 import { isArray } from './utils'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -9,7 +9,7 @@ export const AsyncFunction: AsyncFunctionType = new Function(
 
 export const isEqualConstructor = (
 	propertyValue: any,
-	types: OptionPropertyTypes<any>
+	types: SchemaPropertyTypes<any>
 ): boolean => {
 	const _classes = isArray(types) ? types : [types]
 	let equals = false

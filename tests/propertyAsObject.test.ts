@@ -1,42 +1,46 @@
-import { defineOptions } from '../dist'
+import { defineOptions, schemaProperty } from '../dist'
 
 describe('Check property types of setting option', () => {
 	const opt = { name: 'Dmitry' }
 
 	it('type not found', () => {
-		const object = defineOptions(opt, { name: {} })
+		const object = defineOptions(opt, { name: schemaProperty({}) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type is correct', () => {
-		const object = defineOptions(opt, { name: { type: String } })
+		const object = defineOptions(opt, {
+			name: schemaProperty({ type: String }),
+		})
 		expect(object).toEqual(opt)
 	})
 
 	it('type is wrong', () => {
-		const fn = () => defineOptions(opt, { name: { type: Number } })
+		const fn = () =>
+			defineOptions(opt, { name: schemaProperty({ type: Number }) })
 		expect(fn).toThrow()
 	})
 
 	it('type is null', () => {
-		const object = defineOptions(opt, { name: { type: null } })
+		const object = defineOptions(opt, { name: schemaProperty({ type: null }) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type value is wrong', () => {
-		const fn = () => defineOptions(opt, { name: { type: 'hello' } })
+		const fn = () =>
+			defineOptions(opt, { name: schemaProperty({ type: 'hello' }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is empty array', () => {
-		const fn = () => defineOptions(opt, { name: { type: [] } })
+		const fn = () => defineOptions(opt, { name: schemaProperty({ type: [] }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is array with wrong values', () => {
 		const fn = () =>
 			defineOptions(opt, {
-				name: { type: [Number, 'string', false, undefined] },
+				name: schemaProperty({ type: [Number, 'string', false, undefined] }),
 			})
 		expect(fn).toThrow()
 	})
@@ -50,7 +54,7 @@ describe('Check property validator of setting option', () => {
 
 	it('validator returns true', () => {
 		const object = defineOptions(opt, {
-			name: { ...setValidator('Dmitry') },
+			name: schemaProperty({ ...setValidator('Dmitry') }),
 		})
 
 		expect(object).toEqual(opt)
@@ -59,7 +63,7 @@ describe('Check property validator of setting option', () => {
 	it('validator returns false', () => {
 		const fn1 = () =>
 			defineOptions(opt, {
-				name: { ...setValidator('Other name') },
+				name: schemaProperty({ ...setValidator('Other name') }),
 			})
 
 		expect(fn1).toThrow()
@@ -68,19 +72,23 @@ describe('Check property validator of setting option', () => {
 
 describe('Check property required of setting option', () => {
 	it('required setting is false', () => {
-		const object = defineOptions({}, { name: { required: false } })
+		const object = defineOptions(
+			{},
+			{ name: schemaProperty({ required: false }) }
+		)
 		expect(object).toEqual({})
 	})
 
 	it('required setting is true', () => {
-		const fn = () => defineOptions({}, { name: { required: true } })
+		const fn = () =>
+			defineOptions({}, { name: schemaProperty({ required: true }) })
 		expect(fn).toThrow()
 	})
 })
 
 describe('Check property default of setting option', () => {
 	const settings1 = {
-		name: { required: false, default: 'hello world' },
+		name: schemaProperty({ required: false, default: 'hello world' }),
 	}
 
 	it('property does not exist', () => {
@@ -97,13 +105,13 @@ describe('Check property default of setting option', () => {
 		const object = defineOptions(
 			{},
 			{
-				name: {
+				name: schemaProperty({
 					type: Object,
 					required: false,
 					default: () => {
 						return { test: true }
 					},
-				},
+				}),
 			}
 		)
 		expect(object).toEqual({ name: { test: true } })
@@ -114,13 +122,13 @@ describe('Check property default of setting option', () => {
 			defineOptions(
 				{},
 				{
-					name: {
+					name: schemaProperty({
 						type: Array,
 						required: false,
 						default: () => {
 							return { test: true }
 						},
-					},
+					}),
 				}
 			)
 		expect(fn).toThrow()
@@ -131,7 +139,7 @@ describe('Check property default of setting option', () => {
 			defineOptions(
 				{},
 				{
-					name: {
+					name: schemaProperty({
 						required: false,
 						default: () => {
 							return { test: true }
@@ -139,7 +147,7 @@ describe('Check property default of setting option', () => {
 						validator: (value: { test: boolean }) => {
 							return value.test === false
 						},
-					},
+					}),
 				}
 			)
 
@@ -150,12 +158,12 @@ describe('Check property default of setting option', () => {
 		const object = defineOptions(
 			{},
 			{
-				name: {
+				name: schemaProperty({
 					required: false,
 					default: {
 						test: true,
 					},
-				},
+				}),
 			}
 		)
 
@@ -170,10 +178,10 @@ it('Check unknown object key', () => {
 				name: 'Hello',
 			},
 			{
-				name: {
+				name: schemaProperty({
 					type: String,
 					require: true,
-				},
+				}),
 			}
 		)
 

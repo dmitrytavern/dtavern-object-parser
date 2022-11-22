@@ -1,17 +1,19 @@
-import { Config, OptionSettings } from '@types'
+import { Config, Schema } from '@types'
 import { isObject, isArray } from './utils'
 import { parseProperties } from './parseProperties'
 import { errorLog } from './errorLog'
 
 export { AsyncFunction } from './isEqualConstructor'
 
+export { schemaProperty } from './schema'
+
 export function defineOptions<Props, Return extends Required<Props>>(
 	properties: Props,
-	propertiesSettings: OptionSettings<Props>,
+	propertiesSchema: Schema<Props>,
 	config?: Config
 ): Return {
 	try {
-		if (!(properties && propertiesSettings))
+		if (!(properties && propertiesSchema))
 			throw (
 				'first or second argument is not defined. ' +
 				'The first argument must be an object and the ' +
@@ -23,7 +25,7 @@ export function defineOptions<Props, Return extends Required<Props>>(
 
 		const props = config && config.clone ? { ...properties } : properties
 
-		return parseProperties(props, propertiesSettings)
+		return parseProperties(props, propertiesSchema)
 	} catch (e) {
 		errorLog(e, config ? config.mode : 'strict')
 	}

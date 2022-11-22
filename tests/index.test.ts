@@ -1,4 +1,4 @@
-import { defineOptions } from '../dist'
+import { defineOptions, schemaProperty } from '../dist'
 
 it('Check plugin arguments', () => {
 	expect(() => defineOptions()).toThrow()
@@ -14,7 +14,7 @@ it('Check plugin config', () => {
 
 	const newObject = defineOptions(
 		object,
-		{ name: { required: false, default: 'hello' } },
+		{ name: schemaProperty({ required: false, default: 'hello' }) },
 		{ clone: true }
 	)
 

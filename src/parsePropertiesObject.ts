@@ -1,56 +1,79 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { OptionProperties, OptionProperty, OptionPropertyTypes } from '@types'
+import {
+	SchemaObject,
+	SchemaPropertySettings,
+	SchemaPropertyTypes,
+} from '@types'
 import { hasOwn, isFunction, isArray, isObject } from './utils'
+import { isSchemaProperty, settingsFlagName } from './schema'
 import { isEqualConstructor } from './isEqualConstructor'
 
 export const parsePropertiesObject = <Props, Return = Required<Props>>(
 	properties: Props,
-	propertiesSettings: OptionProperties<Props>
+	propertiesSchemas: SchemaObject<Props>
 ): Return => {
-	const errorSettingKeys = []
+	const errorSchemaKeys = []
+
+	if (isArray(properties)) throw `Object is array, but need object`
+
+	if (!isObject(properties)) throw `Object is not object. Value: ${properties}`
 
 	for (const propertyKey in properties) {
-		if (!hasOwn(propertiesSettings, propertyKey))
-			errorSettingKeys.push(propertyKey)
+		if (!hasOwn(propertiesSchemas, propertyKey))
+			errorSchemaKeys.push(propertyKey)
 	}
 
-	if (errorSettingKeys.length > 0) {
-		const s = errorSettingKeys.join(' | ')
-		throw `settings for "${s}" options not found`
+	if (errorSchemaKeys.length > 0) {
+		const s = errorSchemaKeys.join(' | ')
+		throw `Schema for "${s}" options not found`
 	}
 
-	for (const propertyKey in propertiesSettings) {
-		const propertySetting = propertiesSettings[propertyKey]
+	for (const propertyKey in propertiesSchemas) {
+		const propertySchema = propertiesSchemas[propertyKey]
 		let propertyValue = properties[propertyKey]
 		let propertyExists = hasOwn(properties, propertyKey)
 
-		if (!isArray(propertySetting) && isObject(propertySetting))
-			for (const key of Object.keys(propertySetting))
-				if (!['type', 'required', 'default', 'validator'].includes(key))
-					throw `unknown setting key "${key}" in "${propertyKey}"`
+		if (!isArray(propertySchema) && isObject(propertySchema)) {
+			if (!isSchemaProperty(propertySchema)) {
+				parsePropertiesObject(propertyValue, propertySchema as any)
+				continue
+			}
+
+			for (const key of Object.keys(propertySchema))
+				if (
+					![
+						'type',
+						'required',
+						'default',
+						'validator',
+						settingsFlagName,
+					].includes(key)
+				)
+					throw `unknown Schema key "${key}" in "${propertyKey}"`
+		}
 
 		const type =
-			propertySetting === null
+			propertySchema === null
 				? null
-				: isArray(propertySetting)
-				? propertySetting
-				: isObject(propertySetting)
-				? (propertySetting as OptionProperty<any>).type || null
-				: (propertySetting as OptionPropertyTypes<any>)
+				: isArray(propertySchema)
+				? propertySchema
+				: isObject(propertySchema)
+				? (propertySchema as SchemaPropertySettings<any>).type || null
+				: (propertySchema as SchemaPropertyTypes<any>)
 
 		const required =
-			propertySetting !== null && hasOwn(propertySetting, 'required')
-				? propertySetting['required']
+			propertySchema !== null && hasOwn(propertySchema, 'required')
+				? propertySchema['required']
 				: true
 
 		const defaultValue =
-			propertySetting !== null && hasOwn(propertySetting, 'default')
-				? propertySetting['default']
+			propertySchema !== null && hasOwn(propertySchema, 'default')
+				? propertySchema['default']
 				: null
 
 		const validator =
-			propertySetting !== null && hasOwn(propertySetting, 'validator')
-				? propertySetting['validator']
+			propertySchema !== null && hasOwn(propertySchema, 'validator')
+				? propertySchema['validator']
 				: null
 
 		/**
@@ -65,7 +88,7 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		 * Default setter
 		 * -------------------------------------------------------
 		 * Checking If the property does not exist in options,
-		 * set default value, if it exists in the setting
+		 * set default value, if it exists in the Schema
 		 */
 		if (!propertyExists && defaultValue !== null) {
 			properties[propertyKey] = isFunction(defaultValue)
@@ -86,14 +109,14 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 
 			for (const _class of _classes)
 				if (!isFunction(_class))
-					throw `type of "${propertyKey}" setting have no function type. No-function: ${_class}`
+					throw `type of "${propertyKey}" Schema have no function type. No-function: ${_class}`
 		}
 
 		/**
 		 * Type checker
 		 * -------------------------------------------------------
 		 * Checking If the property does exist, check property types
-		 * form setting
+		 * form Schema
 		 */
 		if (type !== null && propertyExists) {
 			if (!isEqualConstructor(propertyValue, type)) {
@@ -108,7 +131,7 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		/**
 		 * Validator
 		 * -------------------------------------------------------
-		 * If setting have custom validator, call this function
+		 * If Schema have custom validator, call this function
 		 */
 		if (propertyExists && validator !== null) {
 			if (!validator.call(null, propertyValue))
