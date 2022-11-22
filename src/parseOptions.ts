@@ -27,7 +27,9 @@ export function parseOptions<Options, Return extends Required<Options>>(
 		}
 
 		if (isObject(schema)) {
-			return parseOptionsBySchema(props, schema)
+			parseOptionsBySchema(props, schema)
+			// @ts-ignore
+			return props as Return
 		}
 
 		throw 'the second argument is not an object or array'
