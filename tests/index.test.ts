@@ -1,18 +1,20 @@
-import { defineOptions, schemaProperty } from '../dist'
+import { parseOptions, schemaProperty } from '../dist'
+
+const parseFn = parseOptions
 
 it('Check plugin arguments', () => {
-	expect(() => defineOptions()).toThrow()
-	expect(() => defineOptions('hello', ['hello'])).toThrow()
-	expect(() => defineOptions(null, ['hello'])).toThrow()
-	expect(() => defineOptions(undefined, ['hello'])).toThrow()
-	expect(() => defineOptions([], ['hello'])).toThrow()
-	expect(() => defineOptions([], {})).toThrow()
+	expect(() => parseFn()).toThrow()
+	expect(() => parseFn('hello', ['hello'])).toThrow()
+	expect(() => parseFn(null, ['hello'])).toThrow()
+	expect(() => parseFn(undefined, ['hello'])).toThrow()
+	expect(() => parseFn([], ['hello'])).toThrow()
+	expect(() => parseFn([], {})).toThrow()
 })
 
 it('Check plugin config', () => {
 	const object = {}
 
-	const newObject = defineOptions(
+	const newObject = parseFn(
 		object,
 		{ name: schemaProperty({ required: false, default: 'hello' }) },
 		{ clone: true }

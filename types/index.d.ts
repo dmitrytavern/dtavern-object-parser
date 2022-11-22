@@ -30,13 +30,13 @@ export type SchemaPropertySettings<T> = {
 
 export type SchemaProperty<Property> = SchemaPropertyTypes<Property>
 
-export type SchemaObject<Properties> = {
+export type SchemaAsArray<Properties> = string[] | (keyof Properties)[]
+export type SchemaAsObject<Properties> = {
 	[Property in keyof Properties]: SchemaProperty<Property>
 }
 export type Schema<Properties> =
-	| string[]
-	| (keyof Properties)[]
-	| SchemaObject<Properties>
+	| SchemaAsArray<Properties>
+	| SchemaAsObject<Properties>
 
 export type ConfigMode = 'strict' | 'log' | 'disabled'
 export interface Config {

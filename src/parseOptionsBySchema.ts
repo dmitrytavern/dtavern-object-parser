@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-	SchemaObject,
+	SchemaAsObject,
 	SchemaPropertySettings,
 	SchemaPropertyTypes,
 } from '@types'
@@ -8,19 +8,18 @@ import { hasOwn, isFunction, isArray, isObject } from './utils'
 import { isSchemaProperty, settingsFlagName } from './schema'
 import { isEqualConstructor } from './isEqualConstructor'
 
-export const parsePropertiesObject = <Props, Return = Required<Props>>(
-	properties: Props,
-	propertiesSchemas: SchemaObject<Props>
+export const parseOptionsBySchema = <Options, Return = Required<Options>>(
+	options: Options,
+	schema: SchemaAsObject<Options>
 ): Return => {
 	const errorSchemaKeys = []
 
-	if (isArray(properties)) throw `Object is array, but need object`
+	if (isArray(options)) throw `Options is array, but need object`
 
-	if (!isObject(properties)) throw `Object is not object. Value: ${properties}`
+	if (!isObject(options)) throw `Options is not object. Value: ${options}`
 
-	for (const propertyKey in properties) {
-		if (!hasOwn(propertiesSchemas, propertyKey))
-			errorSchemaKeys.push(propertyKey)
+	for (const propertyKey in options) {
+		if (!hasOwn(schema, propertyKey)) errorSchemaKeys.push(propertyKey)
 	}
 
 	if (errorSchemaKeys.length > 0) {
@@ -28,14 +27,14 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		throw `Schema for "${s}" options not found`
 	}
 
-	for (const propertyKey in propertiesSchemas) {
-		const propertySchema = propertiesSchemas[propertyKey]
-		let propertyValue = properties[propertyKey]
-		let propertyExists = hasOwn(properties, propertyKey)
+	for (const schemaKey in schema) {
+		const propertySchema = schema[schemaKey]
+		let optionValue = options[schemaKey]
+		let optionExists = hasOwn(options, schemaKey)
 
 		if (!isArray(propertySchema) && isObject(propertySchema)) {
 			if (!isSchemaProperty(propertySchema)) {
-				parsePropertiesObject(propertyValue, propertySchema as any)
+				parseOptionsBySchema(optionValue, propertySchema as any)
 				continue
 			}
 
@@ -49,7 +48,7 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 						settingsFlagName,
 					].includes(key)
 				)
-					throw `unknown Schema key "${key}" in "${propertyKey}"`
+					throw `unknown Schema key "${key}" in "${schemaKey}"`
 		}
 
 		const type =
@@ -82,7 +81,7 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		 * Checking if property does not exist in options and this
 		 * option is required - throw error.
 		 */
-		if (!propertyExists && required) throw `option "${propertyKey}" not exists`
+		if (!optionExists && required) throw `option "${schemaKey}" not exists`
 
 		/**
 		 * Default setter
@@ -90,13 +89,13 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		 * Checking If the property does not exist in options,
 		 * set default value, if it exists in the Schema
 		 */
-		if (!propertyExists && defaultValue !== null) {
-			properties[propertyKey] = isFunction(defaultValue)
+		if (!optionExists && defaultValue !== null) {
+			options[schemaKey] = isFunction(defaultValue)
 				? defaultValue.apply(null)
 				: defaultValue
 
-			propertyExists = true
-			propertyValue = properties[propertyKey]
+			optionExists = true
+			optionValue = options[schemaKey]
 		}
 
 		/**
@@ -109,7 +108,7 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 
 			for (const _class of _classes)
 				if (!isFunction(_class))
-					throw `type of "${propertyKey}" Schema have no function type. No-function: ${_class}`
+					throw `type of "${schemaKey}" schema have no function type. No-function: ${_class}`
 		}
 
 		/**
@@ -118,13 +117,13 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		 * Checking If the property does exist, check property types
 		 * form Schema
 		 */
-		if (type !== null && propertyExists) {
-			if (!isEqualConstructor(propertyValue, type)) {
+		if (type !== null && optionExists) {
+			if (!isEqualConstructor(optionValue, type)) {
 				const constructors = isArray(type)
 					? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`
 					: type.prototype.constructor.name
 
-				throw `option "${propertyKey}" is not "${constructors}" type`
+				throw `option "${schemaKey}" is not "${constructors}" type`
 			}
 		}
 
@@ -133,12 +132,12 @@ export const parsePropertiesObject = <Props, Return = Required<Props>>(
 		 * -------------------------------------------------------
 		 * If Schema have custom validator, call this function
 		 */
-		if (propertyExists && validator !== null) {
-			if (!validator.call(null, propertyValue))
-				throw `option "${propertyKey}" did not pass the validator. Value: ${propertyValue}`
+		if (optionExists && validator !== null) {
+			if (!validator.call(null, optionValue))
+				throw `option "${schemaKey}" did not pass the validator. Value: ${optionValue}`
 		}
 	}
 
 	// @ts-ignore
-	return properties as Return
+	return options as Return
 }

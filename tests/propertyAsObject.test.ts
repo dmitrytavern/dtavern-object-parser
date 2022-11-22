@@ -1,45 +1,45 @@
-import { defineOptions, schemaProperty } from '../dist'
+import { parseOptions, schemaProperty } from '../dist'
+
+const parseFn = parseOptions
 
 describe('Check property types of setting option', () => {
 	const opt = { name: 'Dmitry' }
 
 	it('type not found', () => {
-		const object = defineOptions(opt, { name: schemaProperty({}) })
+		const object = parseFn(opt, { name: schemaProperty({}) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type is correct', () => {
-		const object = defineOptions(opt, {
+		const object = parseFn(opt, {
 			name: schemaProperty({ type: String }),
 		})
 		expect(object).toEqual(opt)
 	})
 
 	it('type is wrong', () => {
-		const fn = () =>
-			defineOptions(opt, { name: schemaProperty({ type: Number }) })
+		const fn = () => parseFn(opt, { name: schemaProperty({ type: Number }) })
 		expect(fn).toThrow()
 	})
 
 	it('type is null', () => {
-		const object = defineOptions(opt, { name: schemaProperty({ type: null }) })
+		const object = parseFn(opt, { name: schemaProperty({ type: null }) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type value is wrong', () => {
-		const fn = () =>
-			defineOptions(opt, { name: schemaProperty({ type: 'hello' }) })
+		const fn = () => parseFn(opt, { name: schemaProperty({ type: 'hello' }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is empty array', () => {
-		const fn = () => defineOptions(opt, { name: schemaProperty({ type: [] }) })
+		const fn = () => parseFn(opt, { name: schemaProperty({ type: [] }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is array with wrong values', () => {
 		const fn = () =>
-			defineOptions(opt, {
+			parseFn(opt, {
 				name: schemaProperty({ type: [Number, 'string', false, undefined] }),
 			})
 		expect(fn).toThrow()
@@ -53,7 +53,7 @@ describe('Check property validator of setting option', () => {
 	}
 
 	it('validator returns true', () => {
-		const object = defineOptions(opt, {
+		const object = parseFn(opt, {
 			name: schemaProperty({ ...setValidator('Dmitry') }),
 		})
 
@@ -62,7 +62,7 @@ describe('Check property validator of setting option', () => {
 
 	it('validator returns false', () => {
 		const fn1 = () =>
-			defineOptions(opt, {
+			parseFn(opt, {
 				name: schemaProperty({ ...setValidator('Other name') }),
 			})
 
@@ -72,16 +72,12 @@ describe('Check property validator of setting option', () => {
 
 describe('Check property required of setting option', () => {
 	it('required setting is false', () => {
-		const object = defineOptions(
-			{},
-			{ name: schemaProperty({ required: false }) }
-		)
+		const object = parseFn({}, { name: schemaProperty({ required: false }) })
 		expect(object).toEqual({})
 	})
 
 	it('required setting is true', () => {
-		const fn = () =>
-			defineOptions({}, { name: schemaProperty({ required: true }) })
+		const fn = () => parseFn({}, { name: schemaProperty({ required: true }) })
 		expect(fn).toThrow()
 	})
 })
@@ -92,17 +88,17 @@ describe('Check property default of setting option', () => {
 	}
 
 	it('property does not exist', () => {
-		const object = defineOptions({}, settings1)
+		const object = parseFn({}, settings1)
 		expect(object).toEqual({ name: 'hello world' })
 	})
 
 	it('property does exist', () => {
-		const object = defineOptions({ name: 'Dmitry' }, settings1)
+		const object = parseFn({ name: 'Dmitry' }, settings1)
 		expect(object).toEqual({ name: 'Dmitry' })
 	})
 
 	it('default as funtion', () => {
-		const object = defineOptions(
+		const object = parseFn(
 			{},
 			{
 				name: schemaProperty({
@@ -119,7 +115,7 @@ describe('Check property default of setting option', () => {
 
 	it('default as function with type error', () => {
 		const fn = () =>
-			defineOptions(
+			parseFn(
 				{},
 				{
 					name: schemaProperty({
@@ -136,7 +132,7 @@ describe('Check property default of setting option', () => {
 
 	it('default as function with validator error', () => {
 		const fn = () =>
-			defineOptions(
+			parseFn(
 				{},
 				{
 					name: schemaProperty({
@@ -155,7 +151,7 @@ describe('Check property default of setting option', () => {
 	})
 
 	it('default as no-primitive value', () => {
-		const object = defineOptions(
+		const object = parseFn(
 			{},
 			{
 				name: schemaProperty({
@@ -173,7 +169,7 @@ describe('Check property default of setting option', () => {
 
 it('Check unknown object key', () => {
 	const fn = () =>
-		defineOptions(
+		parseFn(
 			{
 				name: 'Hello',
 			},

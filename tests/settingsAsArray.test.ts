@@ -1,18 +1,20 @@
-import { defineOptions } from '../dist'
+import { parseOptions } from '../dist'
+
+const parseFn = parseOptions
 
 describe('Check plugin settings as array', () => {
 	it('properties have equals options', () => {
-		const object = defineOptions({ name: 'Dmitry' }, ['name'])
+		const object = parseFn({ name: 'Dmitry' }, ['name'])
 		expect(object).toEqual({ name: 'Dmitry' })
 	})
 
 	it('properties have more options then settings', () => {
-		const fn = () => defineOptions({ name: 'Dmitry' }, ['name', 'nickname'])
+		const fn = () => parseFn({ name: 'Dmitry' }, ['name', 'nickname'])
 		expect(fn).toThrow()
 	})
 
 	it('properties have less options then settings', () => {
-		const fn = () => defineOptions({ name: 'Dmitry', age: 13 }, ['name'])
+		const fn = () => parseFn({ name: 'Dmitry', age: 13 }, ['name'])
 		expect(fn).toThrow()
 	})
 })
