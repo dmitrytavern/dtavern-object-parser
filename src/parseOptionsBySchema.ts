@@ -43,11 +43,15 @@ export const parseOption = <Options>(
 		isObject(opitonSchema) &&
 		!isSchemaProperty(opitonSchema)
 	) {
-		if (isArray(optionValue) || !isObject(optionValue)) {
-			throw `option "${optionKey}" is not object`
-		}
+		const optionNotExists = isArray(optionValue) || !isObject(optionValue)
 
-		parseOptionsBySchema(optionValue, opitonSchema)
+		if (optionNotExists) optionsParent[optionKey] = {}
+
+		parseOptionsBySchema(optionsParent[optionKey], schemaParent[optionKey])
+
+		if (optionNotExists && Object.keys(optionsParent[optionKey]).length == 0)
+			delete optionsParent[optionKey]
+
 		return
 	}
 
