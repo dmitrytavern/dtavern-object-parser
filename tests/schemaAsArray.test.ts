@@ -2,7 +2,7 @@ import { parseOptions } from '../dist'
 
 const parseFn = parseOptions
 
-describe('Check plugin settings as array', () => {
+describe('Check schema as array', () => {
 	it('properties have equals options', () => {
 		const object = parseFn({ name: 'Dmitry' }, ['name'])
 		expect(object).toEqual({ name: 'Dmitry' })

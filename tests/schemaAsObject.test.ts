@@ -2,8 +2,8 @@ import { parseOptions } from '../dist'
 
 const parseFn = parseOptions
 
-describe('Check plugin settings as object', () => {
-	it('settings types is correct', () => {
+describe('Check schema as object', () => {
+	it('schema have nested properies', () => {
 		const object = parseFn(
 			{
 				name: 'Dmitry',
@@ -45,32 +45,32 @@ describe('Check plugin settings as object', () => {
 		})
 	})
 
-	it('settings types is wrong', () => {
+	it('schema property with wrong type', () => {
 		const fn = () => parseFn({ name: 'Dmitry' }, { name: Number })
 		expect(fn).toThrow()
 	})
 
-	it('settings for properties not found', () => {
+	it('schema have not keys for object', () => {
 		const fn = () => parseFn({ name: 'Dmitry' }, {})
 		expect(fn).toThrow()
 	})
 
-	it('setting have some types as array', () => {
+	it('schema property have some types as array', () => {
 		const object = parseFn({ age: 13 }, { age: [Number, String] })
 		expect(object).toEqual({ age: 13 })
 	})
 
-	it('setting have any type', () => {
+	it('schema property have any type', () => {
 		const object = parseFn({ anyType: undefined }, { anyType: null })
 		expect(object).toEqual({ anyType: undefined })
 	})
 
-	it('setting have undefined type', () => {
+	it('schema property have undefined type', () => {
 		const fn = () => parseFn({ anyType: undefined }, { anyType: undefined })
 		expect(fn).toThrow()
 	})
 
-	it('setting have any type without property', () => {
+	it('schema property have any type without property', () => {
 		const fn = () => parseFn({}, { anyType: null })
 		expect(fn).toThrow()
 	})

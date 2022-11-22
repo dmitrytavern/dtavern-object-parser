@@ -2,10 +2,10 @@ import { parseOptions, schemaProperty } from '../dist'
 
 const parseFn = parseOptions
 
-describe('Check property types of setting option', () => {
+describe('Check option type setting', () => {
 	const opt = { name: 'Dmitry' }
 
-	it('type not found', () => {
+	it('type not exists', () => {
 		const object = parseFn(opt, { name: schemaProperty({}) })
 		expect(object).toEqual(opt)
 	})
@@ -46,7 +46,7 @@ describe('Check property types of setting option', () => {
 	})
 })
 
-describe('Check property validator of setting option', () => {
+describe('Check option validator setting', () => {
 	const opt = { name: 'Dmitry' }
 	const setValidator = (checkValue) => {
 		return { validator: (value) => value === checkValue }
@@ -70,7 +70,7 @@ describe('Check property validator of setting option', () => {
 	})
 })
 
-describe('Check property required of setting option', () => {
+describe('Check option required setting', () => {
 	it('required setting is false', () => {
 		const object = parseFn({}, { name: schemaProperty({ required: false }) })
 		expect(object).toEqual({})
@@ -82,7 +82,7 @@ describe('Check property required of setting option', () => {
 	})
 })
 
-describe('Check property default of setting option', () => {
+describe('Check option default setting', () => {
 	const settings1 = {
 		name: schemaProperty({ required: false, default: 'hello world' }),
 	}
@@ -167,7 +167,7 @@ describe('Check property default of setting option', () => {
 	})
 })
 
-it('Check unknown object key', () => {
+it('Check unknown setting key', () => {
 	const fn = () =>
 		parseFn(
 			{
