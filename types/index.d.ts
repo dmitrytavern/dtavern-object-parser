@@ -1,42 +1,40 @@
-export type SchemaPropertyRequired = boolean
+export type SchemaOptionRequired = boolean
 
-export type SchemaPropertyConstructor<T> =
+export type SchemaOptionConstructor<T> =
 	| { (): T }
 	| { new (...args: never[]): T & object }
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	| { new (...args: string[]): any }
 
-export type SchemaPropertyTypes<T> =
+export type SchemaOptionTypes<T> =
 	| null
-	| SchemaPropertyConstructor<T>
-	| SchemaPropertyConstructor<T>[]
+	| SchemaOptionConstructor<T>
+	| SchemaOptionConstructor<T>[]
 
-export type SchemaPropertyDefault<T> =
+export type SchemaOptionDefault<T> =
 	| T
 	| null
 	| undefined
 	| (() => T | null | undefined)
 
-export interface SchemaPropertyValidator<T> {
+export interface SchemaOptionValidator<T> {
 	(value: T): boolean
 }
 
-export type SchemaPropertySettings<T> = {
-	type?: SchemaPropertyTypes<T>
-	default?: SchemaPropertyDefault<T>
-	required?: SchemaPropertyRequired
-	validator?: SchemaPropertyValidator<T>
+export type SchemaOptionSettings<T> = {
+	type?: SchemaOptionTypes<T>
+	default?: SchemaOptionDefault<T>
+	required?: SchemaOptionRequired
+	validator?: SchemaOptionValidator<T>
 }
 
-export type SchemaProperty<Property> = SchemaPropertyTypes<Property>
+export type SchemaOption<Option> = SchemaOptionTypes<Option>
 
-export type SchemaAsArray<Properties> = string[] | (keyof Properties)[]
-export type SchemaAsObject<Properties> = {
-	[Property in keyof Properties]: SchemaProperty<Property>
+export type SchemaAsArray<Options> = string[] | (keyof Options)[]
+export type SchemaAsObject<Options> = {
+	[Option in keyof Options]: SchemaOption<Option>
 }
-export type Schema<Properties> =
-	| SchemaAsArray<Properties>
-	| SchemaAsObject<Properties>
+export type Schema<Options> = SchemaAsArray<Options> | SchemaAsObject<Options>
 
 export type ConfigMode = 'strict' | 'log' | 'disabled'
 export interface Config {
@@ -50,13 +48,19 @@ export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
 export const AsyncFunction: AsyncFunctionType
 
 export function schemaProperty<Type>(
-	schemaPropertySettings: SchemaPropertySettings<Type>
-): SchemaPropertySettings<Type>
+	schemaOptionSettings: SchemaOptionSettings<Type>
+): SchemaOptionSettings<Type>
 
-export function defineOptions<Properties, Return = Required<Properties>>(
-	properties: Properties,
-	propertiesSchema: Schema<Properties>,
+export function parseOptions<Options, Return = Required<Options>>(
+	options: Options,
+	optionsSchema: Schema<Options>,
 	config?: Config
 ): Return
 
-export default defineOptions
+export const options: {
+	parseOptions: typeof parseOptions
+	schemaProperty: typeof schemaProperty
+	AsyncFunction: typeof AsyncFunction
+}
+
+export default options

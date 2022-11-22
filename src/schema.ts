@@ -1,11 +1,11 @@
-import { SchemaProperty as SchemaPropertyType } from '@types'
+import { SchemaOptionSettings } from '@types'
 import { hasOwn } from './utils'
 
 export const settingsFlagName = '__dtavern_option_pareser__is_schema_property'
 
 export const schemaProperty = <Type>(
-	schemaPropertySettings: SchemaPropertyType<Type>
-): SchemaPropertyType<Type> => {
+	schemaPropertySettings: SchemaOptionSettings<Type>
+): SchemaOptionSettings<Type> => {
 	if (hasOwn(schemaPropertySettings, settingsFlagName))
 		throw 'Object already have settings flag name'
 

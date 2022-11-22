@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-	SchemaAsObject,
-	SchemaPropertySettings,
-	SchemaPropertyTypes,
-} from '@types'
+import { SchemaAsObject, SchemaOptionSettings, SchemaOptionTypes } from '@types'
 import { hasOwn, isFunction, isArray, isObject } from './utils'
 import { isEqualConstructor } from './isEqualConstructor'
 import { isSchemaProperty } from './schema'
@@ -73,8 +69,8 @@ export const parseOptionValue = <Options>(
 			: isArray(propertySchema)
 			? propertySchema
 			: isObject(propertySchema)
-			? (propertySchema as SchemaPropertySettings<any>).type || null
-			: (propertySchema as SchemaPropertyTypes<any>)
+			? (propertySchema as SchemaOptionSettings<any>).type || null
+			: (propertySchema as SchemaOptionTypes<any>)
 
 	const required =
 		propertySchema !== null && hasOwn(propertySchema, 'required')
