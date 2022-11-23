@@ -8,13 +8,14 @@ const _nestedLogs = []
 const _errorLogs = []
 
 export const parseOptionsByObject = <Options>(
+	originalOptions: Options | undefined,
 	options: Options,
 	schema: SchemaAsObject<Options>
 ): void => {
 	_nestedLogs.length = 0
 	_errorLogs.length = 0
 
-	parseOptionsBySchema(options, schema)
+	parseOptionsBySchema(originalOptions, options, schema)
 
 	if (_errorLogs.length > 0) {
 		throw _errorLogs
@@ -22,12 +23,13 @@ export const parseOptionsByObject = <Options>(
 }
 
 const parseOptionsBySchema = <Options>(
+	originalOptions: Options | undefined,
 	options: Options,
 	schema: SchemaAsObject<Options>
 ): void => {
 	const errorSchemaKeys = []
 
-	for (const propertyKey in options) {
+	for (const propertyKey in originalOptions) {
 		if (!hasOwn(schema, propertyKey)) {
 			errorSchemaKeys.push(propertyKey)
 		}
@@ -41,11 +43,12 @@ const parseOptionsBySchema = <Options>(
 	}
 
 	for (const schemaKey in schema) {
-		parseOption(options, schema, schemaKey)
+		parseOption(originalOptions, options, schema, schemaKey)
 	}
 }
 
 const parseOption = <Options>(
+	originalOptionsParent: Options | undefined,
 	optionsParent: Options,
 	schemaParent: SchemaAsObject<Options>,
 	optionKey: string
@@ -64,7 +67,11 @@ const parseOption = <Options>(
 
 		if (optionNotExists) optionsParent[optionKey] = {}
 
-		parseOptionsBySchema(optionsParent[optionKey], schemaParent[optionKey])
+		parseOptionsBySchema(
+			originalOptionsParent[optionKey],
+			optionsParent[optionKey],
+			schemaParent[optionKey]
+		)
 
 		if (optionNotExists && Object.keys(optionsParent[optionKey]).length == 0)
 			delete optionsParent[optionKey]
@@ -74,18 +81,29 @@ const parseOption = <Options>(
 		return
 	}
 
-	parseOptionValue(optionsParent, schemaParent, optionKey)
+	parseOptionValue(
+		originalOptionsParent,
+		optionsParent,
+		schemaParent,
+		optionKey
+	)
 
 	_nestedLogs.pop()
 }
 
 const parseOptionValue = <Options>(
+	originalOptionsParent: Options | undefined,
 	optionsParent: Options,
 	schemaParent: SchemaAsObject<Options>,
 	optionKey: string
 ): void => {
 	try {
-		const optionExists = hasOwn(optionsParent, optionKey)
+		const optionExists = originalOptionsParent
+			? hasOwn(originalOptionsParent, optionKey)
+			: false
+
+		if (optionExists)
+			optionsParent[optionKey] = originalOptionsParent[optionKey]
 
 		const optionValue = parseValue(
 			optionsParent[optionKey],
