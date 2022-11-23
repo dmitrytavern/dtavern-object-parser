@@ -19,13 +19,15 @@ export function parseOptions<Options, Return extends Required<Options>>(
 		if (isArray(options) || !isObject(options))
 			throw 'the first argument is not an object. Please, use the type of object'
 
-		const optionsCopy = config && config.clone ? {} : options
-
 		if (isArray(schema)) {
-			return parseOptionsByArray(options, schema)
+			parseOptionsByArray(options, schema)
+			// @ts-ignore
+			return options as Return
 		}
 
 		if (isObject(schema)) {
+			const optionsCopy = config && config.clone ? {} : options
+
 			parseOptionsByObject(options, optionsCopy, schema)
 			return optionsCopy as Return
 		}
