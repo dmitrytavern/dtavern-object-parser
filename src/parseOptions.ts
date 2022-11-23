@@ -1,8 +1,7 @@
 import { Config, Schema } from '@types'
 import { isObject, isArray } from './utils'
 import { parseOptionsByArray } from './parseOptionsByArray'
-import { parseOptionsBySchema } from './parseOptionsBySchema'
-import { errorLog } from './errorLog'
+import { parseOptionsByObject } from './parseOptionsByObject'
 
 export function parseOptions<Options, Return extends Required<Options>>(
 	options: Options,
@@ -27,13 +26,19 @@ export function parseOptions<Options, Return extends Required<Options>>(
 		}
 
 		if (isObject(schema)) {
-			parseOptionsBySchema(props, schema)
+			parseOptionsByObject(props, schema)
 			// @ts-ignore
 			return props as Return
 		}
 
 		throw 'the second argument is not an object or array'
 	} catch (e) {
-		errorLog(e, config ? config.mode : 'strict')
+		const mode = config ? config.mode : 'strict'
+		const errors = isArray(e) ? e : [e]
+		const error = new Error('\n  ' + errors.join('\n  '))
+
+		if (mode === 'log') console.error(error)
+		if (mode === 'strict') throw error
+		if (mode !== 'log') console.warn('You disable logger in options parser!')
 	}
 }
