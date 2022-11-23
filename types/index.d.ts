@@ -57,8 +57,15 @@ export function parseOptions<Options, Return = Required<Options>>(
 	config?: Config
 ): Return
 
+export function parseValue<OptionValue>(
+	optionValue: OptionValue,
+	optionSchema: SchemaOptionSettings<OptionValue>,
+	existsInParents?: boolean
+): OptionValue
+
 export const options: {
-	parseOptions: typeof parseOptions
+	parse: typeof parseOptions
+	single: typeof parseValue
 	schemaProperty: typeof schemaProperty
 	AsyncFunction: typeof AsyncFunction
 }

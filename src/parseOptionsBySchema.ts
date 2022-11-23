@@ -59,32 +59,53 @@ export const parseOptionValue = <Options>(
 	schemaParent: SchemaAsObject<Options>,
 	optionKey: string
 ): void => {
-	const propertySchema = schemaParent[optionKey]
-	let optionValue = optionsParent[optionKey]
-	let optionExists = hasOwn(optionsParent, optionKey)
+	const optionExists = hasOwn(optionsParent, optionKey)
+
+	const optionValue = parseValue(
+		optionsParent[optionKey],
+		schemaParent[optionKey],
+		optionExists
+	)
+
+	if (optionExists && optionValue === undefined)
+		optionsParent[optionKey] = optionValue
+
+	if (optionValue !== undefined) optionsParent[optionKey] = optionValue
+}
+
+export const parseValue = <OptionValue>(
+	optionValue: OptionValue,
+	optionSchema: SchemaOptionSettings<OptionValue>,
+	existsInParents?: boolean
+): OptionValue => {
+	let _optionValue = optionValue
+	let _optionExists =
+		existsInParents === undefined
+			? optionValue !== undefined
+			: !!existsInParents
 
 	const type =
-		propertySchema === null
+		optionSchema === null
 			? null
-			: isArray(propertySchema)
-			? propertySchema
-			: isObject(propertySchema)
-			? (propertySchema as SchemaOptionSettings<any>).type || null
-			: (propertySchema as SchemaOptionTypes<any>)
+			: isArray(optionSchema)
+			? optionSchema
+			: isObject(optionSchema)
+			? (optionSchema as SchemaOptionSettings<any>).type || null
+			: (optionSchema as SchemaOptionTypes<any>)
 
 	const required =
-		propertySchema !== null && hasOwn(propertySchema, 'required')
-			? propertySchema['required']
+		optionSchema !== null && hasOwn(optionSchema, 'required')
+			? optionSchema['required']
 			: true
 
 	const defaultValue =
-		propertySchema !== null && hasOwn(propertySchema, 'default')
-			? propertySchema['default']
+		optionSchema !== null && hasOwn(optionSchema, 'default')
+			? optionSchema['default']
 			: null
 
 	const validator =
-		propertySchema !== null && hasOwn(propertySchema, 'validator')
-			? propertySchema['validator']
+		optionSchema !== null && hasOwn(optionSchema, 'validator')
+			? optionSchema['validator']
 			: null
 
 	/**
@@ -93,7 +114,7 @@ export const parseOptionValue = <Options>(
 	 * Checking if property does not exist in options and this
 	 * option is required - throw error.
 	 */
-	if (!optionExists && required) throw `option "${optionKey}" not exists`
+	if (!_optionExists && required) throw `option not exists`
 
 	/**
 	 * Default setter
@@ -101,13 +122,12 @@ export const parseOptionValue = <Options>(
 	 * Checking If the property does not exist in options,
 	 * set default value, if it exists in the Schema
 	 */
-	if (!optionExists && defaultValue !== null) {
-		optionsParent[optionKey] = isFunction(defaultValue)
+	if (!_optionExists && defaultValue !== null) {
+		_optionValue = isFunction(defaultValue)
 			? defaultValue.apply(null)
 			: defaultValue
 
-		optionExists = true
-		optionValue = optionsParent[optionKey]
+		_optionExists = true
 	}
 
 	/**
@@ -120,7 +140,7 @@ export const parseOptionValue = <Options>(
 
 		for (const _class of _classes)
 			if (!isFunction(_class))
-				throw `type of "${optionKey}" schema have no function type. No-function: ${_class}`
+				throw `type of schema have no function type. No-function: ${_class}`
 	}
 
 	/**
@@ -129,13 +149,13 @@ export const parseOptionValue = <Options>(
 	 * Checking If the property does exist, check property types
 	 * form Schema
 	 */
-	if (type !== null && optionExists) {
-		if (!isEqualConstructor(optionValue, type)) {
+	if (type !== null && _optionExists) {
+		if (!isEqualConstructor(_optionValue, type)) {
 			const constructors = isArray(type)
 				? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`
 				: type.prototype.constructor.name
 
-			throw `option "${optionKey}" is not "${constructors}" type`
+			throw `option is not "${constructors}" type`
 		}
 	}
 
@@ -144,8 +164,10 @@ export const parseOptionValue = <Options>(
 	 * -------------------------------------------------------
 	 * If Schema have custom validator, call this function
 	 */
-	if (optionExists && validator !== null) {
-		if (!validator.call(null, optionValue))
-			throw `option "${optionKey}" did not pass the validator. Value: ${optionValue}`
+	if (_optionExists && validator !== null) {
+		if (!validator.call(null, _optionValue))
+			throw `option did not pass the validator. Value: ${_optionValue}`
 	}
+
+	return _optionValue
 }
