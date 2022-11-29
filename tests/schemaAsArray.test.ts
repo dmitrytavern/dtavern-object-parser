@@ -49,4 +49,27 @@ describe('Check schema as array', () => {
 			parseFn({ name: { first: '' } }, ['name', 'name.first', 'name.last'])
 		expect(fn).toThrow()
 	})
+
+	it('options are nested with cycle links', () => {
+		const object1: any = {}
+		const object2: any = {}
+		const object3 = {
+			a1: {
+				a1: {},
+			},
+		}
+
+		object1.a = object2
+		object2.b = object1
+		object3.a1.a1 = object3
+
+		const object2_schema = ['a.b']
+		const object3_schema = ['a1']
+
+		const fn1 = () => parseFn(object2, object2_schema)
+		const fn2 = () => parseFn(object3, object3_schema)
+
+		expect(fn1).toThrow()
+		expect(fn2).toThrow()
+	})
 })

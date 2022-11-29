@@ -1,15 +1,21 @@
 import { SchemaAsArray } from '@types'
-import { isArray, isObject } from './utils'
+import { hasOwn, isArray, isObject } from './utils'
 
 type Options = object
+
+const _errorLogs = []
+const _optionsWithFlag = []
+const handledFlagName = '__dtavern_option_pareser__is_already_handled'
 
 export const parseOptionsByArray = (
 	options: Options,
 	schema: SchemaAsArray
 ): void => {
+	_errorLogs.length = 0
+	_optionsWithFlag.length = 0
+
 	const optionsPaths = exportOpitonsPaths(options)
 	const schemaPaths = exportSchemaPaths(schema)
-	const _errorLogs = []
 
 	for (const schemaPath of schemaPaths) {
 		const index = optionsPaths.indexOf(schemaPath)
@@ -21,6 +27,8 @@ export const parseOptionsByArray = (
 	for (const optionPath of optionsPaths)
 		_errorLogs.push(`in ${optionPath}: option not exists in schema`)
 
+	for (const object of _optionsWithFlag) delete object[handledFlagName]
+
 	if (_errorLogs.length > 0) {
 		throw _errorLogs
 	}
@@ -29,7 +37,17 @@ export const parseOptionsByArray = (
 const exportOpitonsPaths = (options: Options): string[] => {
 	const arr = []
 
+	if (hasOwn(options, handledFlagName) && options[handledFlagName]) {
+		_errorLogs.push('detected cycle links')
+		return
+	}
+
+	options[handledFlagName] = true
+	_optionsWithFlag.push(options)
+
 	for (const optionKey in options) {
+		if (optionKey === handledFlagName) continue
+
 		arr.push(optionKey)
 
 		const option = options[optionKey]

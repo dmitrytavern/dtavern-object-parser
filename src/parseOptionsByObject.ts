@@ -10,6 +10,8 @@ type Schema = SchemaProperty
 
 const _nestedLogs = []
 const _errorLogs = []
+const _optionsWithFlags = []
+const handledFlagName = '__dtavern_option_pareser__is_already_handled'
 
 export const parseOptionsByObject = (
 	originalOptions: OriginalOptions,
@@ -18,19 +20,28 @@ export const parseOptionsByObject = (
 ): void => {
 	_nestedLogs.length = 0
 	_errorLogs.length = 0
+	_optionsWithFlags.length
 
-	parseOptionsBySchema(originalOptions, options, schema)
+	parseOptions(originalOptions, options, schema)
+
+	for (const object of _optionsWithFlags) delete object[handledFlagName]
 
 	if (_errorLogs.length > 0) {
 		throw _errorLogs
 	}
 }
 
-const parseOptionsBySchema = (
+const parseOptions = (
 	originalOptions: OriginalOptions,
 	options: Options,
 	schema: Schema
 ): void => {
+	if (hasOwn(options, handledFlagName) && options[handledFlagName]) {
+		const path = _nestedLogs.length === 0 ? 'root' : _nestedLogs.join('.')
+		_errorLogs.push(`in ${path} detected cyrcle links`)
+		return
+	}
+
 	const errorSchemaKeys = []
 
 	for (const propertyKey in originalOptions) {
@@ -45,6 +56,9 @@ const parseOptionsBySchema = (
 		_errorLogs.push(`in ${path} for "${s}" key of options not found in scheme`)
 		return
 	}
+
+	options[handledFlagName] = true
+	_optionsWithFlags.push(options)
 
 	for (const schemaKey in schema) {
 		parseOption(originalOptions, options, schema, schemaKey)
@@ -63,21 +77,21 @@ const parseOption = (
 	const optionValue = optionsParent[optionKey]
 
 	if (
-		!isArray(opitonSchema) &&
 		isObject(opitonSchema) &&
+		!isArray(opitonSchema) &&
 		!isSchemaProperty(opitonSchema)
 	) {
 		const optionNotExists = isArray(optionValue) || !isObject(optionValue)
 
 		if (optionNotExists) optionsParent[optionKey] = {}
 
-		parseOptionsBySchema(
+		parseOptions(
 			originalOptionsParent[optionKey],
 			optionsParent[optionKey],
 			schemaParent[optionKey]
 		)
 
-		if (optionNotExists && Object.keys(optionsParent[optionKey]).length == 0)
+		if (optionNotExists && Object.keys(optionsParent[optionKey]).length <= 1)
 			delete optionsParent[optionKey]
 
 		_nestedLogs.pop()
