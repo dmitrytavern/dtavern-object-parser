@@ -1,10 +1,12 @@
-import { SchemaOptionSettings, SchemaOptionTypes } from '@types'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { OptionSettings, OptionTypeSetting } from '@types'
 import { hasOwn, isFunction, isArray, isObject } from './utils'
 import { isEqualConstructor } from './isEqualConstructor'
 
 export const parseValue = <OptionValue>(
 	optionValue: OptionValue,
-	optionSchema: SchemaOptionSettings<OptionValue>,
+	optionSchema: OptionSettings<any>,
 	existsInParents?: boolean
 ): OptionValue => {
 	let _optionValue = optionValue
@@ -19,8 +21,8 @@ export const parseValue = <OptionValue>(
 			: isArray(optionSchema)
 			? optionSchema
 			: isObject(optionSchema)
-			? (optionSchema as SchemaOptionSettings<any>).type || null
-			: (optionSchema as SchemaOptionTypes<any>)
+			? (optionSchema as OptionSettings<any>).type || null
+			: (optionSchema as OptionTypeSetting<any>)
 
 	const required =
 		optionSchema !== null && hasOwn(optionSchema, 'required')

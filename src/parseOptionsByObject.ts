@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SchemaAsObject } from '@types'
+import { SchemaProperty } from '@types'
 import { hasOwn, isArray, isObject } from './utils'
 import { isSchemaProperty } from './schema'
 import { parseValue } from './parseValue'
 
+type OriginalOptions = object | undefined
+type Options = object
+type Schema = SchemaProperty
+
 const _nestedLogs = []
 const _errorLogs = []
 
-export const parseOptionsByObject = <Options>(
-	originalOptions: Options | undefined,
+export const parseOptionsByObject = (
+	originalOptions: OriginalOptions,
 	options: Options,
-	schema: SchemaAsObject<Options>
+	schema: Schema
 ): void => {
 	_nestedLogs.length = 0
 	_errorLogs.length = 0
@@ -22,10 +26,10 @@ export const parseOptionsByObject = <Options>(
 	}
 }
 
-const parseOptionsBySchema = <Options>(
-	originalOptions: Options | undefined,
+const parseOptionsBySchema = (
+	originalOptions: OriginalOptions,
 	options: Options,
-	schema: SchemaAsObject<Options>
+	schema: Schema
 ): void => {
 	const errorSchemaKeys = []
 
@@ -47,10 +51,10 @@ const parseOptionsBySchema = <Options>(
 	}
 }
 
-const parseOption = <Options>(
-	originalOptionsParent: Options | undefined,
+const parseOption = (
+	originalOptionsParent: OriginalOptions,
 	optionsParent: Options,
-	schemaParent: SchemaAsObject<Options>,
+	schemaParent: Schema,
 	optionKey: string
 ): void => {
 	_nestedLogs.push(optionKey)
@@ -91,10 +95,10 @@ const parseOption = <Options>(
 	_nestedLogs.pop()
 }
 
-const parseOptionValue = <Options>(
-	originalOptionsParent: Options | undefined,
+const parseOptionValue = (
+	originalOptionsParent: OriginalOptions,
 	optionsParent: Options,
-	schemaParent: SchemaAsObject<Options>,
+	schemaParent: Schema,
 	optionKey: string
 ): void => {
 	try {

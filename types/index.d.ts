@@ -1,65 +1,35 @@
-export type SchemaOptionRequired = boolean
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type SchemaOptionConstructor<T> =
-	| { (): T }
-	| { new (...args: never[]): T & object }
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| { new (...args: string[]): any }
+import { SchemaAsArray, SchemaAsObject, SchemaReturn } from './schema'
+import { OptionSettings, OptionTypeSetting } from './option'
+import { Config } from './config'
 
-export type SchemaOptionTypes<T> =
-	| null
-	| SchemaOptionConstructor<T>
-	| SchemaOptionConstructor<T>[]
+export * from './option'
+export * from './config'
+export * from './schema'
 
-export type SchemaOptionDefault<T> =
-	| T
-	| null
-	| undefined
-	| (() => T | null | undefined)
-
-export interface SchemaOptionValidator<T> {
-	(value: T): boolean
-}
-
-export type SchemaOptionSettings<T> = {
-	type?: SchemaOptionTypes<T>
-	default?: SchemaOptionDefault<T>
-	required?: SchemaOptionRequired
-	validator?: SchemaOptionValidator<T>
-}
-
-export type SchemaOption<Option> = SchemaOptionTypes<Option>
-
-export type SchemaAsArray<Options> = string[] | (keyof Options)[]
-export type SchemaAsObject<Options> = {
-	[Option in keyof Options]: SchemaOption<Option>
-}
-export type Schema<Options> = SchemaAsArray<Options> | SchemaAsObject<Options>
-
-export type ConfigMode = 'strict' | 'log' | 'disabled'
-export interface Config {
-	mode?: ConfigMode
-	clone?: boolean
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
 
 export const AsyncFunction: AsyncFunctionType
 
-export function schemaProperty<Type>(
-	schemaOptionSettings: SchemaOptionSettings<Type>
-): SchemaOptionSettings<Type>
-
 export function parseOptions<Options, Return = Required<Options>>(
 	options: Options,
-	optionsSchema: Schema<Options>,
+	schema: SchemaAsArray,
 	config?: Config
 ): Return
 
-export function parseValue<OptionValue>(
+export function parseOptions<
+	Schema extends SchemaAsObject,
+	Return = SchemaReturn<Schema>
+>(options: object, schema: Schema, config?: Config): Return
+
+export function schemaProperty<Type extends OptionTypeSetting<any>>(
+	schemaOptionSettings: OptionSettings<Type>
+): OptionSettings<Type>
+
+export function parseValue<OptionValue extends OptionTypeSetting<any>>(
 	optionValue: OptionValue,
-	optionSchema: SchemaOptionSettings<OptionValue>,
+	optionSchema: OptionSettings<OptionValue>,
 	existsInParents?: boolean
 ): OptionValue
 

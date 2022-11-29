@@ -1,15 +1,17 @@
-import { SchemaOptionSettings } from '@types'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { OptionSettings, OptionTypeSetting } from '@types'
 import { hasOwn } from './utils'
 
 export const settingsFlagName = '__dtavern_option_pareser__is_schema_property'
 
-export const schemaProperty = <Type>(
-	schemaPropertySettings: SchemaOptionSettings<Type>
-): SchemaOptionSettings<Type> => {
-	if (hasOwn(schemaPropertySettings, settingsFlagName))
+export const schemaProperty = <Type extends OptionTypeSetting<any>>(
+	propertySettings: OptionSettings<Type>
+): OptionSettings<Type> => {
+	if (hasOwn(propertySettings, settingsFlagName))
 		throw 'Object already have settings flag name'
 
-	for (const key of Object.keys(schemaPropertySettings))
+	for (const key of Object.keys(propertySettings))
 		if (
 			!['type', 'required', 'default', 'validator', settingsFlagName].includes(
 				key
@@ -17,14 +19,14 @@ export const schemaProperty = <Type>(
 		)
 			throw `unknown Schema key "${key}"`
 
-	schemaPropertySettings[settingsFlagName] = true
+	propertySettings[settingsFlagName] = true
 
-	return schemaPropertySettings
+	return propertySettings
 }
 
-export const isSchemaProperty = (schemaPropertySettings: object): boolean => {
+export const isSchemaProperty = (propertySettings: object): boolean => {
 	return (
-		hasOwn(schemaPropertySettings, settingsFlagName) &&
-		schemaPropertySettings[settingsFlagName]
+		hasOwn(propertySettings, settingsFlagName) &&
+		propertySettings[settingsFlagName]
 	)
 }

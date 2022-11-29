@@ -1,9 +1,11 @@
 import { SchemaAsArray } from '@types'
 import { isArray, isObject } from './utils'
 
-export const parseOptionsByArray = <Options>(
+type Options = object
+
+export const parseOptionsByArray = (
 	options: Options,
-	schema: SchemaAsArray<Options>
+	schema: SchemaAsArray
 ): void => {
 	const optionsPaths = exportOpitonsPaths(options)
 	const schemaPaths = exportSchemaPaths(schema)
@@ -24,7 +26,7 @@ export const parseOptionsByArray = <Options>(
 	}
 }
 
-const exportOpitonsPaths = <Options>(options: Options): string[] => {
+const exportOpitonsPaths = (options: Options): string[] => {
 	const arr = []
 
 	for (const optionKey in options) {
@@ -40,9 +42,7 @@ const exportOpitonsPaths = <Options>(options: Options): string[] => {
 	return arr
 }
 
-const exportSchemaPaths = <Options>(
-	schema: SchemaAsArray<Options>
-): string[] => {
+const exportSchemaPaths = (schema: SchemaAsArray): string[] => {
 	const arr = []
 
 	for (const schemaFullPath of schema as string[]) {

@@ -1,13 +1,18 @@
-import { Config, Schema } from '@types'
+import { Config, SchemaAsArray, SchemaAsObject, SchemaReturn } from '@types'
 import { isObject, isArray } from './utils'
 import { parseOptionsByArray } from './parseOptionsByArray'
 import { parseOptionsByObject } from './parseOptionsByObject'
 
-export function parseOptions<Options, Return extends Required<Options>>(
+export function parseOptions<Options, Return = Required<Options>>(
 	options: Options,
-	schema: Schema<Options>,
+	schema: SchemaAsArray,
 	config?: Config
-): Return {
+): Return
+
+export function parseOptions<
+	Schema extends SchemaAsObject,
+	Return = SchemaReturn<Schema>
+>(options: object, schema: Schema, config?: Config): Return {
 	try {
 		if (!(options && schema))
 			throw (
@@ -21,15 +26,18 @@ export function parseOptions<Options, Return extends Required<Options>>(
 
 		if (isArray(schema)) {
 			parseOptionsByArray(options, schema)
-			// @ts-ignore
-			return options as Return
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return options as any
 		}
 
 		if (isObject(schema)) {
 			const optionsCopy = config && config.clone ? {} : options
 
 			parseOptionsByObject(options, optionsCopy, schema)
-			return optionsCopy as Return
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return optionsCopy as any
 		}
 
 		throw 'the second argument is not an object or array'
