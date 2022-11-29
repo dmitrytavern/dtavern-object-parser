@@ -3,10 +3,13 @@
 /**
  * Settings for property of schema
  */
-export type OptionSettings<T extends OptionTypeSetting<any>> = {
+export type OptionSettings<
+	T extends OptionTypeSetting<any>,
+	K extends OptionRequiredSetting
+> = {
 	type?: T
 	default?: OptionDefaultSetting<T>
-	required?: OptionRequiredSetting
+	required?: K
 	validator?: OptionValidatorSetting<T>
 }
 

@@ -6,7 +6,7 @@ import { isEqualConstructor } from './isEqualConstructor'
 
 export const parseValue = <OptionValue>(
 	optionValue: OptionValue,
-	optionSchema: OptionSettings<any>,
+	optionSchema: OptionSettings<any, any>,
 	existsInParents?: boolean
 ): OptionValue => {
 	let _optionValue = optionValue
@@ -21,7 +21,7 @@ export const parseValue = <OptionValue>(
 			: isArray(optionSchema)
 			? optionSchema
 			: isObject(optionSchema)
-			? (optionSchema as OptionSettings<any>).type || null
+			? (optionSchema as OptionSettings<any, any>).type || null
 			: (optionSchema as OptionTypeSetting<any>)
 
 	const required =

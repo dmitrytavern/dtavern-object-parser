@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { SchemaAsArray, SchemaAsObject, SchemaReturn } from './schema'
-import { OptionSettings, OptionTypeSetting } from './option'
+import {
+	OptionRequiredSetting,
+	OptionSettings,
+	OptionTypeSetting,
+} from './option'
 import { Config } from './config'
 
 export * from './option'
@@ -23,13 +27,16 @@ export function parseOptions<
 	Return = SchemaReturn<Schema>
 >(options: object, schema: Schema, config?: Config): Return
 
-export function schemaProperty<Type extends OptionTypeSetting<any>>(
-	schemaOptionSettings: OptionSettings<Type>
-): OptionSettings<Type>
+export function schemaProperty<
+	Type extends OptionTypeSetting<any>,
+	Required extends OptionRequiredSetting
+>(
+	schemaOptionSettings: OptionSettings<Type, Required>
+): OptionSettings<Type, Required>
 
 export function parseValue<OptionValue extends OptionTypeSetting<any>>(
 	optionValue: OptionValue,
-	optionSchema: OptionSettings<OptionValue>,
+	optionSchema: OptionSettings<OptionValue, any>,
 	existsInParents?: boolean
 ): OptionValue
 

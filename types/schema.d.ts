@@ -20,7 +20,7 @@ export type SchemaAsObject = {
 export type SchemaProperty =
 	| SchemaAsObject
 	| OptionTypeSetting<any>
-	| OptionSettings<any>
+	| OptionSettings<any, any>
 
 /**
  * Return schema type
@@ -37,7 +37,11 @@ export type SchemaReturnProperty<Property> =
 type SchemaReturnPropertyAsType<Constructor> =
 	OptionConstructorReturn<Constructor>
 
-type SchemaReturnPropertyAsSettings<Property> =
-	Property extends OptionSettings<any>
+type SchemaReturnPropertyAsSettings<Property> = Property extends OptionSettings<
+	any,
+	any
+>
+	? Required<Property>['required'] extends true
 		? OptionConstructorReturn<Required<Property>['type']>
-		: SchemaReturn<Property>
+		: OptionConstructorReturn<Required<Property>['type']> | undefined
+	: SchemaReturn<Property>

@@ -1,32 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { OptionSettings, OptionTypeSetting } from '@types'
 import { hasOwn } from './utils'
+import {
+	OptionSettings,
+	OptionTypeSetting,
+	OptionRequiredSetting,
+} from '@types'
 
 export const settingsFlagName = '__dtavern_option_pareser__is_schema_property'
 
-export const schemaProperty = <Type extends OptionTypeSetting<any>>(
-	propertySettings: OptionSettings<Type>
-): OptionSettings<Type> => {
-	if (hasOwn(propertySettings, settingsFlagName))
+export const schemaProperty = <
+	T extends OptionTypeSetting<any>,
+	R extends OptionRequiredSetting
+>(
+	settings: OptionSettings<T, R>
+): OptionSettings<T, R> => {
+	if (hasOwn(settings, settingsFlagName))
 		throw 'Object already have settings flag name'
 
-	for (const key of Object.keys(propertySettings))
+	for (const key of Object.keys(settings))
 		if (
 			!['type', 'required', 'default', 'validator', settingsFlagName].includes(
 				key
 			)
 		)
-			throw `unknown Schema key "${key}"`
+			throw `unknown schema key "${key}"`
 
-	propertySettings[settingsFlagName] = true
+	settings[settingsFlagName] = true
 
-	return propertySettings
+	return settings
 }
 
-export const isSchemaProperty = (propertySettings: object): boolean => {
-	return (
-		hasOwn(propertySettings, settingsFlagName) &&
-		propertySettings[settingsFlagName]
-	)
+export const isSchemaProperty = (object: object): boolean => {
+	return hasOwn(object, settingsFlagName) && object[settingsFlagName]
 }
