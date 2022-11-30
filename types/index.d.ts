@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { SchemaAsArray, SchemaAsObject, SchemaReturn } from './schema'
 import {
 	OptionRequiredSetting,

@@ -1,5 +1,5 @@
 import { SchemaAsArray } from '@types'
-import { hasOwn, isArray, isObject } from './utils'
+import { hasOwn, isArray, isObject } from '@utilities'
 
 type Options = object
 

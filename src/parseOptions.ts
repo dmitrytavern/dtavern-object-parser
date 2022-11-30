@@ -1,5 +1,5 @@
 import { Config, SchemaAsArray, SchemaAsObject, SchemaReturn } from '@types'
-import { isObject, isArray } from './utils'
+import { isObject, isArray } from '@utilities'
 import { parseOptionsByArray } from './parseOptionsByArray'
 import { parseOptionsByObject } from './parseOptionsByObject'
 

@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { hasOwn } from './utils'
+import { hasOwn } from '@utilities'
 import {
 	OptionSettings,
 	OptionTypeSetting,

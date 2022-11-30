@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { OptionTypeSetting, AsyncFunctionType } from '@types'
 import { isArray } from './utils'
 

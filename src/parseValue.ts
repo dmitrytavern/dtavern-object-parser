@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { OptionSettings, OptionTypeSetting } from '@types'
-import { hasOwn, isFunction, isArray, isObject } from './utils'
+import { hasOwn, isFunction, isArray, isObject } from '@utilities'
 import { isEqualConstructor } from './isEqualConstructor'
 
 export const parseValue = <OptionValue>(

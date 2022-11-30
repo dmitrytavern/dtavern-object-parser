@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SchemaProperty } from '@types'
-import { hasOwn, isArray, isObject } from './utils'
+import { hasOwn, isArray, isObject } from '@utilities'
 import { isSchemaProperty } from './schema'
 import { parseValue } from './parseValue'
 

@@ -4,10 +4,10 @@
 		"target": "es2015",
 		"baseUrl": "./",
 		"paths": {
-			"@utilities": ["src/utilities/index.ts"],
+			"@utilities": ["src/utils.ts"],
 			"@types": ["types/index.d.ts"]
 		}
 	},
-	"include": ["src", "types"],
-	"exclude": ["node_modules", "tests"]
+	"include": ["src", "types", "tests"],
+	"exclude": ["node_modules"]
 }

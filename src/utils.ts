@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const isArray = Array.isArray
 
 export function isObject(obj: any): boolean {

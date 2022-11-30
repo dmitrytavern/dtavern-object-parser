@@ -28,6 +28,10 @@ const rollupConfig = {
 					find: '@types',
 					replacement: path.resolve(__dirname, 'types/index'),
 				},
+				{
+					find: '@utilities',
+					replacement: path.resolve(__dirname, 'src/utils.ts'),
+				},
 			],
 		}),
 		typescript(),
