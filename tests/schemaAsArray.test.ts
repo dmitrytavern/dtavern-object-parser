@@ -1,6 +1,6 @@
-import { parseOptions } from '../dist'
+import { parseProperties } from '../dist'
 
-const parseFn = parseOptions
+const parseFn = parseProperties
 
 describe('Check schema as array', () => {
 	it('schema is empty', () => {

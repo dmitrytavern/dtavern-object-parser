@@ -1,7 +1,7 @@
 import { Schema } from '@types'
-import { hasOwn, isArray, isObject } from './utils/objects'
-import { parseValue } from './parseValue'
-import { isSchema } from './schema/createSchema'
+import { hasOwn, isArray, isObject } from '../utils/objects'
+import { parseProperty } from './parseProperty'
+import { isSchema } from '../schema/createSchema'
 
 type OriginalOptions = object | undefined
 type Options = object
@@ -110,17 +110,15 @@ const parseOptionValue = (
 	optionKey: string
 ): void => {
 	try {
+		const optionSchema = schemaParent[optionKey]
 		const optionExists = originalOptionsParent
 			? hasOwn(originalOptionsParent, optionKey)
 			: false
 
-		if (optionExists)
-			optionsParent[optionKey] = originalOptionsParent[optionKey]
-
-		const optionValue = parseValue(
-			optionsParent[optionKey],
-			schemaParent[optionKey],
-			optionExists
+		const optionValue = parseProperty(
+			originalOptionsParent,
+			optionKey,
+			optionSchema,
 		)
 
 		if (optionExists && optionValue === undefined)

@@ -1,9 +1,9 @@
 import { Config, Schema, SchemaReturn, RawSchema } from '@types'
-import { createSchema, isSchema } from './schema/createSchema'
-import { isObject, isArray } from './utils/objects'
+import { createSchema, isSchema } from '../schema/createSchema'
+import { isObject, isArray } from '../utils/objects'
 import { parseObject } from './parseObject'
 
-export function parseOptions<
+export function parseProperties<
 	OptionsSchema extends Schema | RawSchema,
 	Return = SchemaReturn<OptionsSchema>
 >(options: any, schema: OptionsSchema, config?: Config): Return {

@@ -1,19 +1,21 @@
-import { RawOptionSettings, OptionTypeSetting } from '@types'
-import { hasOwn, isFunction, isArray, isObject } from './utils/objects'
-import { isEqualConstructor } from './isEqualConstructor'
+import { hasOwn, isFunction, isArray, isObject } from '../utils/objects'
+import { compareConstructors } from '../utils/constructor'
+import {
+	RawOptionSettings,
+	OptionTypeSetting,
+	OptionConstructorReturn,
+} from '@types'
 
-type SchemaOpitonSettings = RawOptionSettings<any, any, any, any>
+type SchemaOpitonSettings<Type extends OptionTypeSetting<any>> =
+	RawOptionSettings<Type, any, any, any>
 
-export const parseValue = <OptionValue>(
-	optionValue: OptionValue,
-	optionSchema: SchemaOpitonSettings,
-	existsInParents?: boolean
-): OptionValue => {
-	let _optionValue = optionValue
-	let _optionExists =
-		existsInParents === undefined
-			? optionValue !== undefined
-			: !!existsInParents
+export const parseProperty = <Type extends OptionTypeSetting<any>>(
+	options: object | undefined,
+	optionKey: string,
+	optionSchema: SchemaOpitonSettings<Type>
+): OptionConstructorReturn<Type> => {
+	let _optionValue = options ? options[optionKey] : undefined
+	let _optionExists = options ? hasOwn(options, optionKey) : false
 
 	const type =
 		optionSchema === null
@@ -21,8 +23,8 @@ export const parseValue = <OptionValue>(
 			: isArray(optionSchema)
 			? optionSchema
 			: isObject(optionSchema)
-			? (optionSchema as SchemaOpitonSettings).type || null
-			: (optionSchema as OptionTypeSetting<any>)
+			? (optionSchema as SchemaOpitonSettings<Type>).type || null
+			: (optionSchema as OptionTypeSetting<Type>)
 
 	const required =
 		optionSchema !== null && hasOwn(optionSchema, 'required')
@@ -81,7 +83,7 @@ export const parseValue = <OptionValue>(
 	 * form Schema
 	 */
 	if (type !== null && _optionExists) {
-		if (!isEqualConstructor(_optionValue, type)) {
+		if (!compareConstructors(_optionValue, type)) {
 			const constructors = isArray(type)
 				? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`
 				: type.prototype.constructor.name

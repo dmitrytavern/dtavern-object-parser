@@ -1,6 +1,6 @@
-import { parseOptions, createSchemaProperty } from '../dist'
+import { parseProperties, createSchemaProperty } from '../dist'
 
-const parseFn = parseOptions
+const parseFn = parseProperties
 const propertyFn = createSchemaProperty
 
 describe('Check schema as object', () => {

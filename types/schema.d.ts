@@ -11,6 +11,16 @@ export type Schema = {
 	[key: string]: Schema | SchemaOptionSettings
 }
 
+export type SchemaType<Schema> = {
+	[Property in keyof Schema]: SchemaTypeProperty<Schema[Property]>
+}
+
+type SchemaTypeProperty<Property> = Property extends OptionTypeSetting<any>
+	? OptionSettings<Property, any, true, any>
+	: Property extends SchemaOptionSettings
+	? Property
+	: SchemaType<Property>
+
 /**
  * Raw schema
  */

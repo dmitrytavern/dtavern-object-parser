@@ -1,80 +1,77 @@
-import { isEqualConstructor, AsyncFunction } from '../src/isEqualConstructor'
+import { utils } from '../dist/index'
+
+const compareFn = utils.compareConstructors
+const AsyncFunction = utils.AsyncFunction
 
 describe('Check primitive constructors', () => {
 	it('Check string constructor', () => {
-		expect(isEqualConstructor('', String)).toBeTruthy()
-		expect(isEqualConstructor('hello world', String)).toBeTruthy()
-		expect(isEqualConstructor('123', String)).toBeTruthy()
+		expect(compareFn('', String)).toBeTruthy()
+		expect(compareFn('hello world', String)).toBeTruthy()
+		expect(compareFn('123', String)).toBeTruthy()
 
-		expect(isEqualConstructor(134, String)).toBeFalsy()
-		expect(isEqualConstructor(false, String)).toBeFalsy()
-		expect(isEqualConstructor(Symbol('text'), String)).toBeFalsy()
+		expect(compareFn(134, String)).toBeFalsy()
+		expect(compareFn(false, String)).toBeFalsy()
+		expect(compareFn(Symbol('text'), String)).toBeFalsy()
 	})
 
 	it('Check number constructor', () => {
-		expect(isEqualConstructor(123, Number)).toBeTruthy()
-		expect(isEqualConstructor(NaN, Number)).toBeTruthy()
-		expect(isEqualConstructor(1324e3, Number)).toBeTruthy()
+		expect(compareFn(123, Number)).toBeTruthy()
+		expect(compareFn(NaN, Number)).toBeTruthy()
+		expect(compareFn(1324e3, Number)).toBeTruthy()
 
-		expect(isEqualConstructor('134', Number)).toBeFalsy()
+		expect(compareFn('134', Number)).toBeFalsy()
 	})
 
 	it('Check boolean constructor', () => {
-		expect(isEqualConstructor(true, Boolean)).toBeTruthy()
-		expect(isEqualConstructor(false, Boolean)).toBeTruthy()
+		expect(compareFn(true, Boolean)).toBeTruthy()
+		expect(compareFn(false, Boolean)).toBeTruthy()
 
-		expect(isEqualConstructor('', Boolean)).toBeFalsy()
-		expect(isEqualConstructor(0, Boolean)).toBeFalsy()
-		expect(isEqualConstructor(null, Boolean)).toBeFalsy()
-		expect(isEqualConstructor(undefined, Boolean)).toBeFalsy()
+		expect(compareFn('', Boolean)).toBeFalsy()
+		expect(compareFn(0, Boolean)).toBeFalsy()
+		expect(compareFn(null, Boolean)).toBeFalsy()
+		expect(compareFn(undefined, Boolean)).toBeFalsy()
 	})
 
 	it('Check symbol constructor', () => {
-		expect(isEqualConstructor(Symbol('test'), Symbol)).toBeTruthy()
+		expect(compareFn(Symbol('test'), Symbol)).toBeTruthy()
 
-		expect(isEqualConstructor('Symbol', Symbol)).toBeFalsy()
+		expect(compareFn('Symbol', Symbol)).toBeFalsy()
 	})
 })
 
 describe('Check not primitive constructors', () => {
 	it('Check array constructor', () => {
-		expect(isEqualConstructor([], Array)).toBeTruthy()
-		expect(isEqualConstructor({}, Array)).toBeFalsy()
+		expect(compareFn([], Array)).toBeTruthy()
+		expect(compareFn({}, Array)).toBeFalsy()
 	})
 
 	it('Check object constructor', () => {
-		expect(isEqualConstructor({}, Object)).toBeTruthy()
-		expect(isEqualConstructor([], Object)).toBeFalsy()
+		expect(compareFn({}, Object)).toBeTruthy()
+		expect(compareFn([], Object)).toBeFalsy()
 	})
 
 	it('Check function constructor', () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		expect(isEqualConstructor(() => {}, Function)).toBeTruthy()
+		expect(compareFn(() => {}, Function)).toBeTruthy()
 
 		expect(
-			isEqualConstructor(new Function(`return async () => {}`)(), Function)
+			compareFn(new Function(`return async () => {}`)(), Function)
 		).toBeFalsy()
 		expect(
-			isEqualConstructor(new Function(`return async () => {}`)(), AsyncFunction)
+			compareFn(new Function(`return async () => {}`)(), AsyncFunction)
 		).toBeTruthy()
 
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		expect(isEqualConstructor(function () {}, Function)).toBeTruthy()
+		expect(compareFn(function () {}, Function)).toBeTruthy()
 
 		expect(
-			isEqualConstructor(
-				new Function(`return async function () {}`)(),
-				Function
-			)
+			compareFn(new Function(`return async function () {}`)(), Function)
 		).toBeFalsy()
 		expect(
-			isEqualConstructor(
-				new Function(`return async function () {}`)(),
-				AsyncFunction
-			)
+			compareFn(new Function(`return async function () {}`)(), AsyncFunction)
 		).toBeTruthy()
 
-		expect(isEqualConstructor(class Animal {}, Function)).toBeTruthy()
+		expect(compareFn(class Animal {}, Function)).toBeTruthy()
 	})
 })
 
@@ -82,6 +79,6 @@ describe('Check custom constructors', () => {
 	class Animal {}
 	const animal = new Animal()
 
-	expect(isEqualConstructor(animal, Animal)).toBeTruthy()
-	expect(isEqualConstructor('animal', Animal)).toBeFalsy()
+	expect(compareFn(animal, Animal)).toBeTruthy()
+	expect(compareFn('animal', Animal)).toBeFalsy()
 })

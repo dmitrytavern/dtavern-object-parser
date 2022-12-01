@@ -1,4 +1,4 @@
-import { Schema, RawSchema, SchemaReturn } from './schema'
+import { Schema, SchemaType, RawSchema, SchemaReturn } from './schema'
 import { Config } from './config'
 import {
 	OptionSettings,
@@ -6,6 +6,7 @@ import {
 	OptionRequiredSetting,
 	OptionDefaultSetting,
 	OptionValidatorSetting,
+	OptionConstructorReturn,
 	RawOptionSettings,
 } from './option'
 
@@ -14,16 +15,15 @@ export * from './config'
 export * from './schema'
 
 export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
-
 export const AsyncFunction: AsyncFunctionType
 
-export function isSchema(object: object): boolean
+export declare function isSchema(object: object): boolean
 
-export function isSchemaProperty(object: object): boolean
+export declare function isSchemaProperty(object: object): boolean
 
-export function createSchema(schema: RawSchema): Schema
+export declare function createSchema<Schema>(schema: Schema): SchemaType<Schema>
 
-export function createSchemaProperty<
+export declare function createSchemaProperty<
 	Type extends OptionTypeSetting<any>,
 	Default extends OptionDefaultSetting<Type>,
 	Required extends OptionRequiredSetting,
@@ -32,25 +32,42 @@ export function createSchemaProperty<
 	settings: RawOptionSettings<Type, Default, Required, Validator>
 ): OptionSettings<Type, Default, Required, Validator>
 
-export function parseOptions<
+export declare function parseProperties<
 	OptionsSchema,
 	Return = SchemaReturn<OptionsSchema>
 >(options: any, schema: OptionsSchema, config?: Config): Return
 
-export function parseValue<OptionValue extends OptionTypeSetting<any>>(
-	optionValue: OptionValue,
-	optionSchema: OptionSettings<OptionValue, any, any, any>,
-	existsInParents?: boolean
-): OptionValue
+export declare function parseProperty<Type extends OptionTypeSetting<any>>(
+	options: object | undefined,
+	optionKey: string,
+	optionSchema: RawOptionSettings<Type, any, any, any>
+): OptionConstructorReturn<Type>
 
-export const options: {
-	parse: typeof parseOptions
-	single: typeof parseValue
+declare function hasOwn(obj: any | Array<any>, key: string): boolean
+declare function isObject(obj: any): boolean
+declare function isFunction(value: any): value is (...args: any[]) => boolean
+declare function compareConstructors(
+	propertyValue: any,
+	types: OptionTypeSetting<any>
+): boolean
+
+export declare const utils: {
 	AsyncFunction: typeof AsyncFunction
-	createSchema: typeof createSchema
-	createSchemaProperty: typeof createSchemaProperty
+	compareConstructors: typeof compareConstructors
+	hasOwn: typeof hasOwn
+	isArray: typeof Array.isArray
+	isObject: typeof isObject
+	isFunction: typeof isFunction
+}
+
+export declare const options: {
+	parse: typeof parseProperties
+	single: typeof parseProperty
+	schema: typeof createSchema
+	property: typeof createSchemaProperty
 	isSchema: typeof isSchema
 	isSchemaProperty: typeof isSchemaProperty
+	utils: typeof utils
 }
 
 export default options
