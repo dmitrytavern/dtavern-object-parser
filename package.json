@@ -1,25 +1,30 @@
 {
-	"name": "@dtavern/options",
+	"name": "@dtavern/object-parser",
 	"version": "1.1.0",
-	"description": "Js options validator",
+	"description": "Js object validator",
 	"author": {
 		"name": "Dmitry Tavern",
 		"url": "https://github.com/DmitryTavern"
 	},
 	"repository": {
-		"url": "https://github.com/DmitryTavern/dtavern-options"
+		"url": "https://github.com/DmitryTavern/dtavern-object-parser"
 	},
 	"bugs": {
-		"url": "https://github.com/DmitryTavern/dtavern-options/issues"
+		"url": "https://github.com/DmitryTavern/dtavern-object-parser/issues"
 	},
 	"keywords": [
+		"object-parser",
+		"object-validator",
 		"options",
-		"options-parese",
-		"options-validator"
+		"options-parser",
+		"options-validator",
+		"props",
+		"props-parser",
+		"props-validator"
 	],
 	"license": "MIT",
-	"main": "dist/index.js",
-	"module": "dist/index.esm.js",
+	"main": "dist/object-parser.js",
+	"module": "dist/object-parser.esm.js",
 	"types": "types/index.d.ts",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development rollup -w -c rollup.config.js",
@@ -31,15 +36,14 @@
 	"devDependencies": {
 		"@babel/core": "^7.18.6",
 		"@babel/preset-env": "^7.18.6",
-		"@rollup/plugin-alias": "^3.1.9",
 		"@rollup/plugin-babel": "^5.3.1",
+		"@rollup/plugin-terser": "^0.1.0",
 		"@rollup/plugin-typescript": "^8.3.3",
 		"@types/jest": "^28.1.3",
 		"@types/node": "^18.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.30.0",
 		"@typescript-eslint/parser": "^5.30.0",
 		"cross-env": "^7.0.3",
-		"dotenv": "^16.0.1",
 		"eslint": "^8.18.0",
 		"husky": "^8.0.0",
 		"jest": "^28.1.1",

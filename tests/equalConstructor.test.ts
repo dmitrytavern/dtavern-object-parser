@@ -1,4 +1,4 @@
-import { utils } from '../dist/index'
+import { utils } from '../dist/object-parser'
 
 const compareFn = utils.compareConstructors
 const AsyncFunction = utils.AsyncFunction

@@ -1,4 +1,4 @@
-import { Schema, SchemaType, RawSchema, SchemaReturn } from './schema'
+import { SchemaType, SchemaReturn } from './schema'
 import { Config } from './config'
 import {
 	OptionSettings,
@@ -60,14 +60,14 @@ export declare const utils: {
 	isFunction: typeof isFunction
 }
 
-export declare const options: {
+export declare const parser: {
 	parse: typeof parseProperties
 	single: typeof parseProperty
 	schema: typeof createSchema
 	property: typeof createSchemaProperty
 	isSchema: typeof isSchema
-	isSchemaProperty: typeof isSchemaProperty
+	isProperty: typeof isSchemaProperty
 	utils: typeof utils
 }
 
-export default options
+export default parser

@@ -26,14 +26,14 @@ export const utils = {
 	isFunction,
 }
 
-export const options = {
+export const parser = {
 	parse: parseProperties,
 	single: parseProperty,
 	schema: createSchema,
 	property: createSchemaProperty,
 	isSchema,
-	isSchemaProperty,
+	isProperty: isSchemaProperty,
 	utils,
 }
 
-export default options
+export default parser

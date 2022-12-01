@@ -1,4 +1,4 @@
-import { parseProperties, createSchemaProperty } from '../dist'
+import { parseProperties, createSchemaProperty } from '../dist/object-parser'
 
 const parseFn = parseProperties
 const propertyFn = createSchemaProperty

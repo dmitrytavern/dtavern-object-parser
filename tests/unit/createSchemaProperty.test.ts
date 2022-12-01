@@ -1,4 +1,4 @@
-import { isSchemaProperty, createSchemaProperty } from '../../dist'
+import { isSchemaProperty, createSchemaProperty } from '../../dist/object-parser'
 
 const propertyFn = createSchemaProperty
 const isPropertyFn = isSchemaProperty

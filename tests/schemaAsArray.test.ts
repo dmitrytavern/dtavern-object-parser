@@ -1,4 +1,4 @@
-import { parseProperties } from '../dist'
+import { parseProperties } from '../dist/object-parser'
 
 const parseFn = parseProperties
 
