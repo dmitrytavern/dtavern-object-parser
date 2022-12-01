@@ -1,7 +1,7 @@
-import { parseOptions, schemaProperty } from '../dist'
+import { parseOptions, createSchemaProperty } from '../dist'
 
 const parseFn = parseOptions
-const propertyFn = schemaProperty
+const propertyFn = createSchemaProperty
 
 it('Check plugin arguments', () => {
 	expect(() => parseFn()).toThrow()

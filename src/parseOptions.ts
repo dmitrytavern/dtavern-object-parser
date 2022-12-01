@@ -1,46 +1,35 @@
-import { Config, SchemaAsArray, SchemaAsObject, SchemaReturn } from '@types'
-import { isObject, isArray } from '@utilities'
-import { parseOptionsByArray } from './parseOptionsByArray'
-import { parseOptionsByObject } from './parseOptionsByObject'
-
-export function parseOptions<Options, Return = Required<Options>>(
-	options: Options,
-	schema: SchemaAsArray,
-	config?: Config
-): Return
+import { Config, Schema, SchemaReturn, RawSchema } from '@types'
+import { createSchema, isSchema } from './schema/createSchema'
+import { isObject, isArray } from './utils/objects'
+import { parseObject } from './parseObject'
 
 export function parseOptions<
-	Schema extends SchemaAsObject,
-	Return = SchemaReturn<Schema>
->(options: object, schema: Schema, config?: Config): Return {
+	OptionsSchema extends Schema | RawSchema,
+	Return = SchemaReturn<OptionsSchema>
+>(options: any, schema: OptionsSchema, config?: Config): Return {
 	try {
 		if (!(options && schema))
 			throw (
 				'first or second argument is not defined. ' +
 				'The first argument must be an object and the ' +
-				'second argument must be an array or object'
+				'second argument must be object schema'
 			)
 
 		if (isArray(options) || !isObject(options))
-			throw 'the first argument is not an object. Please, use the type of object'
+			throw 'the first argument is not an object.'
 
-		if (isArray(schema)) {
-			parseOptionsByArray(options, schema)
+		if (!isArray(schema) && !isObject(schema))
+			throw 'the second argument is not an object or an array.'
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			return options as any
-		}
+		const optionsCopy = config && config.clone ? {} : options
+		const _schema =
+			isArray(schema) || !isSchema(schema)
+				? createSchema(schema)
+				: (schema as Schema)
 
-		if (isObject(schema)) {
-			const optionsCopy = config && config.clone ? {} : options
+		parseObject(options, optionsCopy, _schema)
 
-			parseOptionsByObject(options, optionsCopy, schema)
-
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			return optionsCopy as any
-		}
-
-		throw 'the second argument is not an object or array'
+		return optionsCopy as any
 	} catch (e) {
 		const mode = config && config.mode ? config.mode : 'strict'
 		const errors = isArray(e) ? e : [e]

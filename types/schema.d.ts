@@ -7,18 +7,25 @@ import {
 /**
  * Schema type
  */
-export type Schema = SchemaAsArray | SchemaAsObject
-
-export type SchemaAsArray = string[]
-
-export type SchemaAsObject = {
-	[Key in string]: SchemaProperty
+export type Schema = {
+	[key: string]: Schema | SchemaOptionSettings
 }
 
-export type SchemaProperty =
-	| SchemaAsObject
+/**
+ * Raw schema
+ */
+export type RawSchema = RawSchemaAsArray | RawSchemaAsObject
+
+export type RawSchemaAsArray = string[]
+
+export type RawSchemaAsObject = {
+	[key: string]: RawSchemaProperty
+}
+
+export type RawSchemaProperty =
 	| OptionTypeSetting<any>
-	| OptionSettings<any, any>
+	| SchemaOptionSettings
+	| RawSchemaAsObject
 
 /**
  * Return schema type
@@ -35,11 +42,11 @@ export type SchemaReturnProperty<Property> =
 type SchemaReturnPropertyAsType<Constructor> =
 	OptionConstructorReturn<Constructor>
 
-type SchemaReturnPropertyAsSettings<Property> = Property extends OptionSettings<
-	any,
-	any
->
-	? Required<Property>['required'] extends true
-		? OptionConstructorReturn<Required<Property>['type']>
-		: OptionConstructorReturn<Required<Property>['type']> | undefined
-	: SchemaReturn<Property>
+type SchemaReturnPropertyAsSettings<Property> =
+	Property extends SchemaOptionSettings
+		? Property['required'] extends true
+			? OptionConstructorReturn<Property['type']>
+			: OptionConstructorReturn<Property['type']> | undefined
+		: SchemaReturn<Property>
+
+type SchemaOptionSettings = OptionSettings<any, any, any, any>

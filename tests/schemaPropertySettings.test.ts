@@ -1,46 +1,47 @@
-import { parseOptions, schemaProperty } from '../dist'
+import { parseOptions, createSchemaProperty } from '../dist'
 
 const parseFn = parseOptions
+const propertyFn = createSchemaProperty
 
 describe('Check option type setting', () => {
 	const opt = { name: 'Dmitry' }
 
 	it('type not exists', () => {
-		const object = parseFn(opt, { name: schemaProperty({}) })
+		const object = parseFn(opt, { name: propertyFn({}) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type is correct', () => {
 		const object = parseFn(opt, {
-			name: schemaProperty({ type: String }),
+			name: propertyFn({ type: String }),
 		})
 		expect(object).toEqual(opt)
 	})
 
 	it('type is wrong', () => {
-		const fn = () => parseFn(opt, { name: schemaProperty({ type: Number }) })
+		const fn = () => parseFn(opt, { name: propertyFn({ type: Number }) })
 		expect(fn).toThrow()
 	})
 
 	it('type is null', () => {
-		const object = parseFn(opt, { name: schemaProperty({ type: null }) })
+		const object = parseFn(opt, { name: propertyFn({ type: null }) })
 		expect(object).toEqual(opt)
 	})
 
 	it('type value is wrong', () => {
-		const fn = () => parseFn(opt, { name: schemaProperty({ type: 'hello' }) })
+		const fn = () => parseFn(opt, { name: propertyFn({ type: 'hello' }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is empty array', () => {
-		const fn = () => parseFn(opt, { name: schemaProperty({ type: [] }) })
+		const fn = () => parseFn(opt, { name: propertyFn({ type: [] }) })
 		expect(fn).toThrow()
 	})
 
 	it('type value is array with wrong values', () => {
 		const fn = () =>
 			parseFn(opt, {
-				name: schemaProperty({ type: [Number, 'string', false, undefined] }),
+				name: propertyFn({ type: [Number, 'string', false, undefined] }),
 			})
 		expect(fn).toThrow()
 	})
@@ -54,7 +55,7 @@ describe('Check option validator setting', () => {
 
 	it('validator returns true', () => {
 		const object = parseFn(opt, {
-			name: schemaProperty({ ...setValidator('Dmitry') }),
+			name: propertyFn({ ...setValidator('Dmitry') }),
 		})
 
 		expect(object).toEqual(opt)
@@ -63,7 +64,7 @@ describe('Check option validator setting', () => {
 	it('validator returns false', () => {
 		const fn1 = () =>
 			parseFn(opt, {
-				name: schemaProperty({ ...setValidator('Other name') }),
+				name: propertyFn({ ...setValidator('Other name') }),
 			})
 
 		expect(fn1).toThrow()
@@ -72,19 +73,19 @@ describe('Check option validator setting', () => {
 
 describe('Check option required setting', () => {
 	it('required setting is false', () => {
-		const object = parseFn({}, { name: schemaProperty({ required: false }) })
+		const object = parseFn({}, { name: propertyFn({ required: false }) })
 		expect(object).toEqual({})
 	})
 
 	it('required setting is true', () => {
-		const fn = () => parseFn({}, { name: schemaProperty({ required: true }) })
+		const fn = () => parseFn({}, { name: propertyFn({ required: true }) })
 		expect(fn).toThrow()
 	})
 })
 
 describe('Check option default setting', () => {
 	const settings1 = {
-		name: schemaProperty({ required: false, default: 'hello world' }),
+		name: propertyFn({ required: false, default: 'hello world' }),
 	}
 
 	it('property does not exist', () => {
@@ -101,7 +102,7 @@ describe('Check option default setting', () => {
 		const object = parseFn(
 			{},
 			{
-				name: schemaProperty({
+				name: propertyFn({
 					type: Object,
 					required: false,
 					default: () => {
@@ -118,7 +119,7 @@ describe('Check option default setting', () => {
 			parseFn(
 				{},
 				{
-					name: schemaProperty({
+					name: propertyFn({
 						type: Array,
 						required: false,
 						default: () => {
@@ -135,7 +136,7 @@ describe('Check option default setting', () => {
 			parseFn(
 				{},
 				{
-					name: schemaProperty({
+					name: propertyFn({
 						required: false,
 						default: () => {
 							return { test: true }
@@ -154,7 +155,7 @@ describe('Check option default setting', () => {
 		const object = parseFn(
 			{},
 			{
-				name: schemaProperty({
+				name: propertyFn({
 					required: false,
 					default: {
 						test: true,
@@ -174,7 +175,7 @@ it('Check unknown setting key', () => {
 				name: 'Hello',
 			},
 			{
-				name: schemaProperty({
+				name: propertyFn({
 					type: String,
 					require: true,
 				}),

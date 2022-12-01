@@ -1,5 +1,5 @@
 import { OptionTypeSetting, AsyncFunctionType } from '@types'
-import { isArray } from './utils'
+import { isArray } from './utils/objects'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const AsyncFunction: AsyncFunctionType = new Function(

@@ -2,7 +2,6 @@ import 'dotenv/config'
 import path from 'path'
 import typescript from '@rollup/plugin-typescript'
 import babel from '@rollup/plugin-babel'
-import alias from '@rollup/plugin-alias'
 import del from 'rollup-plugin-delete'
 
 const {
@@ -22,18 +21,6 @@ const rollupConfig = {
 	output: [{ file: `${output}.js`, format: 'cjs', exports: 'named' }],
 	plugins: [
 		del({ targets: `${APP_BUILD_DIRNAME}/*` }),
-		alias({
-			entries: [
-				{
-					find: '@types',
-					replacement: path.resolve(__dirname, 'types/index'),
-				},
-				{
-					find: '@utilities',
-					replacement: path.resolve(__dirname, 'src/utils.ts'),
-				},
-			],
-		}),
 		typescript(),
 	],
 }

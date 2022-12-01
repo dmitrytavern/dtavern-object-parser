@@ -1,25 +1,24 @@
-import { SchemaProperty } from '@types'
-import { hasOwn, isArray, isObject } from '@utilities'
-import { isSchemaProperty } from './schema'
+import { Schema } from '@types'
+import { hasOwn, isArray, isObject } from './utils/objects'
 import { parseValue } from './parseValue'
+import { isSchema } from './schema/createSchema'
 
 type OriginalOptions = object | undefined
 type Options = object
-type Schema = SchemaProperty
 
 const _nestedLogs = []
 const _errorLogs = []
 const _optionsWithFlags = []
 const handledFlagName = '__dtavern_option_pareser__is_already_handled'
 
-export const parseOptionsByObject = (
+export const parseObject = (
 	originalOptions: OriginalOptions,
 	options: Options,
 	schema: Schema
 ): void => {
 	_nestedLogs.length = 0
 	_errorLogs.length = 0
-	_optionsWithFlags.length
+	_optionsWithFlags.length = 0
 
 	parseOptions(originalOptions, options, schema)
 
@@ -75,11 +74,7 @@ const parseOption = (
 	const opitonSchema = schemaParent[optionKey]
 	const optionValue = optionsParent[optionKey]
 
-	if (
-		isObject(opitonSchema) &&
-		!isArray(opitonSchema) &&
-		!isSchemaProperty(opitonSchema)
-	) {
+	if (isSchema(opitonSchema)) {
 		const optionNotExists = isArray(optionValue) || !isObject(optionValue)
 
 		if (optionNotExists) optionsParent[optionKey] = {}
@@ -87,7 +82,7 @@ const parseOption = (
 		parseOptions(
 			originalOptionsParent[optionKey],
 			optionsParent[optionKey],
-			schemaParent[optionKey]
+			schemaParent[optionKey] as Schema
 		)
 
 		if (optionNotExists && Object.keys(optionsParent[optionKey]).length <= 1)

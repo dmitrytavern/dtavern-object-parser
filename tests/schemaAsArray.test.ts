@@ -3,6 +3,11 @@ import { parseOptions } from '../dist'
 const parseFn = parseOptions
 
 describe('Check schema as array', () => {
+	it('schema is empty', () => {
+		const object = parseFn({}, [])
+		expect(object).toEqual({})
+	})
+
 	it('schema have equals options', () => {
 		const object = parseFn({ name: 'Dmitry' }, ['name'])
 		expect(object).toEqual({ name: 'Dmitry' })
@@ -16,16 +21,6 @@ describe('Check schema as array', () => {
 	it('schema have less keys then options', () => {
 		const fn = () => parseFn({ name: 'Dmitry', age: 13 }, ['name'])
 		expect(fn).toThrow()
-	})
-
-	it('schema have some parser functions', () => {
-		const schema = ['name', 'age']
-		const object1 = { name: 'Dmitry', age: 20 }
-		const object2 = { name: 'Elly', age: 19 }
-
-		parseFn(object1, schema)
-		parseFn(object2, schema)
-		expect(schema).toEqual(['name', 'age'])
 	})
 
 	it('options are nested', () => {
@@ -53,23 +48,12 @@ describe('Check schema as array', () => {
 	it('options are nested with cycle links', () => {
 		const object1: any = {}
 		const object2: any = {}
-		const object3 = {
-			a1: {
-				a1: {},
-			},
-		}
 
 		object1.a = object2
 		object2.b = object1
-		object3.a1.a1 = object3
 
-		const object2_schema = ['a.b']
-		const object3_schema = ['a1']
-
-		const fn1 = () => parseFn(object2, object2_schema)
-		const fn2 = () => parseFn(object3, object3_schema)
+		const fn1 = () => parseFn(object2, ['a.b'])
 
 		expect(fn1).toThrow()
-		expect(fn2).toThrow()
 	})
 })

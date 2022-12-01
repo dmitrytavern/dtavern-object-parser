@@ -1,10 +1,12 @@
-import { OptionSettings, OptionTypeSetting } from '@types'
-import { hasOwn, isFunction, isArray, isObject } from '@utilities'
+import { RawOptionSettings, OptionTypeSetting } from '@types'
+import { hasOwn, isFunction, isArray, isObject } from './utils/objects'
 import { isEqualConstructor } from './isEqualConstructor'
+
+type SchemaOpitonSettings = RawOptionSettings<any, any, any, any>
 
 export const parseValue = <OptionValue>(
 	optionValue: OptionValue,
-	optionSchema: OptionSettings<any, any>,
+	optionSchema: SchemaOpitonSettings,
 	existsInParents?: boolean
 ): OptionValue => {
 	let _optionValue = optionValue
@@ -19,7 +21,7 @@ export const parseValue = <OptionValue>(
 			: isArray(optionSchema)
 			? optionSchema
 			: isObject(optionSchema)
-			? (optionSchema as OptionSettings<any, any>).type || null
+			? (optionSchema as SchemaOpitonSettings).type || null
 			: (optionSchema as OptionTypeSetting<any>)
 
 	const required =

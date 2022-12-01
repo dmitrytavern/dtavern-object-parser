@@ -2,14 +2,23 @@
  * Settings for property of schema
  */
 export type OptionSettings<
-	T extends OptionTypeSetting<any>,
-	K extends OptionRequiredSetting
+	Type extends OptionTypeSetting<any>,
+	Default extends OptionDefaultSetting<Type>,
+	Required extends OptionRequiredSetting,
+	Validator extends OptionValidatorSetting<Type>
 > = {
-	type?: T
-	default?: OptionDefaultSetting<T>
-	required?: K
-	validator?: OptionValidatorSetting<T>
+	type: Type
+	default: Default
+	required: Required
+	validator: Validator
 }
+
+export type RawOptionSettings<
+	Type extends OptionTypeSetting<any>,
+	Default extends OptionDefaultSetting<Type>,
+	Required extends OptionRequiredSetting,
+	Validator extends OptionValidatorSetting<Type>
+> = Partial<OptionSettings<Type, Default, Required, Validator>>
 
 export type OptionTypeSetting<T> =
 	| null
@@ -18,15 +27,14 @@ export type OptionTypeSetting<T> =
 
 export type OptionDefaultSetting<T> =
 	| null
-	| undefined
 	| OptionConstructorReturn<T>
 	| (() => OptionConstructorReturn<T>)
 
 export type OptionRequiredSetting = boolean
 
-export type OptionValidatorSetting<T> = {
-	(value: OptionConstructorReturn<T>): boolean
-}
+export type OptionValidatorSetting<T> =
+	| null
+	| ((value: OptionConstructorReturn<T>) => boolean)
 
 /**
  * Helpers for property

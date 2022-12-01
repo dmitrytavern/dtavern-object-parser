@@ -1,10 +1,13 @@
-import { SchemaAsArray, SchemaAsObject, SchemaReturn } from './schema'
+import { Schema, RawSchema, SchemaReturn } from './schema'
+import { Config } from './config'
 import {
-	OptionRequiredSetting,
 	OptionSettings,
 	OptionTypeSetting,
+	OptionRequiredSetting,
+	OptionDefaultSetting,
+	OptionValidatorSetting,
+	RawOptionSettings,
 } from './option'
-import { Config } from './config'
 
 export * from './option'
 export * from './config'
@@ -14,35 +17,40 @@ export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
 
 export const AsyncFunction: AsyncFunctionType
 
-export function parseOptions<Options, Return = Required<Options>>(
-	options: Options,
-	schema: SchemaAsArray,
-	config?: Config
-): Return
+export function isSchema(object: object): boolean
+
+export function isSchemaProperty(object: object): boolean
+
+export function createSchema(schema: RawSchema): Schema
+
+export function createSchemaProperty<
+	Type extends OptionTypeSetting<any>,
+	Default extends OptionDefaultSetting<Type>,
+	Required extends OptionRequiredSetting,
+	Validator extends OptionValidatorSetting<Type>
+>(
+	settings: RawOptionSettings<Type, Default, Required, Validator>
+): OptionSettings<Type, Default, Required, Validator>
 
 export function parseOptions<
-	Schema extends SchemaAsObject,
-	Return = SchemaReturn<Schema>
->(options: object, schema: Schema, config?: Config): Return
-
-export function schemaProperty<
-	Type extends OptionTypeSetting<any>,
-	Required extends OptionRequiredSetting
->(
-	schemaOptionSettings: OptionSettings<Type, Required>
-): OptionSettings<Type, Required>
+	OptionsSchema,
+	Return = SchemaReturn<OptionsSchema>
+>(options: any, schema: OptionsSchema, config?: Config): Return
 
 export function parseValue<OptionValue extends OptionTypeSetting<any>>(
 	optionValue: OptionValue,
-	optionSchema: OptionSettings<OptionValue, any>,
+	optionSchema: OptionSettings<OptionValue, any, any, any>,
 	existsInParents?: boolean
 ): OptionValue
 
 export const options: {
 	parse: typeof parseOptions
 	single: typeof parseValue
-	schemaProperty: typeof schemaProperty
 	AsyncFunction: typeof AsyncFunction
+	createSchema: typeof createSchema
+	createSchemaProperty: typeof createSchemaProperty
+	isSchema: typeof isSchema
+	isSchemaProperty: typeof isSchemaProperty
 }
 
 export default options
