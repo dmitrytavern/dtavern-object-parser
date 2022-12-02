@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
 		"esModuleInterop": true,
-		"target": "es2015",
+		"target": "ES2022",
 		"baseUrl": "./",
 		"paths": {
 			"@types": ["types/index.d.ts"],
 		}
 	},
-	"include": ["src", "types"],
-	"exclude": ["node_modules", "tests"]
+	"include": ["src", "types", "tests"],
+	"exclude": ["node_modules"]
 }

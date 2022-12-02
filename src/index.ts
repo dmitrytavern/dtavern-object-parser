@@ -6,19 +6,24 @@ import {
 	createSchemaProperty,
 } from './schema/createSchemaProperty'
 
-import { AsyncFunction, compareConstructors } from './utils/constructor'
 import { hasOwn, isArray, isFunction, isObject } from './utils/objects'
+import {
+	AsyncFunction,
+	GeneratorFunction,
+	compareConstructors,
+} from './utils/constructor'
 
 export { parseProperty } from './lib/parseProperty'
 export { parseProperties } from './lib/parseProperties'
 export { createSchema, isSchema } from './schema/createSchema'
 export {
-	createSchemaProperty,
 	isSchemaProperty,
+	createSchemaProperty,
 } from './schema/createSchemaProperty'
 
 export const utils = {
 	AsyncFunction,
+	GeneratorFunction,
 	compareConstructors,
 	hasOwn,
 	isArray,
