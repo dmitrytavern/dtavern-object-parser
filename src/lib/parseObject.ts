@@ -75,30 +75,22 @@ const parseOption = (
 	const optionValue = optionsParent[optionKey]
 
 	if (isSchema(opitonSchema)) {
-		const optionNotExists = isArray(optionValue) || !isObject(optionValue)
-
-		if (optionNotExists) optionsParent[optionKey] = {}
+		if (isArray(optionValue) || !isObject(optionValue))
+			optionsParent[optionKey] = {}
 
 		parseOptions(
 			originalOptionsParent[optionKey],
 			optionsParent[optionKey],
 			schemaParent[optionKey] as Schema
 		)
-
-		if (optionNotExists && Object.keys(optionsParent[optionKey]).length <= 1)
-			delete optionsParent[optionKey]
-
-		_nestedLogs.pop()
-
-		return
+	} else {
+		parseOptionValue(
+			originalOptionsParent,
+			optionsParent,
+			schemaParent,
+			optionKey
+		)
 	}
-
-	parseOptionValue(
-		originalOptionsParent,
-		optionsParent,
-		schemaParent,
-		optionKey
-	)
 
 	_nestedLogs.pop()
 }

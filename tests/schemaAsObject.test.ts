@@ -104,21 +104,20 @@ describe('Check nested schemas', () => {
 		expect(fn).toThrow()
 	})
 
-	it('nested schema with not required options and options object have not keys', () => {
-		const object = parseFn(
-			{},
-			{
-				contacts: {
-					email: {
-						name: propertyFn({ required: false }),
-						domain: propertyFn({ required: false }),
+	it('nested schema without keys', () => {
+		const schema = {
+			a: {
+				b: {
+					c: {
+						d: {},
 					},
-					twitter: propertyFn({ required: false }),
 				},
-			}
-		)
+			},
+		}
 
-		expect(object).toEqual({})
+		const object = parseFn({}, schema)
+
+		expect(object).toEqual(schema)
 	})
 
 	it('nested opitons with cycle links', () => {
