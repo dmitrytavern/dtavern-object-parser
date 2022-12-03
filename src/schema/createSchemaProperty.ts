@@ -33,7 +33,7 @@ export const createSchemaProperty = <
 	}
 
 	if (hasMetadata(settings)) {
-		throw 'object already defined as schema property settings'
+		throw 'object already defined as schema or property settings'
 	}
 
 	for (const key of Object.keys(settings))
