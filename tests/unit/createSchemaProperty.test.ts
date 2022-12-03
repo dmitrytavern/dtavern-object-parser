@@ -73,3 +73,15 @@ it('check settings immutable', () => {
   expect(() => { delete settings['type'] }).toThrow()
   expect(() => { Object.defineProperty(settings, 'type', { value: String }) }).toThrow()
 })
+
+it('check array type setting immutable', () => {
+  const settings = propertyFn({ type: [String, Number] })
+
+  expect(settings.type[0]).toBe(String)
+  expect(settings.type[2]).toBe(undefined)
+  expect(() => { settings.type[0] = Boolean }).toThrow()
+  expect(() => {   settings.type[2] = Function }).toThrow()
+  expect(() => { settings.type.push(Object) }).toThrow()
+  expect(() => { settings.type.pop() }).toThrow()
+  expect(() => { Object.defineProperty(settings.type, 3, { value: Symbol }) }).toThrow()
+})

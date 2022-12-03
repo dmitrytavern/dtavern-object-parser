@@ -1,4 +1,5 @@
 import { setMetadata, hasMetadata, getMetadata } from '../utils/metadata'
+import { isArray } from 'src/utils/objects'
 import {
 	OptionSettings,
 	OptionTypeSetting,
@@ -34,6 +35,8 @@ export const createSchemaProperty = <
 			throw `unknown schema key "${key}"`
 
 	const settingsClone = Object.assign({}, defaultSettings, settings)
+
+	settingsClone.type = isArray(settingsClone.type) ? Object.freeze([...settingsClone.type]) : settingsClone.type
 
 	setMetadata(settingsClone, 'isSchema', false)
 	setMetadata(settingsClone, 'isSettings', true)
