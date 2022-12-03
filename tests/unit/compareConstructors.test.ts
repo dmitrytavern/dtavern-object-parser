@@ -29,6 +29,8 @@ const jsTypes = [
   {name: 'AsyncFunction', instance: async function() {}, type: AsyncFunction},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   {name: 'GeneratorFunction', instance: function * () {}, type: GeneratorFunction},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  {name: 'Promise', instance: new Promise(() => {}), type: Promise},
   {name: 'Date', instance: new Date(), type: Date},
   {name: 'Error', instance: new Error('error'), type: Error},
   {name: 'Symbol', instance: Symbol('str'), type: Symbol},
