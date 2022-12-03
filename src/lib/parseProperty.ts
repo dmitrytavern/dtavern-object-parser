@@ -1,5 +1,5 @@
 import { hasOwn, isFunction, isArray, isObject } from '../utils/objects'
-import { compareConstructors } from '../utils/constructor'
+import { compareConstructors, validateConstructors } from '../utils/constructor'
 import {
 	RawOptionSettings,
 	OptionTypeSetting,
@@ -80,12 +80,12 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	 * Checking if the option type is correct.
 	 */
 	if (type !== null) {
-		const _classes = isArray(type) ? type : [type]
+		const errors = validateConstructors(type)
 
-		for (const _class of _classes)
-			if (!isFunction(_class))
+		if (errors.length > 0)
+			for (const error of errors)
 				_response.errors.push(
-					`type of schema have no function type. No-function: ${_class}`
+					`type setting have no function type. No-function: ${error}`
 				)
 	}
 

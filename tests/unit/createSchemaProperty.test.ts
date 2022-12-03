@@ -23,14 +23,21 @@ it('empty raw settings', () => {
 	})
 })
 
-it('setting type', () => {
-	const settings = propertyFn({ type: String })
+describe('setting type', () => {
+	it('type is correct', () => {
+		const settings = propertyFn({ type: String })
 
-	expect(settings).toEqual({
-		type: String,
-		required: true,
-		default: null,
-		validator: null,
+		expect(settings).toEqual({
+			type: String,
+			required: true,
+			default: null,
+			validator: null,
+		})
+	})
+
+	it('type is not correct', () => {
+		expect(() => propertyFn({ type: false })).toThrow()
+		expect(() => propertyFn({ type: [false, 'sdf'] })).toThrow()
 	})
 })
 
@@ -56,15 +63,22 @@ it('setting default', () => {
 	})
 })
 
-it('setting validator', () => {
-	const fn = () => true
-	const settings = propertyFn({ validator: fn })
+describe('setting validator', () => {
+	it('validator is correct', () => {
+		const fn = () => true
+		const settings = propertyFn({ validator: fn })
 
-	expect(settings).toEqual({
-		type: null,
-		required: true,
-		default: null,
-		validator: fn,
+		expect(settings).toEqual({
+			type: null,
+			required: true,
+			default: null,
+			validator: fn,
+		})
+	})
+
+	it('validator is not correct', () => {
+		expect(() => propertyFn({ validator: false })).toThrow()
+		expect(() => propertyFn({ validator: 'sdfsd' })).toThrow()
 	})
 })
 

@@ -1,4 +1,4 @@
-import { isArray } from './objects'
+import { isArray, isFunction } from './objects'
 import {
 	OptionTypeSetting,
 	AsyncFunctionType,
@@ -30,6 +30,13 @@ export const compareConstructors = (
 	}
 
 	return false
+}
+
+export const validateConstructors = (type): any[] => {
+	const _types = isArray(type) ? type : [type]
+	const errors = []
+	for (const _type of _types) if (!isFunction(_type)) errors.push(_type)
+	return errors
 }
 
 const getInstanceConstructors = (instance) => {
