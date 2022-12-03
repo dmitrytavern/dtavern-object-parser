@@ -1,9 +1,9 @@
+import { isArray } from './objects'
 import {
 	OptionTypeSetting,
 	AsyncFunctionType,
 	GeneratorFunctionType,
 } from '@types'
-import { isArray, isObject } from './objects'
 
 type Constructors = OptionTypeSetting<any> | undefined
 
@@ -17,32 +17,37 @@ export const GeneratorFunction: GeneratorFunctionType = new Function(
 )().constructor
 
 export const compareConstructors = (
-	propertyValue: any,
+	instance: any,
 	constructors: Constructors
 ): boolean => {
-	if (propertyValue === null || propertyValue === undefined)
-		return propertyValue === constructors
-
-	if (constructors === null || constructors === undefined)
-		return propertyValue === constructors
-
+	const _types = getInstanceConstructors(instance)
 	const _classes = isArray(constructors) ? constructors : [constructors]
 
 	for (const _class of _classes) {
-		if (propertyValue.constructor === _class) {
-			return true
-		}
-
-		// Handle Object.create(null)
-		if (
-			!propertyValue.constructor &&
-			_class === Object &&
-			!isArray(propertyValue) &&
-			isObject(propertyValue)
-		) {
+		if (_types.includes(_class)) {
 			return true
 		}
 	}
 
 	return false
+}
+
+const getInstanceConstructors = (instance) => {
+	if (instance === null || instance === undefined) return [instance]
+
+	let next = Object.getPrototypeOf(instance)
+
+	if (next) {
+		const constructors = []
+		constructors.push(next.constructor)
+	
+		while (next) {
+			if (!constructors.includes(next.constructor)) constructors.push(next.constructor)
+			next = Object.getPrototypeOf(next)
+		}
+		return constructors
+	} else {
+		// Handle Object.create(null)
+		return [Object]
+	}
 }
