@@ -40,9 +40,10 @@ const getInstanceConstructors = (instance) => {
 	if (next) {
 		const constructors = []
 		constructors.push(next.constructor)
-	
+
 		while (next) {
-			if (!constructors.includes(next.constructor)) constructors.push(next.constructor)
+			if (!constructors.includes(next.constructor))
+				constructors.push(next.constructor)
 			next = Object.getPrototypeOf(next)
 		}
 		return constructors

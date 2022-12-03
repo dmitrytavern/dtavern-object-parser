@@ -36,7 +36,9 @@ export const createSchemaProperty = <
 
 	const settingsClone = Object.assign({}, defaultSettings, settings)
 
-	settingsClone.type = isArray(settingsClone.type) ? Object.freeze([...settingsClone.type]) : settingsClone.type
+	settingsClone.type = isArray(settingsClone.type)
+		? Object.freeze([...settingsClone.type])
+		: settingsClone.type
 
 	setMetadata(settingsClone, 'isSchema', false)
 	setMetadata(settingsClone, 'isSettings', true)

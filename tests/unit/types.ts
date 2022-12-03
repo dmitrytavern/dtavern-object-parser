@@ -178,23 +178,27 @@ const customTypes = [
 		name: 'class Animal',
 		instance: new Animal(),
 		type: Animal,
-    ignore
+		ignore,
 	},
-
 ]
 
 export const types = [
-  ...primitiveTypes,
-  ...functionTypes,
-  ...arrayTypes,
-  ...regexpTypes,
-  ...collectionTypes,
-  ...typedArrayTypes,
-  ...nodeBufferTypes,
-  ...customTypes,
+	...primitiveTypes,
+	...functionTypes,
+	...arrayTypes,
+	...regexpTypes,
+	...collectionTypes,
+	...typedArrayTypes,
+	...nodeBufferTypes,
+	...customTypes,
 
 	{ name: 'Object', instance: {}, type: Object, ignore: [] },
-	{ name: 'Object.create', instance: Object.create(null), type: Object, ignore: [] },
+	{
+		name: 'Object.create',
+		instance: Object.create(null),
+		type: Object,
+		ignore: [],
+	},
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	{ name: 'Promise', instance: new Promise(() => {}), type: Promise, ignore },
 	{ name: 'Date', instance: new Date(), type: Date, ignore },
