@@ -3,7 +3,7 @@ import { compareConstructors } from '../utils/constructor'
 import {
 	RawOptionSettings,
 	OptionTypeSetting,
-	OptionConstructorReturn,
+	ParsePropertyResponse,
 } from '@types'
 
 type SchemaOpitonSettings<Type extends OptionTypeSetting<any>> =
@@ -13,18 +13,25 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	options: object | undefined,
 	optionKey: string,
 	optionSchema: SchemaOpitonSettings<Type>
-): OptionConstructorReturn<Type> => {
+): ParsePropertyResponse => {
 	let _optionValue = options ? options[optionKey] : undefined
 	let _optionExists = options ? hasOwn(options, optionKey) : false
 
+	const _response: ParsePropertyResponse = {
+		isChanged: false,
+		value: _optionValue,
+		errors: [],
+	}
+
+	if (!isObject(optionSchema)) {
+		_response.errors.push(`schema is not object`)
+		return _response
+	}
+
 	const type =
-		optionSchema === null
-			? null
-			: isArray(optionSchema)
-			? optionSchema
-			: isObject(optionSchema)
-			? (optionSchema as SchemaOpitonSettings<Type>).type || null
-			: (optionSchema as OptionTypeSetting<Type>)
+		optionSchema !== null && hasOwn(optionSchema, 'type')
+			? optionSchema['type']
+			: null
 
 	const required =
 		optionSchema !== null && hasOwn(optionSchema, 'required')
@@ -47,7 +54,9 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	 * Checking if property does not exist in options and this
 	 * option is required - throw error.
 	 */
-	if (!_optionExists && required) throw `option not exists`
+	if (!_optionExists && required) {
+		_response.errors.push(`option not exists`)
+	}
 
 	/**
 	 * Default setter
@@ -55,12 +64,14 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	 * Checking If the property does not exist in options,
 	 * set default value, if it exists in the Schema
 	 */
-	if (!_optionExists && defaultValue !== null) {
+	if (!_optionExists && !required && defaultValue !== null) {
 		_optionValue = isFunction(defaultValue)
 			? defaultValue.apply(null)
 			: defaultValue
 
 		_optionExists = true
+		_response.value = _optionValue
+		_response.isChanged = true
 	}
 
 	/**
@@ -73,7 +84,9 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 
 		for (const _class of _classes)
 			if (!isFunction(_class))
-				throw `type of schema have no function type. No-function: ${_class}`
+				_response.errors.push(
+					`type of schema have no function type. No-function: ${_class}`
+				)
 	}
 
 	/**
@@ -82,13 +95,13 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	 * Checking If the property does exist, check property types
 	 * form Schema
 	 */
-	if (type !== null && _optionExists) {
+	if (type !== null && _optionExists && _response.errors.length === 0) {
 		if (!compareConstructors(_optionValue, type)) {
 			const constructors = isArray(type)
 				? `[${type.map((x) => x.prototype.constructor.name).join(', ')}]`
 				: type.prototype.constructor.name
 
-			throw `option is not "${constructors}" type`
+			_response.errors.push(`option is not "${constructors}" type`)
 		}
 	}
 
@@ -97,10 +110,12 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 	 * -------------------------------------------------------
 	 * If Schema have custom validator, call this function
 	 */
-	if (_optionExists && validator !== null) {
+	if (_optionExists && validator !== null && _response.errors.length === 0) {
 		if (!validator.call(null, _optionValue))
-			throw `option did not pass the validator. Value: ${_optionValue}`
+			_response.errors.push(
+				`option did not pass the validator. Value: ${_optionValue}`
+			)
 	}
 
-	return _optionValue
+	return _response
 }

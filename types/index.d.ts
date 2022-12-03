@@ -6,7 +6,6 @@ import {
 	OptionRequiredSetting,
 	OptionDefaultSetting,
 	OptionValidatorSetting,
-	OptionConstructorReturn,
 	RawOptionSettings,
 } from './option'
 
@@ -21,6 +20,12 @@ interface Generator<T = unknown, TReturn = any, TNext = unknown>
 	return(value: TReturn): IteratorResult<T, TReturn>
 	throw(e: any): IteratorResult<T, TReturn>
 	[Symbol.iterator](): Generator<T, TReturn, TNext>
+}
+
+export type ParsePropertyResponse = {
+	isChanged: boolean
+	value: any
+	errors: string[]
 }
 
 export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
@@ -58,7 +63,7 @@ export declare function parseProperty<Type extends OptionTypeSetting<any>>(
 	options: object | undefined,
 	optionKey: string,
 	optionSchema: RawOptionSettings<Type, any, any, any>
-): OptionConstructorReturn<Type>
+): ParsePropertyResponse
 
 declare function hasOwn(obj: any | Array<any>, key: string): boolean
 declare function isObject(obj: any): boolean

@@ -109,23 +109,22 @@ const parseOptionValue = (
 	schemaParent: Schema,
 	optionKey: string
 ): void => {
-	try {
-		const optionSchema = schemaParent[optionKey]
-		const optionExists = originalOptionsParent
-			? hasOwn(originalOptionsParent, optionKey)
-			: false
+	const response = parseProperty(
+		originalOptionsParent,
+		optionKey,
+		schemaParent[optionKey]
+	)
 
-		const optionValue = parseProperty(
-			originalOptionsParent,
-			optionKey,
-			optionSchema,
-		)
-
-		if (optionExists && optionValue === undefined)
-			optionsParent[optionKey] = optionValue
-
-		if (optionValue !== undefined) optionsParent[optionKey] = optionValue
-	} catch (error) {
-		_errorLogs.push(`in ${_nestedLogs.join('.')}: ${error}`)
+	if (response.errors.length > 0) {
+		const nested = _nestedLogs.join('.')
+		for (const error of response.errors)
+			_errorLogs.push(`in ${nested}: ${error}`)
+		return
 	}
+
+	if (
+		response.isChanged ||
+		(!hasOwn(optionsParent, optionKey) && response.value !== undefined)
+	)
+		optionsParent[optionKey] = response.value
 }
