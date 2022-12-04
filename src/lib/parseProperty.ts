@@ -5,22 +5,16 @@ import {
 	createSchemaProperty,
 } from '../schema/createSchemaProperty'
 import {
-	OptionSettings,
-	RawOptionSettings,
-	OptionTypeSetting,
+	PropertyType,
+	PropertyOptions,
+	PropertyOptionsRaw,
 	ParsePropertyResponse,
 } from '@types'
 
-type SchemaOpitonSettings = OptionSettings<any, any, any, any>
-type RawSchemaOpitonSettings<Type extends OptionTypeSetting<any>> =
-	| null
-	| undefined
-	| RawOptionSettings<Type, any, any, any>
-
-export const parseProperty = <Type extends OptionTypeSetting<any>>(
+export const parseProperty = <Type extends PropertyType>(
 	options: object | undefined,
 	optionKey: string,
-	optionSchema: RawSchemaOpitonSettings<Type>
+	optionSchema: PropertyOptionsRaw<Type, any, any, any, any>
 ): ParsePropertyResponse => {
 	let _optionValue = options ? options[optionKey] : undefined
 	let _optionExists = options ? hasOwn(options, optionKey) : false
@@ -99,10 +93,10 @@ export const parseProperty = <Type extends OptionTypeSetting<any>>(
 }
 
 const parseSettings = (
-	settings: RawSchemaOpitonSettings<any>
-): SchemaOpitonSettings | string => {
+	settings: null | undefined | PropertyOptionsRaw
+): PropertyOptions | string => {
 	try {
-		if (isSchemaProperty(settings)) return settings as SchemaOpitonSettings
+		if (isSchemaProperty(settings)) return settings as PropertyOptions
 		return createSchemaProperty(settings)
 	} catch (e) {
 		return e

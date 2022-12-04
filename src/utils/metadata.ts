@@ -2,8 +2,8 @@ import { isObject } from './objects'
 
 const metadataName = '__dtavern_options_parser'
 
-export const hasMetadata = (object: object) => {
-	return isObject(object) && isObject(object[metadataName])
+export const hasMetadata = (obj: any) => {
+	return isObject(obj) && isObject(obj[metadataName])
 }
 
 export const getMetadata = (object: object, key: string): any => {

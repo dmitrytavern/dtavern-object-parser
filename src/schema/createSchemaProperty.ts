@@ -1,47 +1,59 @@
 import { setMetadata, hasMetadata, getMetadata } from '../utils/metadata'
 import { isArray, isObject, isFunction, hasOwn } from 'src/utils/objects'
-import { validateConstructors } from '../utils/constructor'
+import { createSchema } from './createSchema'
 import {
-	OptionSettings,
-	OptionTypeSetting,
-	OptionRequiredSetting,
-	OptionValidatorSetting,
-	OptionDefaultSetting,
-	RawOptionSettings,
+	PropertyOptions,
+	PropertyType,
+	PropertyTypeArray,
+	PropertyRequired,
+	PropertyDefault,
+	PropertyValidator,
+	PropertyOptionsRaw,
 } from '@types'
 
-const defaultSettings = {
+const defaultOptions = {
 	type: null,
+	typeElement: null,
 	required: true,
 	default: null,
 	validator: null,
 }
 
+const propertyKeys = Object.keys(defaultOptions)
+
 export const isSchemaProperty = (object: object): boolean =>
 	hasMetadata(object) ? getMetadata(object, 'isSettings') : false
 
 export const createSchemaProperty = <
-	Type extends OptionTypeSetting<any>,
-	Default extends OptionDefaultSetting<Type>,
-	Required extends OptionRequiredSetting,
-	Validator extends OptionValidatorSetting<Type>
+	Type extends PropertyType,
+	TypeArray extends PropertyTypeArray,
+	Required extends PropertyRequired,
+	Default extends PropertyDefault<Type, TypeArray>,
+	Validator extends PropertyValidator<Type, TypeArray>
 >(
-	settings: RawOptionSettings<Type, Default, Required, Validator>
-): OptionSettings<Type, Default, Required, Validator> => {
-	if (!isObject(settings)) {
-		throw 'settings is not object'
+	opitons: PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
+): PropertyOptions<Type, TypeArray, Required, Default, Validator> => {
+	if (!isObject(opitons)) {
+		throw 'opitons is not object'
 	}
 
-	if (hasMetadata(settings)) {
-		throw 'object already defined as schema or property settings'
+	if (hasMetadata(opitons)) {
+		throw 'object already defined as schema or property options'
 	}
 
-	for (const key of Object.keys(settings))
-		if (!['type', 'required', 'default', 'validator'].includes(key))
-			throw `unknown setting key "${key}"`
+	for (const key of Object.keys(opitons))
+		if (!propertyKeys.includes(key))
+			throw `unknown setting key "${key}" in options`
 
-	if (hasOwn(settings, 'type') && settings.type !== null) {
-		const errors = validateConstructors(settings.type)
+	let _isArray = false
+	if (hasOwn(opitons, 'type') && opitons.type !== null) {
+		const _types = isArray(opitons.type) ? opitons.type : [opitons.type]
+		const errors = []
+
+		for (const _type of _types) {
+			if (_type === Array) _isArray = true
+			if (!isFunction(_type)) errors.push(_type)
+		}
 
 		if (errors.length > 0) {
 			const s = errors.join(', ')
@@ -49,18 +61,28 @@ export const createSchemaProperty = <
 		}
 	}
 
-	if (hasOwn(settings, 'validator'))
-		if (!isFunction(settings.validator))
+	if (hasOwn(opitons, 'validator'))
+		if (!isFunction(opitons.validator))
 			throw `validator setting is not function`
 
-	const settingsClone = Object.assign({}, defaultSettings, settings)
+	const opitonsClone = Object.assign({}, defaultOptions, opitons)
 
-	settingsClone.type = isArray(settingsClone.type)
-		? Object.freeze([...settingsClone.type])
-		: settingsClone.type
+	opitonsClone.type = isArray(opitonsClone.type)
+		? Object.freeze([...opitonsClone.type])
+		: opitonsClone.type
 
-	setMetadata(settingsClone, 'isSchema', false)
-	setMetadata(settingsClone, 'isSettings', true)
+	if (_isArray)
+		opitonsClone.typeElement =
+			opitonsClone.typeElement === null
+				? createSchemaProperty({})
+				: hasMetadata(opitonsClone.typeElement)
+				? opitonsClone.typeElement
+				: createSchemaProperty({ type: opitonsClone.typeElement })
+	else if (opitonsClone.typeElement !== null)
+		throw 'typeElement property exists, but type is not array'
 
-	return Object.freeze(settingsClone)
+	setMetadata(opitonsClone, 'isSchema', false)
+	setMetadata(opitonsClone, 'isSettings', true)
+
+	return Object.freeze(opitonsClone)
 }

@@ -81,7 +81,7 @@ const parseOption = (
 		parseOptions(
 			originalOptionsParent[optionKey],
 			optionsParent[optionKey],
-			schemaParent[optionKey] as Schema
+			schemaParent[optionKey]
 		)
 	} else {
 		parseOptionValue(

@@ -1,18 +1,14 @@
 import { getMetadata, hasMetadata, setMetadata } from '../utils/metadata'
 import { isArray, isFunction, isObject } from '../utils/objects'
 import { createSchemaProperty } from './createSchemaProperty'
-import {
-	Schema,
-	RawSchema,
-	RawSchemaAsArray,
-	RawSchemaAsObject,
-	OptionTypeSetting,
-} from '@types'
+import { Schema, RawSchema, PropertyType } from '@types'
 
-export const isSchema = (object: object): boolean =>
-	hasMetadata(object) ? getMetadata(object, 'isSchema') : false
+export const isSchema = (obj: any): boolean =>
+	hasMetadata(obj) ? getMetadata(obj, 'isSchema') : false
 
-export const createSchema = (schema: RawSchema): Schema => {
+export const createSchema = <RawSchemaObject extends RawSchema>(
+	schema: RawSchemaObject
+): Schema<RawSchemaObject> => {
 	if (!schema) throw 'Argument is not defined.'
 
 	if (isArray(schema)) {
@@ -26,7 +22,7 @@ export const createSchema = (schema: RawSchema): Schema => {
 	throw 'Argument is not an array or an object.'
 }
 
-const parseSchemaArray = (rawArraySchema: RawSchemaAsArray): Schema => {
+const parseSchemaArray = (rawArraySchema: string[]): any => {
 	const rawObjectSchema = {}
 
 	for (const stringPath of rawArraySchema) {
@@ -49,8 +45,8 @@ const parseSchemaArray = (rawArraySchema: RawSchemaAsArray): Schema => {
 	return parseSchemaObject(rawObjectSchema)
 }
 
-const parseSchemaObject = (schema: RawSchemaAsObject): Schema => {
-	if (hasMetadata(schema)) return schema as Schema
+const parseSchemaObject = (schema: object): any => {
+	if (hasMetadata(schema)) return schema as Schema<any>
 
 	const schemaCopy = {}
 
@@ -65,14 +61,14 @@ const parseSchemaObject = (schema: RawSchemaAsObject): Schema => {
 
 		if (isFunction(property) || isArray(property) || property === null) {
 			schemaCopy[propertyKey] = createSchemaProperty({
-				type: property as OptionTypeSetting<any>,
+				type: property as PropertyType,
 			})
 
 			continue
 		}
 
 		if (isObject(property)) {
-			schemaCopy[propertyKey] = parseSchemaObject(property as RawSchemaAsObject)
+			schemaCopy[propertyKey] = parseSchemaObject(property)
 
 			continue
 		}

@@ -1,13 +1,6 @@
+import { PropertyType, AsyncFunctionType, GeneratorFunctionType } from '@types'
 import { isArray, isFunction } from './objects'
-import {
-	OptionTypeSetting,
-	AsyncFunctionType,
-	GeneratorFunctionType,
-} from '@types'
 
-type Constructors = OptionTypeSetting<any> | undefined
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const AsyncFunction: AsyncFunctionType = new Function(
 	`return async () => {}`
 )().constructor
@@ -18,7 +11,7 @@ export const GeneratorFunction: GeneratorFunctionType = new Function(
 
 export const compareConstructors = (
 	instance: any,
-	constructors: Constructors
+	constructors: PropertyType
 ): boolean => {
 	const _types = getInstanceConstructors(instance)
 	const _classes = isArray(constructors) ? constructors : [constructors]
@@ -35,7 +28,13 @@ export const compareConstructors = (
 export const validateConstructors = (type): any[] => {
 	const _types = isArray(type) ? type : [type]
 	const errors = []
-	for (const _type of _types) if (!isFunction(_type)) errors.push(_type)
+
+	for (const _type of _types) {
+		if (!isFunction(_type)) {
+			errors.push(_type)
+		}
+	}
+
 	return errors
 }
 
@@ -53,6 +52,7 @@ const getInstanceConstructors = (instance) => {
 				constructors.push(next.constructor)
 			next = Object.getPrototypeOf(next)
 		}
+
 		return constructors
 	} else {
 		// Handle Object.create(null)

@@ -1,25 +1,26 @@
-import {
-	OptionSettings,
-	OptionTypeSetting,
-	OptionConstructorReturn,
-} from './option'
+import { ConstructorReturn, ArrayConstructorType } from './constructor'
+import { PropertyOptions, PropertyType } from './options'
 
 /**
  * Schema type
  */
-export type Schema = {
-	[key: string]: Schema | SchemaOptionSettings
+export type Schema<RawSchema = any> = RawSchema extends RawSchemaAsArray
+	? any
+	: RawSchema extends RawSchemaAsObject
+	? SchemaObject<RawSchema>
+	: never
+
+type SchemaArray<RawSchema extends RawSchemaAsArray> = RawSchema
+
+type SchemaObject<RawSchema extends RawSchemaAsObject> = {
+	[Property in keyof RawSchema]: SchemaTypeProperty<RawSchema[Property]>
 }
 
-export type SchemaType<Schema> = {
-	[Property in keyof Schema]: SchemaTypeProperty<Schema[Property]>
-}
-
-type SchemaTypeProperty<Property> = Property extends OptionTypeSetting<any>
-	? OptionSettings<Property, any, true, any>
-	: Property extends SchemaOptionSettings
+type SchemaTypeProperty<Property> = Property extends PropertyType
+	? PropertyOptions<Property, any, true, any, any>
+	: Property extends PropertyOptions
 	? Property
-	: SchemaType<Property>
+	: Schema<Property>
 
 /**
  * Raw schema
@@ -32,31 +33,28 @@ export type RawSchemaAsObject = {
 	[key: string]: RawSchemaProperty
 }
 
-export type RawSchemaProperty =
-	| OptionTypeSetting<any>
-	| SchemaOptionSettings
-	| RawSchemaAsObject
+type RawSchemaProperty = PropertyType | PropertyOptions | RawSchemaAsObject
 
 /**
  * Return schema type
  */
-export type SchemaReturn<Schema> = {
-	[Option in keyof Schema]: SchemaReturnProperty<Schema[Option]>
+export type SchemaReturn<RawSchemaObject = any> = {
+	[Key in keyof RawSchemaObject]: SchemaReturnProperty<RawSchemaObject[Key]>
 }
 
-export type SchemaReturnProperty<Property> =
-	Property extends OptionTypeSetting<any>
-		? SchemaReturnPropertyAsType<Property>
-		: SchemaReturnPropertyAsSettings<Property>
+type SchemaReturnProperty<Property> = Property extends PropertyType<any>
+	? ConstructorReturn<Property>
+	: SchemaReturnPropertyAsOptions<Property>
 
-type SchemaReturnPropertyAsType<Constructor> =
-	OptionConstructorReturn<Constructor>
+type SchemaReturnPropertyAsOptions<Property> = Property extends PropertyOptions
+	? Property['required'] extends true
+		? SchemaContructorReturnArray<Property>
+		: SchemaContructorReturnArray<Property> | undefined
+	: SchemaReturn<Property>
 
-type SchemaReturnPropertyAsSettings<Property> =
-	Property extends SchemaOptionSettings
-		? Property['required'] extends true
-			? OptionConstructorReturn<Property['type']>
-			: OptionConstructorReturn<Property['type']> | undefined
-		: SchemaReturn<Property>
-
-type SchemaOptionSettings = OptionSettings<any, any, any, any>
+type SchemaContructorReturnArray<Property extends PropertyOptions> = Extract<
+	Property['type'],
+	ArrayConstructorType
+> extends never
+	? ConstructorReturn<Property['type']>
+	: SchemaReturnProperty<Property['typeElement']>[]

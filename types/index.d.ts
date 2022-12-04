@@ -1,26 +1,21 @@
-import { SchemaType, SchemaReturn } from './schema'
+import { AsyncFunctionType, GeneratorFunctionType } from './functions'
+import { Schema, RawSchema, SchemaReturn } from './schema'
 import { Config } from './config'
 import {
-	OptionSettings,
-	OptionTypeSetting,
-	OptionRequiredSetting,
-	OptionDefaultSetting,
-	OptionValidatorSetting,
-	RawOptionSettings,
-} from './option'
+	PropertyOptions,
+	PropertyOptionsRaw,
+	PropertyType,
+	PropertyTypeArray,
+	PropertyDefault,
+	PropertyRequired,
+	PropertyValidator,
+} from './options'
 
-export * from './option'
-export * from './config'
+export * from './constructor'
+export * from './functions'
+export * from './options'
 export * from './schema'
-
-interface Generator<T = unknown, TReturn = any, TNext = unknown>
-	extends Iterator<T, TReturn, TNext> {
-	// NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
-	next(...args: [] | [TNext]): IteratorResult<T, TReturn>
-	return(value: TReturn): IteratorResult<T, TReturn>
-	throw(e: any): IteratorResult<T, TReturn>
-	[Symbol.iterator](): Generator<T, TReturn, TNext>
-}
+export * from './config'
 
 export type ParsePropertyResponse = {
 	isChanged: boolean
@@ -28,49 +23,45 @@ export type ParsePropertyResponse = {
 	errors: string[]
 }
 
-export type AsyncFunctionType = (...args: any[]) => Promise<boolean>
-export type GeneratorFunctionType = <
-	T = unknown,
-	TReturn = any,
-	TNext = unknown
->(
-	...args: any
-) => Generator<T, TReturn, TNext>
 export const AsyncFunction: AsyncFunctionType
+
 export const GeneratorFunction: GeneratorFunctionType
 
-export declare function isSchema(object: object): boolean
+export declare function isSchema(obj: any): boolean
 
-export declare function isSchemaProperty(object: object): boolean
+export declare function isSchemaProperty(obj: any): boolean
 
-export declare function createSchema<Schema>(schema: Schema): SchemaType<Schema>
+export declare function createSchema<RawSchemaObject extends RawSchema>(
+	schema: RawSchemaObject
+): Schema<RawSchemaObject>
 
 export declare function createSchemaProperty<
-	Type extends OptionTypeSetting<any>,
-	Default extends OptionDefaultSetting<Type>,
-	Required extends OptionRequiredSetting,
-	Validator extends OptionValidatorSetting<Type>
+	Type extends PropertyType,
+	TypeArray extends PropertyTypeArray,
+	Required extends PropertyRequired,
+	Default extends PropertyDefault<Type, TypeArray>,
+	Validator extends PropertyValidator<Type, TypeArray>
 >(
-	settings: RawOptionSettings<Type, Default, Required, Validator>
-): OptionSettings<Type, Default, Required, Validator>
+	settings: PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
+): PropertyOptions<Type, TypeArray, Required, Default, Validator>
 
 export declare function parseProperties<
 	OptionsSchema,
 	Return = SchemaReturn<OptionsSchema>
 >(options: any, schema: OptionsSchema, config?: Config): Return
 
-export declare function parseProperty<Type extends OptionTypeSetting<any>>(
+export declare function parseProperty<Type extends PropertyType>(
 	options: object | undefined,
 	optionKey: string,
-	optionSchema: RawOptionSettings<Type, any, any, any>
+	optionSchema: PropertyOptionsRaw<Type, any, any, any, any>
 ): ParsePropertyResponse
 
 declare function hasOwn(obj: any | Array<any>, key: string): boolean
 declare function isObject(obj: any): boolean
 declare function isFunction(value: any): value is (...args: any[]) => boolean
 declare function compareConstructors(
-	propertyValue: any,
-	types: OptionTypeSetting<any>
+	instance: any,
+	constructors: PropertyType
 ): boolean
 
 export declare const utils: {

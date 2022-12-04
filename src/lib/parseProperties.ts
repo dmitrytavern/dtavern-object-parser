@@ -4,7 +4,7 @@ import { isObject, isArray } from '../utils/objects'
 import { parseObject } from './parseObject'
 
 export function parseProperties<
-	OptionsSchema extends Schema | RawSchema,
+	OptionsSchema extends RawSchema,
 	Return = SchemaReturn<OptionsSchema>
 >(options: any, schema: OptionsSchema, config?: Config): Return {
 	try {
@@ -29,7 +29,7 @@ export function parseProperties<
 
 		parseObject(options, optionsCopy, _schema)
 
-		return optionsCopy as any
+		return optionsCopy
 	} catch (e) {
 		const mode = config && config.mode ? config.mode : 'strict'
 		const errors = isArray(e) ? e : [e]

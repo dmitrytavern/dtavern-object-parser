@@ -1,8 +1,10 @@
 import {
 	isSchemaProperty,
+	createSchema,
 	createSchemaProperty,
 } from '../../dist/object-parser'
 
+const schemaFn = createSchema
 const propertyFn = createSchemaProperty
 const isPropertyFn = isSchemaProperty
 
@@ -17,6 +19,7 @@ it('empty raw settings', () => {
 
 	expect(settings).toEqual({
 		type: null,
+		typeElement: null,
 		required: true,
 		default: null,
 		validator: null,
@@ -29,6 +32,7 @@ describe('setting type', () => {
 
 		expect(settings).toEqual({
 			type: String,
+			typeElement: null,
 			required: true,
 			default: null,
 			validator: null,
@@ -46,6 +50,7 @@ it('setting reqired', () => {
 
 	expect(settings).toEqual({
 		type: null,
+		typeElement: null,
 		required: false,
 		default: null,
 		validator: null,
@@ -57,6 +62,7 @@ it('setting default', () => {
 
 	expect(settings).toEqual({
 		type: null,
+		typeElement: null,
 		required: false,
 		default: 'def',
 		validator: null,
@@ -70,6 +76,7 @@ describe('setting validator', () => {
 
 		expect(settings).toEqual({
 			type: null,
+			typeElement: null,
 			required: true,
 			default: null,
 			validator: fn,
@@ -79,6 +86,91 @@ describe('setting validator', () => {
 	it('validator is not correct', () => {
 		expect(() => propertyFn({ validator: false })).toThrow()
 		expect(() => propertyFn({ validator: 'sdfsd' })).toThrow()
+	})
+})
+
+describe('setting type element', () => {
+	const defaults = {
+		required: true,
+		default: null,
+		validator: null,
+	}
+
+	it('type element is null', () => {
+		const settings = propertyFn({ type: Array, typeElement: null })
+
+		expect(settings).toEqual({
+			...defaults,
+			type: Array,
+			typeElement: {
+				...defaults,
+				type: null,
+				typeElement: null,
+			},
+		})
+	})
+
+	it('type element is correct', () => {
+		const settings = propertyFn({ type: Array, typeElement: Number })
+
+		expect(settings).toEqual({
+			...defaults,
+			type: Array,
+			typeElement: {
+				...defaults,
+				type: Number,
+				typeElement: null,
+			},
+		})
+	})
+
+	it('type element is schema', () => {
+		const settings = propertyFn({
+			type: Array,
+			typeElement: propertyFn({ type: [String, Boolean] }),
+		})
+
+		expect(settings).toEqual({
+			...defaults,
+			type: Array,
+			typeElement: {
+				...defaults,
+				type: [String, Boolean],
+				typeElement: null,
+			},
+		})
+	})
+
+	it('type element is property schema', () => {
+		const settings = propertyFn({
+			type: Array,
+			typeElement: schemaFn({ a: { b: [String, Number] } }),
+		})
+
+		expect(settings).toEqual({
+			...defaults,
+			type: Array,
+			typeElement: {
+				a: {
+					b: {
+						...defaults,
+						type: [String, Number],
+						typeElement: null,
+					},
+				},
+			},
+		})
+	})
+
+	it('type is array but type element is object', () => {
+		expect(() => propertyFn({ type: Array, typeElement: {} })).toThrow()
+		expect(() =>
+			propertyFn({ type: Array, typeElement: { a: { b: String } } })
+		).toThrow()
+	})
+
+	it('type is not array but type element exists', () => {
+		expect(() => propertyFn({ type: Number, typeElement: Number })).toThrow()
 	})
 })
 
