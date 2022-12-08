@@ -1,9 +1,9 @@
-export type Constructor<T> = ConstructorFunction<T> | ConstructorClass<T>
-
+export type Constructor<T = any> = ConstructorFunction<T> | ConstructorClass<T>
+export type ConstructorType = Constructor | Constructor[]
 export type ArrayConstructorType = typeof Array | typeof Array[]
 
-type ConstructorFunction<T> = { (): T }
-type ConstructorClass<T> = { new (...args: any[]): T }
+type ConstructorFunction<T = any> = { (): T }
+type ConstructorClass<T = any> = { new (...args: any[]): T }
 
 export type ConstructorReturn<Constructors> =
 	Constructors extends Constructor<any>[]

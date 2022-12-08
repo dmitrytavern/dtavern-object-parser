@@ -1,13 +1,17 @@
 export const isArray = Array.isArray
 
-export function isObject(obj: any): boolean {
-	return obj !== null && typeof obj === 'object'
+export const toArray = <T>(value: T | T[]): T[] => {
+	return isArray(value) ? value : [value]
 }
 
-export function isFunction(value: any): value is (...args: any[]) => any {
+export const isObject = (value: any): boolean => {
+	return value !== null && typeof value === 'object'
+}
+
+export const isFunction = (value: any): boolean => {
 	return typeof value === 'function'
 }
 
-export function hasOwn(obj: any | Array<any>, key: string): boolean {
-	return Object.prototype.hasOwnProperty.call(obj, key)
+export const hasOwn = (value: any | any[], key: any): boolean => {
+	return Object.prototype.hasOwnProperty.call(value, key)
 }

@@ -8,8 +8,6 @@ class Animal {}
 const ignore = [Object]
 
 const primitiveTypes = [
-	{ name: 'undefined', instance: undefined, type: undefined, ignore: [] },
-	{ name: 'null', instance: null, type: null, ignore: [] },
 	{ name: 'string', instance: 'str', type: String, ignore },
 	{ name: 'number', instance: 42, type: Number, ignore },
 	{ name: 'number NaN', instance: NaN, type: Number, ignore },

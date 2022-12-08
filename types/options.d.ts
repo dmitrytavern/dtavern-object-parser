@@ -26,28 +26,28 @@ export type PropertyOptionsRaw<
 	Required extends PropertyRequired = any,
 	Default extends PropertyDefault<Type, TypeArray> = any,
 	Validator extends PropertyValidator<Type, TypeArray> = any
-> = Partial<PropertyOptions<Type, TypeArray, Required, Default, Validator>>
+> = {
+	type?: Type | Constructor<Type> | null | undefined
+	typeElement?: Type extends ArrayConstructorType ? TypeArray : never
+	default?: Default
+	required?: Required
+	validator?: Validator
+}
 
-export type PropertyType<Type = any> =
-	| null
-	| undefined
-	| Constructor<Type>
-	| Constructor<Type>[]
-
-export type PropertyDefault<Type = any, TypeArray = any> =
-	| null
-	| undefined
-	| PropertyContructorReturn<Type, TypeArray>
-	| (() => PropertyContructorReturn<Type, TypeArray>)
+export type PropertyType<Type = any> = Constructor<Type>[]
 
 export type PropertyRequired = null | undefined | boolean
 
+export type PropertyTypeArray = PropertyType | PropertyOptions | Schema<any>
+
+export type PropertyDefault<Type = any, TypeArray = any> =
+	| null
+	| PropertyContructorReturn<Type, TypeArray>
+	| (() => PropertyContructorReturn<Type, TypeArray>)
+
 export type PropertyValidator<Type = any, TypeArray = any> =
 	| null
-	| undefined
 	| ((value: PropertyContructorReturn<Type, TypeArray>) => boolean)
-
-export type PropertyTypeArray = PropertyType | PropertyOptions | Schema<any>
 
 // Options helpers
 

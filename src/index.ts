@@ -1,30 +1,30 @@
 import { parseProperty } from './lib/parseProperty'
 import { parseProperties } from './lib/parseProperties'
-import { isSchema, createSchema } from './schema/createSchema'
-import {
-	isSchemaProperty,
-	createSchemaProperty,
-} from './schema/createSchemaProperty'
+import { createSchema } from './schema/createSchema'
+import { createPropertySchema } from './schema/createPropertySchema'
+import { isSchema, isPropertySchema } from './schema/helpers'
 
 import { hasOwn, isArray, isFunction, isObject } from './utils/objects'
 import {
 	AsyncFunction,
 	GeneratorFunction,
 	compareConstructors,
-} from './utils/constructor'
+	getConstructors,
+	isConstructors,
+} from './utils/constructors'
 
 export { parseProperty } from './lib/parseProperty'
 export { parseProperties } from './lib/parseProperties'
-export { createSchema, isSchema } from './schema/createSchema'
-export {
-	isSchemaProperty,
-	createSchemaProperty,
-} from './schema/createSchemaProperty'
+export { createSchema } from './schema/createSchema'
+export { createPropertySchema } from './schema/createPropertySchema'
+export { isSchema, isPropertySchema } from './schema/helpers'
 
 export const utils = {
 	AsyncFunction,
 	GeneratorFunction,
 	compareConstructors,
+	getConstructors,
+	isConstructors,
 	hasOwn,
 	isArray,
 	isObject,
@@ -35,9 +35,9 @@ export const parser = {
 	parse: parseProperties,
 	single: parseProperty,
 	schema: createSchema,
-	property: createSchemaProperty,
+	property: createPropertySchema,
 	isSchema,
-	isProperty: isSchemaProperty,
+	isProperty: isPropertySchema,
 	utils,
 }
 

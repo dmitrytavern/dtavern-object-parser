@@ -1,42 +1,237 @@
-import { Config, Schema, SchemaReturn, RawSchema } from '@types'
-import { createSchema, isSchema } from '../schema/createSchema'
-import { isObject, isArray } from '../utils/objects'
-import { parseObject } from './parseObject'
+import {
+	Schema,
+	RawSchema,
+	Config,
+	SchemaReturn,
+	PropertyOptions,
+} from '@types'
+import { hasOwn, isArray, isObject } from '../utils/objects'
+import { parseProperty } from './parseProperty'
+import {
+	isArrayTypeSchema,
+	isPropertySchema,
+	isSchema,
+} from '../schema/helpers'
+import { useObjectHandler, ObjectHandler } from '../utils/handlers'
+import { metadata } from '../utils/metadata'
+import { useSchema } from '../schema/createSchema'
+import { Props, PropsSchema, ReadonlyProps, WritableProps } from './tmp'
 
-export function parseProperties<
-	OptionsSchema extends RawSchema,
-	Return = SchemaReturn<OptionsSchema>
->(options: any, schema: OptionsSchema, config?: Config): Return {
+type PropsConfig = null | undefined | Config
+
+export function parseProperties<PropsSchema extends RawSchema | Schema>(
+	_object: Props,
+	_schema: PropsSchema,
+	_config?: PropsConfig
+): SchemaReturn<PropsSchema> {
+	const config = useConfig(_config)
+	const schema = useSchema(_schema)
+	const readonlyObject = _object
+	const writableObject = useWritableObject(_object, _schema, config)
+	const handler = useObjectHandler()
+
+	handlePropertiesBySchema(
+		readonlyObject,
+		writableObject,
+		schema,
+		handler,
+		config
+	)
+
+	handler.validate()
+
+	handler.clear()
+
+	return writableObject as SchemaReturn<PropsSchema>
+}
+
+function handlePropertiesBySchema(
+	readonlyObject: ReadonlyProps,
+	writableObject: WritableProps,
+	schema: Schema,
+	handler: ObjectHandler,
+	config: Required<Config>
+) {
 	try {
-		if (!(options && schema))
-			throw (
-				'first or second argument is not defined. ' +
-				'The first argument must be an object and the ' +
-				'second argument must be object schema'
+		validateReadonlyObject(readonlyObject)
+
+		validateWritableObject(writableObject, handler)
+
+		handler.handle(writableObject)
+
+		for (const propertyKey in schema) {
+			handler.set(propertyKey)
+
+			handleProperty(
+				readonlyObject,
+				writableObject,
+				propertyKey,
+				schema[propertyKey],
+				handler,
+				config
 			)
 
-		if (isArray(options) || !isObject(options))
-			throw 'the first argument is not an object.'
-
-		if (!isArray(schema) && !isObject(schema))
-			throw 'the second argument is not an object or an array.'
-
-		const optionsCopy = config && config.clone ? {} : options
-		const _schema =
-			isArray(schema) || !isSchema(schema)
-				? createSchema(schema)
-				: (schema as Schema)
-
-		parseObject(options, optionsCopy, _schema)
-
-		return optionsCopy
+			handler.unset()
+		}
 	} catch (e) {
-		const mode = config && config.mode ? config.mode : 'strict'
-		const errors = isArray(e) ? e : [e]
-		const error = new Error('\n  ' + errors.join('\n  '))
-
-		if (mode === 'log') console.error(error)
-		if (mode === 'strict') throw error
-		if (mode !== 'log') console.warn('You disable logger in options parser!')
+		handler.addError(e)
 	}
+}
+
+function handlePropertiesByOneSchema(
+	readonlyObject: ReadonlyProps,
+	writableObject: WritableProps,
+	propertySchema: Schema,
+	handler: ObjectHandler,
+	config: Required<Config>
+) {
+	if (!readonlyObject) return
+
+	try {
+		validateWritableObject(writableObject, handler)
+
+		handler.handle(writableObject)
+
+		for (const propertyKey in readonlyObject) {
+			handler.set(propertyKey)
+
+			handleProperty(
+				readonlyObject,
+				writableObject,
+				propertyKey,
+				propertySchema,
+				handler,
+				config
+			)
+
+			handler.unset()
+		}
+	} catch (e) {
+		handler.addError(e)
+	}
+}
+
+function handleProperty(
+	readonlyObject: ReadonlyProps,
+	writableObject: WritableProps,
+	propertyKey: string,
+	schema: Schema,
+	handler: ObjectHandler,
+	config: Required<Config>
+) {
+	const _value = writableObject[propertyKey]
+
+	if (isSchema(schema)) {
+		if (!isObject(_value)) {
+			writableObject[propertyKey] = {}
+		}
+
+		handlePropertiesBySchema(
+			readonlyObject && readonlyObject[propertyKey],
+			writableObject[propertyKey],
+			schema,
+			handler,
+			config
+		)
+
+		return
+	}
+
+	if (isPropertySchema(schema)) {
+		handlePropertyValue(
+			readonlyObject,
+			writableObject,
+			propertyKey,
+			schema,
+			handler,
+			config
+		)
+
+		return
+	}
+
+	throw 'Something went wrong: schema must be is schema or schema property'
+}
+
+function handlePropertyValue(
+	readonlyObject: ReadonlyProps,
+	writableObject: WritableProps,
+	propertyKey: string,
+	propertySchema: PropertyOptions,
+	handler: ObjectHandler,
+	config: Required<Config>
+) {
+	try {
+		parseProperty(readonlyObject, writableObject, propertyKey, propertySchema)
+
+		if (
+			isArrayTypeSchema(propertySchema) &&
+			isArray(writableObject[propertyKey])
+		) {
+			const readonlyArray =
+				readonlyObject && isArray(readonlyObject[propertyKey])
+					? readonlyObject[propertyKey]
+					: writableObject[propertyKey]
+
+			writableObject[propertyKey] = config.clone
+				? []
+				: writableObject[propertyKey]
+
+			handlePropertiesByOneSchema(
+				readonlyArray,
+				writableObject[propertyKey],
+				propertySchema['typeElement'],
+				handler,
+				config
+			)
+			return
+		}
+	} catch (e) {
+		handler.addError(e)
+	}
+}
+
+// Helpers
+
+const useWritableObject = (
+	readonlyObject: ReadonlyProps,
+	schema: PropsSchema,
+	config: Required<Config>
+): WritableProps => {
+	const _isArrayType = metadata.get(schema, 'isArrayType')
+	const copy = _isArrayType ? [] : {}
+
+	if (readonlyObject === undefined || readonlyObject === null) return copy
+
+	if (isObject(readonlyObject)) return config.clone ? copy : readonlyObject
+
+	throw 'Object is not null | undefined | object type'
+}
+
+const useConfig = (config: PropsConfig): Required<Config> => {
+	return {
+		mode: config && config.mode ? config.mode : 'strict',
+		clone: config && config.clone ? config.clone : false,
+	}
+}
+
+const validateReadonlyObject = (obj: ReadonlyProps) => {
+	if (obj === null || obj === undefined) return
+
+	const errorKeys: string[] = []
+
+	for (const propertyKey in obj) {
+		if (!hasOwn(obj, propertyKey)) {
+			errorKeys.push(propertyKey)
+		}
+	}
+
+	if (errorKeys.length > 0) {
+		const s = errorKeys.join(' | ')
+		throw `for "${s}" key of options not found in scheme`
+	}
+}
+
+const validateWritableObject = (obj: WritableProps, handler: ObjectHandler) => {
+	if (handler.isHandled(obj)) throw `detected cyrcle links`
 }

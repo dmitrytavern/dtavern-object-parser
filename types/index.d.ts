@@ -10,6 +10,7 @@ import {
 	PropertyRequired,
 	PropertyValidator,
 } from './options'
+import { Constructor, ConstructorType } from './constructor'
 
 export * from './constructor'
 export * from './functions'
@@ -20,7 +21,6 @@ export * from './config'
 export type ParsePropertyResponse = {
 	isChanged: boolean
 	value: any
-	errors: string[]
 }
 
 export const AsyncFunction: AsyncFunctionType
@@ -29,13 +29,13 @@ export const GeneratorFunction: GeneratorFunctionType
 
 export declare function isSchema(obj: any): boolean
 
-export declare function isSchemaProperty(obj: any): boolean
+export declare function isPropertySchema(obj: any): boolean
 
 export declare function createSchema<RawSchemaObject extends RawSchema>(
 	schema: RawSchemaObject
 ): Schema<RawSchemaObject>
 
-export declare function createSchemaProperty<
+export declare function createPropertySchema<
 	Type extends PropertyType,
 	TypeArray extends PropertyTypeArray,
 	Required extends PropertyRequired,
@@ -52,22 +52,26 @@ export declare function parseProperties<
 
 export declare function parseProperty<Type extends PropertyType>(
 	options: object | undefined,
-	optionKey: string,
+	optionKey: string | number,
 	optionSchema: PropertyOptionsRaw<Type, any, any, any, any>
 ): ParsePropertyResponse
 
-declare function hasOwn(obj: any | Array<any>, key: string): boolean
+declare function hasOwn(obj: any | Array<any>, key: string | number): boolean
 declare function isObject(obj: any): boolean
 declare function isFunction(value: any): value is (...args: any[]) => boolean
+declare function isConstructors(instance: any): boolean
+declare function getConstructors(instance: any): Constructor[]
 declare function compareConstructors(
-	instance: any,
-	constructors: PropertyType
+	constructors1: ConstructorType,
+	constructors2: ConstructorType
 ): boolean
 
 export declare const utils: {
 	AsyncFunction: typeof AsyncFunction
 	GeneratorFunction: typeof GeneratorFunction
 	compareConstructors: typeof compareConstructors
+	getConstructors: typeof getConstructors
+	isConstructors: typeof isConstructors
 	hasOwn: typeof hasOwn
 	isArray: typeof Array.isArray
 	isObject: typeof isObject
@@ -78,9 +82,9 @@ export declare const parser: {
 	parse: typeof parseProperties
 	single: typeof parseProperty
 	schema: typeof createSchema
-	property: typeof createSchemaProperty
+	property: typeof createPropertySchema
 	isSchema: typeof isSchema
-	isProperty: typeof isSchemaProperty
+	isProperty: typeof isPropertySchema
 	utils: typeof utils
 }
 
