@@ -121,12 +121,14 @@ describe('e2e: copy object', () => {
 		expect(object.a1.a2.a3.a4.hello).toBe('Hello world')
 		expect(cloneObject.a1.a2.a3.a4.hello).toBe('Any')
 	})
+})
 
-	it('deep array copy', () => {
-		const object = {
-			a1: ['hello', 'world'],
-		}
+describe('e2e: copy array', () => {
+	const arr = ['hello', 'world']
+	const config = { clone: true }
 
+	it('deep copy', () => {
+		const object: any = { a1: [...arr] }
 		const schema = schemaFn({
 			a1: Array,
 		})
@@ -135,7 +137,23 @@ describe('e2e: copy object', () => {
 
 		cloneObject.a1[0] = 'any'
 
-		expect(object.a1).toStrictEqual(['hello', 'world'])
+		expect(object.a1).toStrictEqual([...arr])
 		expect(cloneObject.a1[0]).toBe('any')
+	})
+
+	it('default copy', () => {
+		const object: any = {}
+		const schema = schemaFn({
+			b1: propertyFn({
+				type: Array,
+				required: false,
+				default: () => [...arr],
+			}),
+		})
+
+		const cloneObject = parseFn(object, schema, config)
+
+		expect(object.b1).toBeUndefined()
+		expect(cloneObject.b1).toStrictEqual(arr)
 	})
 })

@@ -173,9 +173,10 @@ function handlePropertyValue(
 					? readonlyObject[propertyKey]
 					: writableObject[propertyKey]
 
-			writableObject[propertyKey] = config.clone
-				? []
-				: writableObject[propertyKey]
+			writableObject[propertyKey] =
+				config.clone && readonlyObject && isArray(readonlyObject[propertyKey])
+					? []
+					: writableObject[propertyKey]
 
 			handlePropertiesByOneSchema(
 				readonlyArray,
