@@ -6,14 +6,23 @@ import {
 	GeneratorFunctionType,
 } from '@types'
 
+/**
+ * @public
+ */
 export const AsyncFunction: AsyncFunctionType = new Function(
 	`return async () => {}`
 )().constructor
 
+/**
+ * @public
+ */
 export const GeneratorFunction: GeneratorFunctionType = new Function(
 	`return function* t() {}`
 )().constructor
 
+/**
+ * @public
+ */
 export const compareConstructors = (
 	constructors1: ConstructorType,
 	constructors2: ConstructorType
@@ -28,6 +37,9 @@ export const compareConstructors = (
 	return false
 }
 
+/**
+ * @public
+ */
 export const getConstructors = (instance: any): Constructor[] => {
 	if (instance === null || instance === undefined) return []
 
@@ -50,6 +62,9 @@ export const getConstructors = (instance: any): Constructor[] => {
 	}
 }
 
+/**
+ * @public
+ */
 export const isConstructors = (value: any): boolean => {
 	for (const constructor of toArray(value)) {
 		if (!isFunction(constructor)) {

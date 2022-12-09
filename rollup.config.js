@@ -1,8 +1,8 @@
+import fs from 'fs'
 import path from 'path'
 import typescript from '@rollup/plugin-typescript'
-import terser from '@rollup/plugin-terser';
+import terser from '@rollup/plugin-terser'
 import babel from '@rollup/plugin-babel'
-import del from 'rollup-plugin-delete'
 
 const NODE_ENV = process.env.NODE_ENV
 const APP_FILENAME = 'index'
@@ -14,6 +14,10 @@ const APP_BUILD_UMD_NAME = 'objectParser'
 const input = path.join(APP_SRC_DIRNAME, `${APP_FILENAME}.ts`)
 const output = path.join(APP_BUILD_DIRNAME, `${APP_BUILD_FILENAME}`)
 
+if (fs.existsSync(APP_BUILD_DIRNAME)) {
+	fs.rmSync(APP_BUILD_DIRNAME, { recursive: true, force: true })
+}
+
 const rollupConfig = {
 	input,
 	output: [
@@ -24,7 +28,7 @@ const rollupConfig = {
 			name: APP_BUILD_UMD_NAME,
 		},
 	],
-	plugins: [del({ targets: `${APP_BUILD_DIRNAME}/*` }), typescript()],
+	plugins: [typescript()],
 }
 
 if (NODE_ENV === 'production') {
@@ -36,7 +40,7 @@ if (NODE_ENV === 'production') {
 				format: 'umd',
 				exports: 'named',
 				name: APP_BUILD_UMD_NAME,
-				plugins: [terser()]
+				plugins: [terser()],
 			},
 		]
 	)

@@ -1,12 +1,21 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"newLine": "LF",
+		"strict": true,
+
+		"allowJs": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+
 		"esModuleInterop": true,
-		"target": "ES2022",
-		"baseUrl": "./",
 		"paths": {
 			"@types": ["types/index.d.ts"],
 		}
 	},
-	"include": ["src", "types", "tests"],
-	"exclude": ["node_modules"]
+	"include": ["src", "types"],
+	"exclude": ["node_modules", "test"]
 }

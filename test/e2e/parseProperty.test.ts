@@ -1,4 +1,6 @@
-import { parseProperty } from '../dist/object-parser.js'
+// @ts-nocheck
+
+import { parseProperty } from '../../dist/object-parser.js'
 
 const propertyParseFn = parseProperty
 

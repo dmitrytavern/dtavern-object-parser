@@ -1,8 +1,10 @@
+// @ts-nocheck
+
 import {
 	parseProperties,
 	createSchema,
 	createPropertySchema,
-} from '../dist/object-parser.js'
+} from '../../dist/object-parser.js'
 
 const parseFn = parseProperties
 const schemaFn = createSchema

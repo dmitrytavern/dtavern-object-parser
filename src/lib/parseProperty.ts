@@ -2,9 +2,9 @@ import { PropertyOptionsRaw } from '@types'
 import { compareConstructors, getConstructors } from '../utils/constructors'
 import { usePropertySchema } from '../schema/createPropertySchema'
 import { hasOwn, isFunction, isObject } from '../utils/objects'
-import { ReadonlyProps, WritableProps, PropKey } from './tmp'
+import { ReadonlyProps, WritableProps, PropKey } from '@types'
 
-type ParseProperty = {
+export type ParseProperty = {
 	(writableProps: WritableProps, key: PropKey, schema: PropertyOptionsRaw): void
 	(
 		readonlyObject: ReadonlyProps,
@@ -14,7 +14,7 @@ type ParseProperty = {
 	): void
 }
 
-type ParseOverload = {
+export type ParseOverload = {
 	(...args): {
 		readonlyObject: ReadonlyProps
 		writableObject: WritableProps
@@ -23,6 +23,9 @@ type ParseOverload = {
 	}
 }
 
+/**
+ * @public
+ */
 export const parseProperty: ParseProperty = (...args): void => {
 	const { readonlyObject, writableObject, propertyKey, propertySchema } =
 		parseOverload(...args)

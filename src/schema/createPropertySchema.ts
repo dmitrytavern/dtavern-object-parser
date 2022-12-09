@@ -31,6 +31,9 @@ const schemaPrimitiveTypes = [
 	Symbol,
 ]
 
+/**
+ * @public
+ */
 export const createPropertySchema = <
 	Type extends PropertyType = any,
 	TypeArray extends PropertyTypeArray = any,
@@ -38,7 +41,10 @@ export const createPropertySchema = <
 	Default extends PropertyDefault<Type, TypeArray> = any,
 	Validator extends PropertyValidator<Type, TypeArray> = any
 >(
-	settings: PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
+	settings:
+		| PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
+		| null
+		| undefined
 ): PropertyOptions<Type, TypeArray, Required, Default, Validator> => {
 	validateSchemaSettings(settings)
 
@@ -103,7 +109,9 @@ const isPrimitiveType = (schema: PropertyOptions) => {
 /**
  * Validators
  */
-const validateSchemaSettings = (settings: PropertyOptionsRaw) => {
+const validateSchemaSettings = (
+	settings: PropertyOptionsRaw | null | undefined
+) => {
 	if (
 		(settings !== null && settings !== undefined && !isObject(settings)) ||
 		isArray(settings)

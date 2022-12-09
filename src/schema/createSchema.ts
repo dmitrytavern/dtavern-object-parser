@@ -5,6 +5,9 @@ import { createPropertySchema } from './createPropertySchema'
 import { isHandledSchema, isSchema } from './helpers'
 import { metadata } from '../utils/metadata'
 
+/**
+ * @public
+ */
 export const createSchema = <RawSchemaObject extends RawSchema>(
 	rawSchema: RawSchemaObject
 ): Schema<RawSchemaObject> => {

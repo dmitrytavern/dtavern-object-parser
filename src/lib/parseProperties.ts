@@ -15,10 +15,13 @@ import {
 import { useObjectHandler, ObjectHandler } from '../utils/handlers'
 import { metadata } from '../utils/metadata'
 import { useSchema } from '../schema/createSchema'
-import { Props, PropsSchema, ReadonlyProps, WritableProps } from './tmp'
+import { Props, PropsSchema, ReadonlyProps, WritableProps } from '@types'
 
-type PropsConfig = null | undefined | Config
+export type PropsConfig = null | undefined | Config
 
+/**
+ * @public
+ */
 export function parseProperties<PropsSchema extends RawSchema | Schema>(
 	_object: Props,
 	_schema: PropsSchema,
@@ -73,7 +76,7 @@ function handlePropertiesBySchema(
 
 			handler.unset()
 		}
-	} catch (e) {
+	} catch (e: any) {
 		handler.addError(e)
 	}
 }
@@ -106,7 +109,7 @@ function handlePropertiesByOneSchema(
 
 			handler.unset()
 		}
-	} catch (e) {
+	} catch (e: any) {
 		handler.addError(e)
 	}
 }
@@ -187,7 +190,7 @@ function handlePropertyValue(
 			)
 			return
 		}
-	} catch (e) {
+	} catch (e: any) {
 		handler.addError(e)
 	}
 }

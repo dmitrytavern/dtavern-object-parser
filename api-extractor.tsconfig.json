@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./.temp",
+    "types": [],
+    "paths": {
+			"@types": ["../types/index.d.ts"]
+		}
+  }
+}

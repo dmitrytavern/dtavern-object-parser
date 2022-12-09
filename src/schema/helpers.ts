@@ -1,13 +1,25 @@
 import { metadata } from 'src/utils/metadata'
 
+/**
+ * @public
+ */
 export const isSchema = (object: any): boolean =>
 	metadata.get(object, 'isSchema')
 
-export const isPropertySchema = (object: object): boolean =>
+/**
+ * @public
+ */
+export const isPropertySchema = (object: any): boolean =>
 	metadata.get(object, 'isPropertySchema')
 
-export const isHandledSchema = (object: object): boolean =>
+/**
+ * @internal
+ */
+export const isHandledSchema = (object: any): boolean =>
 	metadata.get(object, 'isHandledSchema')
 
-export const isArrayTypeSchema = (object: object): boolean =>
+/**
+ * @internal
+ */
+export const isArrayTypeSchema = (object: any): boolean =>
 	metadata.get(object, 'isArrayType')

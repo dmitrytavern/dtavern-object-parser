@@ -11,10 +11,13 @@ export type ObjectHandler = {
 	clear(): void
 }
 
+/**
+ * @internal
+ */
 export const useObjectHandler = (): ObjectHandler => {
-	const errorList = []
-	const nestedList = []
-	const handledList = []
+	const errorList: string[] = []
+	const nestedList: string[] = []
+	const handledList: object[] = []
 
 	const set = (key: string) => nestedList.push(key)
 

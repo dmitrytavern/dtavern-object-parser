@@ -29,6 +29,9 @@ const defineMetadata = (object: object): void => {
 	})
 }
 
+/**
+ * @internal
+ */
 export const metadata = {
 	has: hasMetadata,
 	get: getMetadata,

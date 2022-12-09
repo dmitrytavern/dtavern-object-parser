@@ -1,8 +1,0 @@
-node_modules
-dist
-.husky
-.git
-
-jest.config.js
-rollup.config.js
-tsconfig.json

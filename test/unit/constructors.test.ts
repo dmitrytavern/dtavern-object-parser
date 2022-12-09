@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { utils } from '../../dist/object-parser'
 import { types } from './types'
 

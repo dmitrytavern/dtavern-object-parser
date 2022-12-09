@@ -19,6 +19,9 @@ export { createSchema } from './schema/createSchema'
 export { createPropertySchema } from './schema/createPropertySchema'
 export { isSchema, isPropertySchema } from './schema/helpers'
 
+/**
+ * @public
+ */
 export const utils = {
 	AsyncFunction,
 	GeneratorFunction,
@@ -31,6 +34,9 @@ export const utils = {
 	isFunction,
 }
 
+/**
+ * @public
+ */
 export const parser = {
 	parse: parseProperties,
 	single: parseProperty,
