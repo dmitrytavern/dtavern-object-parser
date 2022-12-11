@@ -14,21 +14,26 @@ export type ParseProperty = {
 	): void
 }
 
-export type ParseOverload = {
-	(...args): {
-		readonlyObject: ReadonlyProps
-		writableObject: WritableProps
-		propertyKey: PropKey
-		propertySchema: PropertyOptionsRaw
-	}
-}
-
 /**
  * @public
  */
-export const parseProperty: ParseProperty = (...args): void => {
-	const { readonlyObject, writableObject, propertyKey, propertySchema } =
-		parseOverload(...args)
+export const parseProperty: ParseProperty = (
+	object?,
+	objectOrKey?,
+	schemaOrKey?,
+	objectSchema?
+): void => {
+	const _isFull = typeof objectOrKey === 'object'
+	const _schema = _isFull ? objectSchema : schemaOrKey
+	const readonlyObject = object
+	const writableObject = _isFull ? objectOrKey : object
+	const propertyKey = _isFull ? schemaOrKey : objectOrKey
+	const propertySchema = usePropertySchema(_schema)
+
+	if (!isObject(writableObject))
+		throw _isFull
+			? 'second argument must be an object if you have 4 arguments'
+			: 'first argument must be an object if you have 3 arguments'
 
 	let _propertyValue = readonlyObject ? readonlyObject[propertyKey] : undefined
 	let _propertyExists = readonlyObject
@@ -40,16 +45,12 @@ export const parseProperty: ParseProperty = (...args): void => {
 	const defaultValue = propertySchema.default
 	const validator = propertySchema.validator
 
-	/**
-	 * Exists checker
-	 */
+	// Exists checker
 	if (!_propertyExists && required) {
 		throw 'property not exists'
 	}
 
-	/**
-	 * Default setter
-	 */
+	// Default setter
 	if (!_propertyExists && !required && defaultValue !== null) {
 		_propertyExists = true
 		_propertyValue = isFunction(defaultValue)
@@ -57,9 +58,7 @@ export const parseProperty: ParseProperty = (...args): void => {
 			: defaultValue
 	}
 
-	/**
-	 * Type checker
-	 */
+	// Type checker
 	if (_propertyExists && type.length > 0) {
 		const _valueContructors = getConstructors(_propertyValue)
 		if (!compareConstructors(_valueContructors, type)) {
@@ -70,36 +69,10 @@ export const parseProperty: ParseProperty = (...args): void => {
 		}
 	}
 
-	/**
-	 * Validator
-	 */
+	// Validator
 	if (_propertyExists && validator !== null)
 		if (!validator.call(null, _propertyValue))
 			throw `property did not pass the validator. Value: ${_propertyValue}`
 
 	writableObject[propertyKey] = _propertyValue
-}
-
-const parseOverload: ParseOverload = (
-	object?,
-	objectOrKey?,
-	schemaOrKey?,
-	objectSchema?
-) => {
-	const _isFull =
-		typeof objectOrKey !== 'string' && typeof objectOrKey !== 'number'
-	const _schema = _isFull ? objectSchema : schemaOrKey
-	const result = {
-		readonlyObject: object,
-		writableObject: _isFull ? objectOrKey : object,
-		propertyKey: _isFull ? schemaOrKey : objectOrKey,
-		propertySchema: usePropertySchema(_schema),
-	}
-
-	if (!isObject(result.writableObject))
-		throw _isFull
-			? 'second argument must be an object if you have 4 arguments'
-			: 'first argument must be an object if you have 3 arguments'
-
-	return result
 }
