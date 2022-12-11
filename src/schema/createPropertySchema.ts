@@ -129,7 +129,7 @@ const validateSchemaKeys = (schema: PropertyOptions) => {
 }
 
 const validateSchemaType = (schema: PropertyOptions) => {
-	if (!isConstructors(schema.type))
+	if (schema.type.length > 0 && !isConstructors(schema.type))
 		throw `type setting have no-function type. Must be Function`
 }
 

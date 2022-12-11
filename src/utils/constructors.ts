@@ -66,6 +66,10 @@ export const getConstructors = (instance: any): Constructor[] => {
  * @public
  */
 export const isConstructors = (value: any): boolean => {
+	const arr = toArray(value)
+
+	if (arr.length === 0) return false
+
 	for (const constructor of toArray(value)) {
 		if (!isFunction(constructor)) {
 			return false
