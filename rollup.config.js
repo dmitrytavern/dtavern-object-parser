@@ -40,7 +40,7 @@ if (NODE_ENV === 'production') {
 				format: 'umd',
 				exports: 'named',
 				name: APP_BUILD_UMD_NAME,
-				plugins: [terser()],
+				plugins: [terser({ compress: { unsafe_arrows: true, passes: 2 } })],
 			},
 		]
 	)
