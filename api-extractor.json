@@ -34,6 +34,16 @@
       "ae-forgotten-export": {
         "logLevel": "none"
       }
+    },
+
+    "tsdocMessageReporting": {
+      "default": {
+        "logLevel": "warning"
+      },
+
+      "tsdoc-param-tag-missing-hyphen": {
+        "logLevel": "none"
+      }
     }
   }
 }

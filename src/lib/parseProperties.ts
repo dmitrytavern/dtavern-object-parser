@@ -12,10 +12,9 @@ import {
 	isPropertySchema,
 	isSchema,
 } from '../schema/helpers'
-import { useObjectHandler, ObjectHandler } from '../utils/handlers'
-import { metadata } from '../utils/metadata'
+import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { useSchema } from '../schema/createSchema'
-import { Props, PropsSchema, ReadonlyProps, WritableProps } from '@types'
+import { Props, ReadonlyProps, WritableProps } from '@types'
 
 export type PropsConfig = null | undefined | Config
 
@@ -30,20 +29,20 @@ export function parseProperties<PropsSchema extends RawSchema | Schema>(
 	const config = useConfig(_config)
 	const schema = useSchema(_schema)
 	const readonlyObject = _object
-	const writableObject = useWritableObject(_object, _schema, config)
-	const handler = useObjectHandler()
+	const writableObject = useWritableObject(readonlyObject, config)
+	const store = useHandlerStore()
 
 	handlePropertiesBySchema(
 		readonlyObject,
 		writableObject,
 		schema,
-		handler,
+		store,
 		config
 	)
 
-	handler.validate()
+	handler.validate(store)
 
-	handler.clear()
+	handler.clear(store)
 
 	return writableObject as SchemaReturn<PropsSchema>
 }
@@ -52,32 +51,30 @@ function handlePropertiesBySchema(
 	readonlyObject: ReadonlyProps,
 	writableObject: WritableProps,
 	schema: Schema,
-	handler: ObjectHandler,
+	store: HandlerStore,
 	config: Required<Config>
 ) {
 	try {
 		validateReadonlyObject(readonlyObject)
 
-		validateWritableObject(writableObject, handler)
-
-		handler.handle(writableObject)
+		handler.handle(store, writableObject)
 
 		for (const propertyKey in schema) {
-			handler.set(propertyKey)
+			handler.set(store, propertyKey)
 
 			handleProperty(
 				readonlyObject,
 				writableObject,
 				propertyKey,
 				schema[propertyKey],
-				handler,
+				store,
 				config
 			)
 
-			handler.unset()
+			handler.unset(store)
 		}
 	} catch (e: any) {
-		handler.addError(e)
+		handler.error(store, e)
 	}
 }
 
@@ -85,32 +82,30 @@ function handlePropertiesByOneSchema(
 	readonlyObject: ReadonlyProps,
 	writableObject: WritableProps,
 	propertySchema: Schema,
-	handler: ObjectHandler,
+	store: HandlerStore,
 	config: Required<Config>
 ) {
 	if (!readonlyObject) return
 
 	try {
-		validateWritableObject(writableObject, handler)
-
-		handler.handle(writableObject)
+		handler.handle(store, writableObject)
 
 		for (const propertyKey in readonlyObject) {
-			handler.set(propertyKey)
+			handler.set(store, propertyKey)
 
 			handleProperty(
 				readonlyObject,
 				writableObject,
 				propertyKey,
 				propertySchema,
-				handler,
+				store,
 				config
 			)
 
-			handler.unset()
+			handler.unset(store)
 		}
 	} catch (e: any) {
-		handler.addError(e)
+		handler.error(store, e)
 	}
 }
 
@@ -119,7 +114,7 @@ function handleProperty(
 	writableObject: WritableProps,
 	propertyKey: string,
 	schema: Schema,
-	handler: ObjectHandler,
+	store: HandlerStore,
 	config: Required<Config>
 ) {
 	const _value = writableObject[propertyKey]
@@ -133,7 +128,7 @@ function handleProperty(
 			readonlyObject && readonlyObject[propertyKey],
 			writableObject[propertyKey],
 			schema,
-			handler,
+			store,
 			config
 		)
 
@@ -146,7 +141,7 @@ function handleProperty(
 			writableObject,
 			propertyKey,
 			schema,
-			handler,
+			store,
 			config
 		)
 
@@ -161,7 +156,7 @@ function handlePropertyValue(
 	writableObject: WritableProps,
 	propertyKey: string,
 	propertySchema: PropertyOptions,
-	handler: ObjectHandler,
+	store: HandlerStore,
 	config: Required<Config>
 ) {
 	try {
@@ -185,13 +180,13 @@ function handlePropertyValue(
 				readonlyArray,
 				writableObject[propertyKey],
 				propertySchema['typeElement'],
-				handler,
+				store,
 				config
 			)
 			return
 		}
 	} catch (e: any) {
-		handler.addError(e)
+		handler.error(store, e)
 	}
 }
 
@@ -199,15 +194,14 @@ function handlePropertyValue(
 
 const useWritableObject = (
 	readonlyObject: ReadonlyProps,
-	schema: PropsSchema,
 	config: Required<Config>
 ): WritableProps => {
-	const _isArrayType = metadata.get(schema, 'isArrayType')
-	const copy = _isArrayType ? [] : {}
+	if (readonlyObject === undefined || readonlyObject === null)
+		config.clone = true
 
-	if (readonlyObject === undefined || readonlyObject === null) return copy
+	if (config.clone) return {}
 
-	if (isObject(readonlyObject)) return config.clone ? copy : readonlyObject
+	if (isObject(readonlyObject)) return readonlyObject as object
 
 	throw 'Object is not null | undefined | object type'
 }
@@ -234,8 +228,4 @@ const validateReadonlyObject = (obj: ReadonlyProps) => {
 		const s = errorKeys.join(' | ')
 		throw `for "${s}" key of options not found in scheme`
 	}
-}
-
-const validateWritableObject = (obj: WritableProps, handler: ObjectHandler) => {
-	if (handler.isHandled(obj)) throw `detected cyrcle links`
 }

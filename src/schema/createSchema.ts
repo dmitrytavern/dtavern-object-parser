@@ -1,5 +1,5 @@
-import { Schema, RawSchema, PropertyType } from '@types'
-import { useObjectHandler, ObjectHandler } from '../utils/handlers'
+import { Schema, RawSchema } from '@types'
+import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { isArray, isFunction, isObject } from '../utils/objects'
 import { createPropertySchema } from './createPropertySchema'
 import { isHandledSchema, isSchema } from './helpers'
@@ -13,16 +13,16 @@ export const createSchema = <RawSchemaObject extends RawSchema>(
 ): Schema<RawSchemaObject> => {
 	validateRawSchema(rawSchema)
 
-	const handler = useObjectHandler()
+	const store = useHandlerStore()
 	const _rawSchema = isArray(rawSchema)
 		? generateRawSchemaByPaths(rawSchema)
 		: rawSchema
 
-	const result = parseSchemaObject(_rawSchema, handler)
+	const result = parseSchemaObject(_rawSchema, store)
 
-	handler.validate()
+	handler.validate(store)
 
-	handler.clear()
+	handler.clear(store)
 
 	return result
 }
@@ -39,52 +39,54 @@ const validateRawSchema = (rawSchema: RawSchema) => {
 		throw 'Argument is not an array or an object.'
 }
 
-const parseSchemaObject = (schema: object, handler: ObjectHandler): any => {
-	if (isHandledSchema(schema)) return schema as Schema<any>
-	if (handler.isHandled(schema)) {
-		handler.addError('detected cycle links')
-		return schema
+const parseSchemaObject = (schema: object, store: HandlerStore): any => {
+	try {
+		if (isHandledSchema(schema)) return schema as Schema<any>
+
+		handler.handle(store, schema)
+
+		const schemaCopy = {}
+
+		metadata.set(schemaCopy, 'isSchema', true)
+		metadata.set(schemaCopy, 'isPropertySchema', false)
+		metadata.set(schemaCopy, 'isHandledSchema', true)
+
+		for (const propertyKey in schema) {
+			handler.set(store, propertyKey)
+
+			parseSchemaProperty(schema, schemaCopy, propertyKey, store)
+
+			handler.unset(store)
+		}
+
+		return Object.freeze(schemaCopy)
+	} catch (e: any) {
+		handler.error(store, e)
 	}
-
-	handler.handle(schema)
-
-	const schemaCopy = {}
-
-	metadata.set(schemaCopy, 'isSchema', true)
-	metadata.set(schemaCopy, 'isPropertySchema', false)
-	metadata.set(schemaCopy, 'isHandledSchema', true)
-
-	for (const propertyKey in schema) {
-		handler.set(propertyKey)
-
-		schemaCopy[propertyKey] = parseSchemaProperty(schema, propertyKey, handler)
-
-		handler.unset()
-	}
-
-	return Object.freeze(schemaCopy)
 }
 
 const parseSchemaProperty = (
-	schema: object,
+	readonlyObject: object,
+	writableObject: object,
 	key: string | number,
-	handler: ObjectHandler
+	store: HandlerStore
 ) => {
-	const property = schema[key]
+	const property = readonlyObject[key]
 
 	if (property === null || isFunction(property) || isArray(property)) {
-		return createPropertySchema({
-			type: property as PropertyType,
+		writableObject[key] = createPropertySchema({
+			type: property,
 		})
+
+		return
 	}
 
 	if (isObject(property)) {
-		return parseSchemaObject(property, handler)
+		writableObject[key] = parseSchemaObject(property, store)
+		return
 	}
 
-	handler.addError('property is not function, array or object')
-
-	return undefined
+	handler.error(store, 'property is not function, array or object')
 }
 
 const generateRawSchemaByPaths = (rawArraySchema: string[]): any => {
