@@ -3,18 +3,22 @@ import { isHandledSchema, isPropertySchema } from './helpers'
 import { isConstructors } from 'src/utils/constructors'
 import { metadata } from 'src/utils/metadata'
 import {
-	PropertyOptions,
-	PropertyType,
-	PropertyTypeArray,
-	PropertyRequired,
+	PropertySchema,
+	PropertySchemaRaw,
+	PropertyRequiredRaw,
+	PropertyTypeRaw,
+	PropertyElementTypeRaw,
 	PropertyDefault,
 	PropertyValidator,
-	PropertyOptionsRaw,
+	PropertyTypeNormalize,
+	PropertyElementNormalize,
+	PropertyRequiredNormalize,
+	PropertySchemaTemplate,
 } from '@types'
 
-const defaultSchema: PropertyOptions = {
+const defaultSchema: PropertySchemaTemplate = {
 	type: [],
-	typeElement: null,
+	element: null,
 	required: true,
 	default: null,
 	validator: null,
@@ -35,17 +39,26 @@ const schemaPrimitiveTypes = [
  * @public
  */
 export const createPropertySchema = <
-	Type extends PropertyType = any,
-	TypeArray extends PropertyTypeArray = any,
-	Required extends PropertyRequired = any,
-	Default extends PropertyDefault<Type, TypeArray> = any,
-	Validator extends PropertyValidator<Type, TypeArray> = any
+	TRaw extends PropertyTypeRaw,
+	ERaw extends PropertyElementTypeRaw,
+	RRaw extends PropertyRequiredRaw,
+	D extends PropertyDefault<
+		PropertyTypeNormalize<TRaw>,
+		PropertyElementNormalize<ERaw>
+	>,
+	V extends PropertyValidator<
+		PropertyTypeNormalize<TRaw>,
+		PropertyElementNormalize<ERaw>
+	>
 >(
-	settings:
-		| PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
-		| null
-		| undefined
-): PropertyOptions<Type, TypeArray, Required, Default, Validator> => {
+	settings: PropertySchemaRaw<TRaw, ERaw, RRaw, D, V> | null | undefined
+): PropertySchema<
+	PropertyTypeNormalize<TRaw>,
+	PropertyElementNormalize<ERaw>,
+	PropertyRequiredNormalize<RRaw>,
+	D,
+	V
+> => {
 	validateSchemaSettings(settings)
 
 	const schema = Object.assign({}, defaultSchema, settings)
@@ -76,18 +89,30 @@ export const createPropertySchema = <
 
 	metadata.set(schema, 'isHandledSchema', true)
 
-	return Object.freeze(schema)
+	return Object.freeze(schema) as any
 }
 
 export const usePropertySchema = <
-	Type extends PropertyType = any,
-	TypeArray extends PropertyTypeArray = any,
-	Required extends PropertyRequired = any,
-	Default extends PropertyDefault<Type, TypeArray> = any,
-	Validator extends PropertyValidator<Type, TypeArray> = any
+	TRaw extends PropertyTypeRaw,
+	ERaw extends PropertyElementTypeRaw,
+	RRaw extends PropertyRequiredRaw,
+	D extends PropertyDefault<
+		PropertyTypeNormalize<TRaw>,
+		PropertyElementNormalize<ERaw>
+	>,
+	V extends PropertyValidator<
+		PropertyTypeNormalize<TRaw>,
+		PropertyElementNormalize<ERaw>
+	>
 >(
-	settings: PropertyOptionsRaw<Type, TypeArray, Required, Default, Validator>
-): PropertyOptions<Type, TypeArray, Required, Default, Validator> =>
+	settings: PropertySchemaRaw<TRaw, ERaw, RRaw, D, V>
+): PropertySchema<
+	PropertyTypeNormalize<TRaw>,
+	PropertyElementNormalize<ERaw>,
+	PropertyRequiredNormalize<RRaw>,
+	D,
+	V
+> =>
 	isPropertySchema(settings)
 		? (settings as any)
 		: createPropertySchema(settings)
@@ -95,12 +120,12 @@ export const usePropertySchema = <
 /**
  * Helpers
  */
-const isArrayType = (schema: PropertyOptions) => {
+const isArrayType = (schema: PropertySchemaTemplate) => {
 	for (const type of schema.type) if (type === Array) return true
 	return false
 }
 
-const isPrimitiveType = (schema: PropertyOptions) => {
+const isPrimitiveType = (schema: PropertySchemaTemplate) => {
 	for (const type of schema.type)
 		if (!schemaPrimitiveTypes.includes(type)) return false
 	return true
@@ -110,7 +135,7 @@ const isPrimitiveType = (schema: PropertyOptions) => {
  * Validators
  */
 const validateSchemaSettings = (
-	settings: PropertyOptionsRaw | null | undefined
+	settings: PropertySchemaRaw | null | undefined
 ) => {
 	if (
 		(settings !== null && settings !== undefined && !isObject(settings)) ||
@@ -122,18 +147,18 @@ const validateSchemaSettings = (
 		throw 'argument is already schema or property schema'
 }
 
-const validateSchemaKeys = (schema: PropertyOptions) => {
+const validateSchemaKeys = (schema: PropertySchemaTemplate) => {
 	for (const key of Object.keys(schema))
 		if (!schemaAllowKeys.includes(key))
 			throw `unknown setting key "${key}" in options. Allow: ${schemaAllowKeys}`
 }
 
-const validateSchemaType = (schema: PropertyOptions) => {
+const validateSchemaType = (schema: PropertySchemaTemplate) => {
 	if (schema.type.length > 0 && !isConstructors(schema.type))
 		throw `type setting have no-function type. Must be Function`
 }
 
-const validateSchemaDefault = (schema: PropertyOptions) => {
+const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 	const _existsValue = schema.default !== null
 	const _typeNotPrimitive = !metadata.get(schema, 'isPrimitiveType')
 	const _isNotFunction = !isFunction(schema.default)
@@ -142,26 +167,26 @@ const validateSchemaDefault = (schema: PropertyOptions) => {
 		throw `use default setting as funtion for no primitive types`
 }
 
-const validateSchemaValidator = (schema: PropertyOptions) => {
+const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
 	if (schema.validator !== null && !isFunction(schema.validator))
 		throw `validator setting is not function. Must be null or Function`
 }
 
-const validateSchemaElement = (schema: PropertyOptions) => {
+const validateSchemaElement = (schema: PropertySchemaTemplate) => {
 	const _isArray = metadata.get(schema, 'isArrayType')
-	const _value = schema.typeElement
+	const _value = schema.element
 
 	if (!_isArray && _value !== null)
-		throw 'typeElement is not null when type is not Array'
+		throw 'element is not null when type is not Array'
 
 	if (_isArray && _value !== null && !isObject(_value) && !isFunction(_value))
-		throw 'typeElement is not null, Array, Function or Schema'
+		throw 'element is not null, Array, Function or Schema'
 }
 
 /**
  * Parsers
  */
-const parseSchemaType = (schema: PropertyOptions) => {
+const parseSchemaType = (schema: PropertySchemaTemplate) => {
 	const _types =
 		schema.type === null || schema.type === undefined
 			? []
@@ -170,23 +195,23 @@ const parseSchemaType = (schema: PropertyOptions) => {
 	schema.type = Object.freeze(_types)
 }
 
-const parseSchemaRequired = (schema: PropertyOptions) => {
+const parseSchemaRequired = (schema: PropertySchemaTemplate) => {
 	schema.required = !!schema.required
 }
 
-const parseSchemaElement = (schema: PropertyOptions) => {
+const parseSchemaElement = (schema: PropertySchemaTemplate) => {
 	try {
-		const elementSchema = schema.typeElement
+		const elementSchema = schema.element
 
 		if (isHandledSchema(elementSchema)) return
 
-		schema.typeElement =
+		schema.element =
 			elementSchema === null
 				? createPropertySchema(null)
 				: createPropertySchema({ type: elementSchema })
 	} catch (error) {
 		throw (
-			'typeElement setting have error with creating property schema. Error: ' +
+			'element setting have error with creating property schema. Error: ' +
 			error
 		)
 	}

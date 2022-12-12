@@ -19,7 +19,7 @@ describe('e2e: parse object', () => {
 
 	const roles_schema = propertyFn({
 		type: Array,
-		typeElement: role_schema,
+		element: role_schema,
 	})
 
 	const flags_schema = propertyFn({

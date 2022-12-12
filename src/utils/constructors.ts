@@ -1,10 +1,11 @@
 import { toArray, isFunction } from './objects'
 import {
 	Constructor,
-	ConstructorType,
-	AsyncFunctionType,
-	GeneratorFunctionType,
+	AsyncFunctionConstructor,
+	GeneratorFunctionConstructor,
 } from '@types'
+
+type ConstructorType = Constructor | Constructor[]
 
 /**
  * Compares two arrays of constructors and returns `true` when found
@@ -110,7 +111,7 @@ export function getConstructors(instance: any): Constructor[] {
  * @param arg
  * @public
  */
-export function isConstructors(arg: any): boolean {
+export function isConstructors(arg: any): arg is ConstructorType {
 	const arr = toArray(arg)
 
 	if (arr.length === 0) return false
@@ -129,7 +130,7 @@ export function isConstructors(arg: any): boolean {
  *
  * @public
  */
-export const AsyncFunction: AsyncFunctionType = new Function(
+export const AsyncFunction: AsyncFunctionConstructor = new Function(
 	`return async () => {}`
 )().constructor
 
@@ -139,6 +140,6 @@ export const AsyncFunction: AsyncFunctionType = new Function(
  *
  * @public
  */
-export const GeneratorFunction: GeneratorFunctionType = new Function(
+export const GeneratorFunction: GeneratorFunctionConstructor = new Function(
 	`return function* t() {}`
 )().constructor

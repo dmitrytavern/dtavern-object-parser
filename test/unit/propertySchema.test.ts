@@ -13,7 +13,7 @@ const isSchemaFn = isSchema
 const isPropertyFn = isPropertySchema
 const defaultSchema = {
 	type: [],
-	typeElement: null,
+	element: null,
 	required: true,
 	default: null,
 	validator: null,
@@ -150,45 +150,45 @@ describe('validator setting', () => {
 
 describe('type element setting', () => {
 	it('should be a default property schema', () => {
-		const _null = propertyFn({ type: Array, typeElement: null })
-		const _emptyArray = propertyFn({ type: Array, typeElement: [] })
+		const _null = propertyFn({ type: Array, element: null })
+		const _emptyArray = propertyFn({ type: Array, element: [] })
 
-		expect(isPropertyFn(_null.typeElement)).toBeTruthy()
-		expect(isPropertyFn(_emptyArray.typeElement)).toBeTruthy()
+		expect(isPropertyFn(_null.element)).toBeTruthy()
+		expect(isPropertyFn(_emptyArray.element)).toBeTruthy()
 	})
 
 	it('should be a property schema with function type', () => {
-		const _asFn = propertyFn({ type: Array, typeElement: Number })
-		const _asArray = propertyFn({ type: Array, typeElement: [Number, String] })
+		const _asFn = propertyFn({ type: Array, element: Number })
+		const _asArray = propertyFn({ type: Array, element: [Number, String] })
 
-		expect(_asFn.typeElement.type).toEqual([Number])
-		expect(_asArray.typeElement.type).toEqual([Number, String])
+		expect(_asFn.element.type).toEqual([Number])
+		expect(_asArray.element.type).toEqual([Number, String])
 	})
 
 	it('should be a schema', () => {
 		const _schema = propertyFn({
 			type: Array,
-			typeElement: schemaFn({ a: { b: [String, Number] } }),
+			element: schemaFn({ a: { b: [String, Number] } }),
 		})
 
-		expect(isSchemaFn(_schema.typeElement)).toBeTruthy()
-		expect(isSchemaFn(_schema.typeElement.a)).toBeTruthy()
-		expect(isPropertyFn(_schema.typeElement.a.b)).toBeTruthy()
+		expect(isSchemaFn(_schema.element)).toBeTruthy()
+		expect(isSchemaFn(_schema.element.a)).toBeTruthy()
+		expect(isPropertyFn(_schema.element.a.b)).toBeTruthy()
 	})
 
 	it('should throw if type element is undefined', () => {
-		expect(() => propertyFn({ type: Array, typeElement: undefined })).toThrow()
+		expect(() => propertyFn({ type: Array, element: undefined })).toThrow()
 	})
 
 	it('should throw if type is array and type element is common object', () => {
-		expect(() => propertyFn({ type: Array, typeElement: {} })).toThrow()
+		expect(() => propertyFn({ type: Array, element: {} })).toThrow()
 		expect(() =>
-			propertyFn({ type: Array, typeElement: { a: { b: String } } })
+			propertyFn({ type: Array, element: { a: { b: String } } })
 		).toThrow()
 	})
 
 	it('should throw if type is not array and type element have value', () => {
-		expect(() => propertyFn({ type: Number, typeElement: Number })).toThrow()
+		expect(() => propertyFn({ type: Number, element: Number })).toThrow()
 	})
 })
 

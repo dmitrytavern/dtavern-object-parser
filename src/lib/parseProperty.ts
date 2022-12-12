@@ -1,16 +1,24 @@
-import { PropertyOptionsRaw } from '@types'
 import { compareConstructors, getConstructors } from '../utils/constructors'
-import { usePropertySchema } from '../schema/createPropertySchema'
 import { hasOwn, isFunction, isObject } from '../utils/objects'
-import { ReadonlyProps, WritableProps, PropKey } from '@types'
+import { usePropertySchema } from '../schema/createPropertySchema'
+import {
+	PropertyKey,
+	PropertySchemaRaw,
+	ReadonlyObject,
+	WritableObject,
+} from '@types'
 
 export type ParseProperty = {
-	(writableProps: WritableProps, key: PropKey, schema: PropertyOptionsRaw): void
 	(
-		readonlyObject: ReadonlyProps,
-		writableProps: WritableProps,
-		key: PropKey,
-		schema?: PropertyOptionsRaw
+		writableProps: WritableObject,
+		key: PropertyKey,
+		schema: PropertySchemaRaw
+	): void
+	(
+		readonlyObject: ReadonlyObject,
+		writableProps: WritableObject,
+		key: PropertyKey,
+		schema?: PropertySchemaRaw
 	): void
 }
 

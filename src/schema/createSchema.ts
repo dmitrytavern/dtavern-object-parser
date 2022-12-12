@@ -1,22 +1,30 @@
-import { Schema, RawSchema } from '@types'
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { isArray, isFunction, isObject } from '../utils/objects'
 import { createPropertySchema } from './createPropertySchema'
 import { isHandledSchema, isSchema } from './helpers'
 import { metadata } from '../utils/metadata'
+import {
+	Schema,
+	RawSchema,
+	ReadonlyObject,
+	WritableObject,
+	PropertyKey,
+	RawSchemaAsArray,
+	RawSchemaAsObject,
+} from '@types'
 
 /**
  * @public
  */
-export const createSchema = <RawSchemaObject extends RawSchema>(
-	rawSchema: RawSchemaObject
-): Schema<RawSchemaObject> => {
+export const createSchema = <SRaw extends RawSchema>(
+	rawSchema: SRaw
+): Schema<SRaw> => {
 	validateRawSchema(rawSchema)
 
 	const store = useHandlerStore()
 	const _rawSchema = isArray(rawSchema)
 		? generateRawSchemaByPaths(rawSchema)
-		: rawSchema
+		: (rawSchema as RawSchemaAsObject)
 
 	const result = parseSchemaObject(_rawSchema, store)
 
@@ -27,9 +35,9 @@ export const createSchema = <RawSchemaObject extends RawSchema>(
 	return result
 }
 
-export const useSchema = <RawSchemaObject extends RawSchema | Schema>(
-	rawSchema: RawSchemaObject
-): Schema<RawSchemaObject> =>
+export const useSchema = <SRaw extends RawSchema>(
+	rawSchema: SRaw
+): Schema<SRaw> =>
 	isSchema(rawSchema)
 		? (rawSchema as any)
 		: createSchema(rawSchema as RawSchema)
@@ -39,7 +47,10 @@ const validateRawSchema = (rawSchema: RawSchema) => {
 		throw 'Argument is not an array or an object.'
 }
 
-const parseSchemaObject = (schema: object, store: HandlerStore): any => {
+const parseSchemaObject = (
+	schema: RawSchemaAsObject,
+	store: HandlerStore
+): any => {
 	try {
 		if (isHandledSchema(schema)) return schema as Schema<any>
 
@@ -66,9 +77,9 @@ const parseSchemaObject = (schema: object, store: HandlerStore): any => {
 }
 
 const parseSchemaProperty = (
-	readonlyObject: object,
-	writableObject: object,
-	key: string | number,
+	readonlyObject: NonNullable<ReadonlyObject>,
+	writableObject: WritableObject,
+	key: PropertyKey,
 	store: HandlerStore
 ) => {
 	const property = readonlyObject[key]
@@ -89,7 +100,9 @@ const parseSchemaProperty = (
 	handler.error(store, 'property is not function, array or object')
 }
 
-const generateRawSchemaByPaths = (rawArraySchema: string[]): any => {
+const generateRawSchemaByPaths = (
+	rawArraySchema: RawSchemaAsArray
+): RawSchemaAsObject => {
 	const rawObjectSchema = {}
 
 	for (const stringPath of rawArraySchema) {

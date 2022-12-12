@@ -1,58 +1,58 @@
+import { useConfig, PropertiesConfig, RequiredConfig } from '../utils/config'
+import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
+import { hasOwn, isArray, isObject } from '../utils/objects'
+import { parseProperty } from './parseProperty'
+import { useSchema } from '../schema/createSchema'
+import {
+	isSchema,
+	isPropertySchema,
+	isArrayTypeSchema,
+} from '../schema/helpers'
 import {
 	Schema,
 	RawSchema,
-	Config,
 	SchemaReturn,
-	PropertyOptions,
+	PropertySchema,
+	PropertiesSchema,
+	ReadonlyObject,
+	WritableObject,
 } from '@types'
-import { hasOwn, isArray, isObject } from '../utils/objects'
-import { parseProperty } from './parseProperty'
-import {
-	isArrayTypeSchema,
-	isPropertySchema,
-	isSchema,
-} from '../schema/helpers'
-import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
-import { useSchema } from '../schema/createSchema'
-import { Props, ReadonlyProps, WritableProps } from '@types'
-
-export type PropsConfig = null | undefined | Config
 
 /**
  * @public
  */
-export function parseProperties<PropsSchema extends RawSchema | Schema>(
-	_object: Props,
-	_schema: PropsSchema,
-	_config?: PropsConfig
-): SchemaReturn<PropsSchema> {
-	const config = useConfig(_config)
-	const schema = useSchema(_schema)
-	const readonlyObject = _object
-	const writableObject = useWritableObject(readonlyObject, config)
+export function parseProperties<S extends Schema | RawSchema>(
+	object: ReadonlyObject,
+	schema: PropertiesSchema,
+	config?: PropertiesConfig
+): SchemaReturn<S> {
+	const readonlyObject = object
+	const propertiesConfig = useConfig(config)
+	const propertiesSchema = useSchema(schema)
+	const writableObject = useWritableObject(readonlyObject, propertiesConfig)
 	const store = useHandlerStore()
 
 	handlePropertiesBySchema(
 		readonlyObject,
 		writableObject,
-		schema,
+		propertiesSchema,
 		store,
-		config
+		propertiesConfig
 	)
 
 	handler.validate(store)
 
 	handler.clear(store)
 
-	return writableObject as SchemaReturn<PropsSchema>
+	return writableObject as any
 }
 
 function handlePropertiesBySchema(
-	readonlyObject: ReadonlyProps,
-	writableObject: WritableProps,
+	readonlyObject: ReadonlyObject,
+	writableObject: WritableObject,
 	schema: Schema,
 	store: HandlerStore,
-	config: Required<Config>
+	config: RequiredConfig
 ) {
 	try {
 		validateReadonlyObject(readonlyObject)
@@ -79,11 +79,11 @@ function handlePropertiesBySchema(
 }
 
 function handlePropertiesByOneSchema(
-	readonlyObject: ReadonlyProps,
-	writableObject: WritableProps,
+	readonlyObject: ReadonlyObject,
+	writableObject: WritableObject,
 	propertySchema: Schema,
 	store: HandlerStore,
-	config: Required<Config>
+	config: RequiredConfig
 ) {
 	if (!readonlyObject) return
 
@@ -110,12 +110,12 @@ function handlePropertiesByOneSchema(
 }
 
 function handleProperty(
-	readonlyObject: ReadonlyProps,
-	writableObject: WritableProps,
+	readonlyObject: ReadonlyObject,
+	writableObject: WritableObject,
 	propertyKey: string,
 	schema: Schema,
 	store: HandlerStore,
-	config: Required<Config>
+	config: RequiredConfig
 ) {
 	const _value = writableObject[propertyKey]
 
@@ -152,12 +152,12 @@ function handleProperty(
 }
 
 function handlePropertyValue(
-	readonlyObject: ReadonlyProps,
-	writableObject: WritableProps,
+	readonlyObject: ReadonlyObject,
+	writableObject: WritableObject,
 	propertyKey: string,
-	propertySchema: PropertyOptions,
+	propertySchema: PropertySchema,
 	store: HandlerStore,
-	config: Required<Config>
+	config: RequiredConfig
 ) {
 	try {
 		parseProperty(readonlyObject, writableObject, propertyKey, propertySchema)
@@ -179,7 +179,7 @@ function handlePropertyValue(
 			handlePropertiesByOneSchema(
 				readonlyArray,
 				writableObject[propertyKey],
-				propertySchema['typeElement'],
+				propertySchema['element'],
 				store,
 				config
 			)
@@ -193,9 +193,9 @@ function handlePropertyValue(
 // Helpers
 
 const useWritableObject = (
-	readonlyObject: ReadonlyProps,
-	config: Required<Config>
-): WritableProps => {
+	readonlyObject: ReadonlyObject,
+	config: RequiredConfig
+): WritableObject => {
 	if (readonlyObject === undefined || readonlyObject === null)
 		config.clone = true
 
@@ -206,14 +206,7 @@ const useWritableObject = (
 	throw 'Object is not null | undefined | object type'
 }
 
-const useConfig = (config: PropsConfig): Required<Config> => {
-	return {
-		mode: config && config.mode ? config.mode : 'strict',
-		clone: config && config.clone ? config.clone : false,
-	}
-}
-
-const validateReadonlyObject = (obj: ReadonlyProps) => {
+const validateReadonlyObject = (obj: ReadonlyObject) => {
 	if (obj === null || obj === undefined) return
 
 	const errorKeys: string[] = []
