@@ -1,6 +1,6 @@
 import { compareConstructors, getConstructors } from '../utils/constructors'
 import { hasOwn, isFunction, isObject } from '../utils/objects'
-import { usePropertySchema } from '../schema/createPropertySchema'
+import { usePropertySchema } from './createPropertySchema'
 import {
 	PropertyKey,
 	PropertySchemaRaw,

@@ -1,7 +1,7 @@
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { isArray, isFunction, isObject } from '../utils/objects'
 import { createPropertySchema } from './createPropertySchema'
-import { isHandledSchema, isSchema } from './helpers'
+import { isHandledSchema, isSchema } from '../utils/schema'
 import { metadata } from '../utils/metadata'
 import {
 	Schema,

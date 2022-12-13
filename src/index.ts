@@ -1,8 +1,8 @@
 import { parseProperty } from './lib/parseProperty'
 import { parseProperties } from './lib/parseProperties'
-import { createSchema } from './schema/createSchema'
-import { createPropertySchema } from './schema/createPropertySchema'
-import { isSchema, isPropertySchema } from './schema/helpers'
+import { createSchema } from './lib/createSchema'
+import { createPropertySchema } from './lib/createPropertySchema'
+import { isSchema, isPropertySchema } from './utils/schema'
 
 import { hasOwn, isArray, isFunction, isObject } from './utils/objects'
 import {
@@ -15,9 +15,9 @@ import {
 
 export { parseProperty } from './lib/parseProperty'
 export { parseProperties } from './lib/parseProperties'
-export { createSchema } from './schema/createSchema'
-export { createPropertySchema } from './schema/createPropertySchema'
-export { isSchema, isPropertySchema } from './schema/helpers'
+export { createSchema } from './lib/createSchema'
+export { createPropertySchema } from './lib/createPropertySchema'
+export { isSchema, isPropertySchema } from './utils/schema'
 
 /**
  * @public

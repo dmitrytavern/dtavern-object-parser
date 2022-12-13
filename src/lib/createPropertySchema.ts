@@ -1,5 +1,5 @@
 import { isFunction, isObject, isArray, toArray } from 'src/utils/objects'
-import { isHandledSchema, isPropertySchema } from './helpers'
+import { isHandledSchema, isPropertySchema } from '../utils/schema'
 import { isConstructors } from 'src/utils/constructors'
 import { metadata } from 'src/utils/metadata'
 import {
