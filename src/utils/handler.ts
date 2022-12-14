@@ -23,7 +23,7 @@ export interface HandlerStore {
  * @param key The nested level name.
  * @internal
  */
-function set(store: HandlerStore, key: string): void {
+const set = (store: HandlerStore, key: string): void => {
 	store[NESTED_LIST_KEY].push(key)
 }
 
@@ -33,7 +33,7 @@ function set(store: HandlerStore, key: string): void {
  * @param store The handler store.
  * @internal
  */
-function unset(store: HandlerStore): void {
+const unset = (store: HandlerStore): void => {
 	store[NESTED_LIST_KEY].pop()
 }
 
@@ -46,7 +46,7 @@ function unset(store: HandlerStore): void {
  * a circular structure.
  * @internal
  */
-function handle(store: HandlerStore, object: object): void {
+const handle = (store: HandlerStore, object: object): void => {
 	const isHandled = metadata.has(object)
 		? metadata.get(object, 'isHandled')
 		: false
@@ -65,7 +65,7 @@ function handle(store: HandlerStore, object: object): void {
  * @param message An error message.
  * @internal
  */
-function error(store: HandlerStore, message: string | string[]): void {
+const error = (store: HandlerStore, message: string | string[]): void => {
 	const path =
 		store[NESTED_LIST_KEY].length === 0
 			? 'root'
@@ -83,7 +83,7 @@ function error(store: HandlerStore, message: string | string[]): void {
  * @throws if the store has errors.
  * @internal
  */
-const validate = (store: HandlerStore) => {
+const validate = (store: HandlerStore): void => {
 	if (store[ERROR_LIST_KEY].length > 0) {
 		throw new Error('\n' + store[ERROR_LIST_KEY].join('\n'))
 	}
@@ -95,8 +95,8 @@ const validate = (store: HandlerStore) => {
  * @param store The handler store.
  * @internal
  */
-const clear = (store: HandlerStore) => {
-	store[HANDLED_LIST_KEY].forEach((obj) => metadata.delete(obj))
+const clear = (store: HandlerStore): void => {
+	store[HANDLED_LIST_KEY].forEach((obj) => metadata.clear(obj))
 	store[ERROR_LIST_KEY].length = 0
 	store[NESTED_LIST_KEY].length = 0
 	store[HANDLED_LIST_KEY].length = 0

@@ -8,7 +8,7 @@ const metadataName = '__dtavern_object_parser'
  * @param object Object to check.
  * @internal
  */
-function hasMetadata(object: object): object is object {
+const has = (object: object): object is object => {
 	return isObject(object) && isObject(object[metadataName])
 }
 
@@ -21,8 +21,8 @@ function hasMetadata(object: object): object is object {
  * @param key Metadata property name.
  * @internal
  */
-function getMetadata(object: object, key: string): any {
-	if (!hasMetadata(object)) return undefined
+const get = (object: object, key: string): any => {
+	if (!has(object)) return undefined
 	return object[metadataName][key]
 }
 
@@ -34,8 +34,8 @@ function getMetadata(object: object, key: string): any {
  * @param value Metadata property value.
  * @internal
  */
-function setMetadata(object: object, key: string, value: any): void {
-	if (!hasMetadata(object)) {
+const set = (object: object, key: string, value: any): void => {
+	if (!has(object)) {
 		Object.defineProperty(object, metadataName, {
 			value: {},
 			enumerable: false,
@@ -52,8 +52,8 @@ function setMetadata(object: object, key: string, value: any): void {
  * @param object Object to metadata delete.
  * @internal
  */
-function deleteMetadata(object: object): void {
-	if (hasMetadata(object)) delete object[metadataName]
+const clear = (object: object): void => {
+	if (has(object)) delete object[metadataName]
 }
 
 /**
@@ -62,8 +62,8 @@ function deleteMetadata(object: object): void {
  * @internal
  */
 export const metadata = {
-	has: hasMetadata,
-	get: getMetadata,
-	set: setMetadata,
-	delete: deleteMetadata,
+	has,
+	get,
+	set,
+	clear,
 }
