@@ -29,6 +29,18 @@ describe('empty settings', () => {
 		expect(propertyFn(null)).toEqual(defaultSchema)
 		expect(propertyFn(undefined)).toEqual(defaultSchema)
 		expect(propertyFn({})).toEqual(defaultSchema)
+		expect(
+			propertyFn({
+				type: undefined,
+				element: undefined,
+				required: undefined,
+				default: undefined,
+				validator: undefined,
+			})
+		).toEqual({
+			...defaultSchema,
+			required: false,
+		})
 	})
 
 	it('should throw if settings is not correct type', () => {
@@ -190,10 +202,6 @@ describe('type element setting', () => {
 		expect(isSchemaFn(_schema.element)).toBeTruthy()
 		expect(isSchemaFn(_schema.element.a)).toBeTruthy()
 		expect(isPropertyFn(_schema.element.a.b)).toBeTruthy()
-	})
-
-	it('should throw if type element is undefined', () => {
-		expect(() => propertyFn({ type: Array, element: undefined })).toThrow()
 	})
 
 	it('should throw if type is array and type element is common object', () => {

@@ -1,6 +1,6 @@
 import { useConfig, PropertiesConfig, RequiredConfig } from '../utils/config'
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
-import { hasOwn, isArray, isObject } from '../utils/shared'
+import { hasOwn, isArray, isObject, isUndefined } from '../utils/shared'
 import { parseProperty } from './parseProperty'
 import { useSchema } from './createSchema'
 import { isSchema, isPropertySchema, isArrayTypeSchema } from '../utils/schema'
@@ -192,8 +192,7 @@ const useWritableObject = (
 	readonlyObject: ReadonlyObject,
 	config: RequiredConfig
 ): WritableObject => {
-	if (readonlyObject === undefined || readonlyObject === null)
-		config.clone = true
+	if (isUndefined(readonlyObject)) config.clone = true
 
 	if (config.clone) return {}
 
@@ -203,7 +202,7 @@ const useWritableObject = (
 }
 
 const validateReadonlyObject = (obj: ReadonlyObject) => {
-	if (obj === null || obj === undefined) return
+	if (isUndefined(obj)) return
 
 	const errorKeys: string[] = []
 

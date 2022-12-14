@@ -4,7 +4,14 @@ import { createSchema } from './lib/createSchema'
 import { createPropertySchema } from './lib/createPropertySchema'
 import { isSchema, isPropertySchema } from './utils/schema'
 
-import { hasOwn, isArray, isFunction, isObject } from './utils/shared'
+import {
+	isDefined,
+	isUndefined,
+	hasOwn,
+	isArray,
+	isFunction,
+	isObject,
+} from './utils/shared'
 import {
 	AsyncFunction,
 	GeneratorFunction,
@@ -34,6 +41,8 @@ export const utils = {
 	isArray,
 	isObject,
 	isFunction,
+	isDefined,
+	isUndefined,
 }
 
 /**

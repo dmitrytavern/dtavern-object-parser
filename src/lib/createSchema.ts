@@ -1,7 +1,8 @@
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
-import { isArray, isFunction, isObject } from '../utils/shared'
-import { createPropertySchema } from './createPropertySchema'
+import { isArray, isObject, isUndefined } from '../utils/shared'
 import { isHandledSchema, isSchema } from '../utils/schema'
+import { createPropertySchema } from './createPropertySchema'
+import { isConstructors } from 'src/utils/constructors'
 import { metadata } from '../utils/metadata'
 import {
 	Schema,
@@ -43,7 +44,7 @@ export const useSchema = <SRaw extends RawSchema>(
 		: createSchema(rawSchema as RawSchema)
 
 const validateRawSchema = (rawSchema: RawSchema) => {
-	if (rawSchema === null || rawSchema === undefined || !isObject(rawSchema))
+	if (isUndefined(rawSchema) || !isObject(rawSchema))
 		throw 'Argument is not an array or an object.'
 }
 
@@ -84,7 +85,7 @@ const parseSchemaProperty = (
 ) => {
 	const property = readonlyObject[key]
 
-	if (property === null || isFunction(property) || isArray(property)) {
+	if (isUndefined(property) || isConstructors(property)) {
 		writableObject[key] = createPropertySchema({
 			type: property,
 		})

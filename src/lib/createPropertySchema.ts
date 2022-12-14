@@ -1,7 +1,14 @@
 import { isConstructors, isPrimitiveConstructors } from 'src/utils/constructors'
-import { isFunction, isObject, isArray, toArray } from 'src/utils/shared'
 import { isHandledSchema, isPropertySchema } from '../utils/schema'
 import { metadata } from 'src/utils/metadata'
+import {
+	isFunction,
+	isObject,
+	isArray,
+	toArray,
+	isDefined,
+	isUndefined,
+} from 'src/utils/shared'
 import {
 	PropertySchema,
 	PropertySchemaRaw,
@@ -56,6 +63,8 @@ export const createPropertySchema = <
 
 	parseSchemaType(schema)
 	parseSchemaRequired(schema)
+	parseSchemaDefault(schema)
+	parseSchemaValidator(schema)
 
 	validateSchemaKeys(schema)
 
@@ -64,19 +73,14 @@ export const createPropertySchema = <
 
 	validateSchemaType(schema)
 
-	const _isArrayType = isArrayType(schema)
-	const _isPrimitiveType = isPrimitiveConstructors(schema.type)
-
-	metadata.set(schema, 'isArrayType', _isArrayType)
-	metadata.set(schema, 'isPrimitiveType', _isPrimitiveType)
+	metadata.set(schema, 'isArrayType', isArrayType(schema))
+	metadata.set(schema, 'isPrimitiveType', isPrimitiveConstructors(schema.type))
 
 	validateSchemaDefault(schema)
 	validateSchemaValidator(schema)
 	validateSchemaElement(schema)
 
-	if (_isArrayType) {
-		parseSchemaElement(schema)
-	}
+	parseSchemaElement(schema)
 
 	metadata.set(schema, 'isHandledSchema', true)
 
@@ -122,13 +126,15 @@ const isArrayType = (schema: PropertySchemaTemplate) => {
 const validateSchemaSettings = (
 	settings: PropertySchemaRaw | null | undefined
 ) => {
-	if (
-		(settings !== null && settings !== undefined && !isObject(settings)) ||
-		isArray(settings)
-	)
+	const _argIsDefined = isDefined(settings)
+	const _argIsArray = isArray(settings)
+	const _argIsNotObject = !isObject(settings)
+	const _argIsSomeSchema = isHandledSchema(settings)
+
+	if (_argIsDefined && (_argIsArray || _argIsNotObject))
 		throw 'argument is not null | undefined | object'
 
-	if (isHandledSchema(settings))
+	if (_argIsDefined && _argIsSomeSchema)
 		throw 'argument is already schema or property schema'
 }
 
@@ -139,21 +145,24 @@ const validateSchemaKeys = (schema: PropertySchemaTemplate) => {
 }
 
 const validateSchemaType = (schema: PropertySchemaTemplate) => {
-	if (schema.type.length > 0 && !isConstructors(schema.type))
+	const _typeIsNotAny = schema.type.length > 0
+	const _typeIsNotConstructors = !isConstructors(schema.type)
+
+	if (_typeIsNotAny && _typeIsNotConstructors)
 		throw `type setting have no-function type. Must be Function`
 }
 
 const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
-	const _existsValue = schema.default !== null
 	const _typeIsAny = schema.type.length === 0
 	const _typeIsNotAny = schema.type.length > 0
 	const _typeIsNotPrimitive = !metadata.get(schema, 'isPrimitiveType')
 	const _defaultIsObject = isObject(schema.default)
+	const _defaultIsDefined = isDefined(schema.default)
 	const _defaultIsNotFunction = !isFunction(schema.default)
 
 	if (
-		(_existsValue && _typeIsAny && _defaultIsObject) ||
-		(_existsValue &&
+		(_defaultIsDefined && _typeIsAny && _defaultIsObject) ||
+		(_defaultIsDefined &&
 			_typeIsNotAny &&
 			_typeIsNotPrimitive &&
 			_defaultIsNotFunction)
@@ -162,30 +171,37 @@ const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 }
 
 const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
-	if (schema.validator !== null && !isFunction(schema.validator))
+	const _validatorIsDefined = isDefined(schema.validator)
+	const _validatorIsNotFunction = !isFunction(schema.validator)
+
+	if (_validatorIsDefined && _validatorIsNotFunction)
 		throw `validator setting is not function. Must be null or Function`
 }
 
 const validateSchemaElement = (schema: PropertySchemaTemplate) => {
-	const _isArray = metadata.get(schema, 'isArrayType')
-	const _value = schema.element
+	const _schemaIsArray = metadata.get(schema, 'isArrayType')
+	const _schemaIsNotArray = !_schemaIsArray
+	const _elementIsDefined = isDefined(schema.element)
+	const _elementIsNotObject = !isObject(schema.element)
+	const _elementIsNotFunction = !isFunction(schema.element)
 
-	if (!_isArray && _value !== null)
-		throw 'element is not null when type is not Array'
-
-	if (_isArray && _value !== null && !isObject(_value) && !isFunction(_value))
+	if (
+		_schemaIsArray &&
+		_elementIsDefined &&
+		_elementIsNotObject &&
+		_elementIsNotFunction
+	)
 		throw 'element is not null, Array, Function or Schema'
+
+	if (_schemaIsNotArray && _elementIsDefined)
+		throw 'element is not null when type is not Array'
 }
 
 /**
  * Parsers
  */
 const parseSchemaType = (schema: PropertySchemaTemplate) => {
-	const _types =
-		schema.type === null || schema.type === undefined
-			? []
-			: toArray(schema.type)
-
+	const _types = isUndefined(schema.type) ? [] : toArray(schema.type)
 	schema.type = Object.freeze(_types)
 }
 
@@ -193,16 +209,30 @@ const parseSchemaRequired = (schema: PropertySchemaTemplate) => {
 	schema.required = !!schema.required
 }
 
+const parseSchemaDefault = (schema: PropertySchemaTemplate) => {
+	if (isUndefined(schema.default)) schema.default = null
+}
+
+const parseSchemaValidator = (schema: PropertySchemaTemplate) => {
+	if (isUndefined(schema.validator)) schema.validator = null
+}
+
 const parseSchemaElement = (schema: PropertySchemaTemplate) => {
+	const _schemaIsNotArray = !metadata.get(schema, 'isArrayType')
+
+	if (_schemaIsNotArray) {
+		schema.element = null
+		return
+	}
+
 	try {
 		const elementSchema = schema.element
 
 		if (isHandledSchema(elementSchema)) return
 
-		schema.element =
-			elementSchema === null
-				? createPropertySchema(null)
-				: createPropertySchema({ type: elementSchema })
+		schema.element = isUndefined(elementSchema)
+			? createPropertySchema(null)
+			: createPropertySchema({ type: elementSchema })
 	} catch (error) {
 		throw (
 			'element setting have error with creating property schema. Error: ' +

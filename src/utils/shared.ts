@@ -1,6 +1,26 @@
 export const isArray = Array.isArray
 
 /**
+ * Returns `true` if the arg is `null` or `undefined`, otherwise returns `false`.
+ *
+ * @param arg
+ * @public
+ */
+export function isUndefined(arg: any): arg is undefined | null {
+	return arg === undefined || arg === null
+}
+
+/**
+ * Returns `true` if the arg is not `null` or `undefined`, otherwise returns `false`.
+ *
+ * @param arg
+ * @public
+ */
+export function isDefined<T>(arg: T): arg is NonNullable<T> {
+	return arg !== undefined && arg !== null
+}
+
+/**
  * Returns `true` if the arg is an object, otherwise returns `false`.
  *
  * Note:

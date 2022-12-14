@@ -31,7 +31,7 @@ export const parseProperty: ParseProperty = (
 	schemaOrKey?,
 	objectSchema?
 ): void => {
-	const _isFull = typeof objectOrKey === 'object'
+	const _isFull = isObject(objectOrKey)
 	const _schema = _isFull ? objectSchema : schemaOrKey
 	const readonlyObject = object
 	const writableObject = _isFull ? objectOrKey : object
