@@ -5,6 +5,8 @@ import { types } from './types'
 
 const compareFn = utils.compareConstructors
 const getterFn = utils.getConstructors
+const getConstructorsFn = utils.getConstructors
+const isConstructorsFn = utils.isConstructors
 const isPrimitveFn = utils.isPrimitiveConstructors
 const containsArrayFn = utils.containsArrayConstructor
 
@@ -55,13 +57,41 @@ describe('type upcasting', () => {
 	})
 })
 
-describe('ignoring no-function elements', () => {
-	it('should return false when compare no-function type', () => {
+describe('compareConstructors', () => {
+	it('should ignore no-function type', () => {
 		expect(compareFn([null], [Function, null, String])).toBeFalsy()
 		expect(compareFn([undefined], [Function, undefined, String])).toBeFalsy()
 		expect(compareFn(['dfs'], [Function, 'dfs', String])).toBeFalsy()
 		expect(compareFn([{}], [Function, {}, String])).toBeFalsy()
 		expect(compareFn([[]], [Function, [], String])).toBeFalsy()
+	})
+})
+
+describe('getConstructors', () => {
+	it('should return the object prototype hierarchy', () => {
+		expect(getConstructorsFn(null)).toStrictEqual([])
+		expect(getConstructorsFn(true)).toStrictEqual([Boolean, Object])
+		expect(getConstructorsFn({})).toStrictEqual([Object])
+		expect(getConstructorsFn([])).toStrictEqual([Array, Object])
+		expect(getConstructorsFn(() => {})).toStrictEqual([Function, Object])
+	})
+})
+
+describe('isConstructors', () => {
+	it('should return true', () => {
+		expect(isConstructorsFn(String)).toBeTruthy()
+		expect(isConstructorsFn([Number, String])).toBeTruthy()
+		expect(
+			isConstructorsFn([String, Number, Boolean, BigInt, Symbol])
+		).toBeTruthy()
+	})
+
+	it('should return false', () => {
+		expect(isConstructorsFn(null)).toBeFalsy()
+		expect(isConstructorsFn(undefined)).toBeFalsy()
+		expect(isConstructorsFn([])).toBeFalsy()
+		expect(isConstructorsFn([null, String])).toBeFalsy()
+		expect(isConstructorsFn(['sfsdf', String])).toBeFalsy()
 	})
 })
 
@@ -91,6 +121,7 @@ describe('containsArrayConstructor', () => {
 
 	it('should return false', () => {
 		expect(containsArrayFn(Object)).toBeFalsy()
+		expect(containsArrayFn([])).toBeFalsy()
 		expect(containsArrayFn([String, Object])).toBeFalsy()
 	})
 })
