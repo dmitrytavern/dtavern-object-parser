@@ -159,6 +159,35 @@ export function isPrimitiveConstructors(arg: ConstructorArgType): boolean {
 }
 
 /**
+ * Returns `true` if the argument is a array constructor or the array with
+ * an array constructor, otherwise returns `false`.
+ *
+ * Note:
+ * - If you pass an empty array, returns `false`.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * containsArrayConstructor(Array)            // Retunrs: true
+ * containsArrayConstructor([String, Array])  // Retunrs: true
+ * containsArrayConstructor([String, Object]) // Retunrs: false
+ * ```
+ *
+ * @param arg Constructor or array of constructors.
+ * @public
+ */
+export function containsArrayConstructor(arg: ConstructorType): boolean {
+	const arr = toArray(arg)
+
+	if (arr.length === 0) return false
+
+	for (const constructor of arr) {
+		if (constructor === Array) return true
+	}
+	return false
+}
+
+/**
  * TODO: Rewrite it.
  * Returns the async function constructor.
  *

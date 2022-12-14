@@ -6,6 +6,7 @@ import { types } from './types'
 const compareFn = utils.compareConstructors
 const getterFn = utils.getConstructors
 const isPrimitveFn = utils.isPrimitiveConstructors
+const containsArrayFn = utils.containsArrayConstructor
 
 describe('compare types', () => {
 	it.each(types)(
@@ -79,5 +80,17 @@ describe('isPrimitiveConstructors', () => {
 		expect(isPrimitveFn([])).toBeFalsy()
 		expect(isPrimitveFn([String, Object])).toBeFalsy()
 		expect(isPrimitveFn('sdfs')).toBeFalsy()
+	})
+})
+
+describe('containsArrayConstructor', () => {
+	it('should return true', () => {
+		expect(containsArrayFn(Array)).toBeTruthy()
+		expect(containsArrayFn([Array, String])).toBeTruthy()
+	})
+
+	it('should return false', () => {
+		expect(containsArrayFn(Object)).toBeFalsy()
+		expect(containsArrayFn([String, Object])).toBeFalsy()
 	})
 })

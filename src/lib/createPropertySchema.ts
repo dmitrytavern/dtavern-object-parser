@@ -1,6 +1,10 @@
-import { isConstructors, isPrimitiveConstructors } from 'src/utils/constructors'
 import { isHandledSchema, isPropertySchema } from '../utils/schema'
 import { metadata } from 'src/utils/metadata'
+import {
+	isConstructors,
+	isPrimitiveConstructors,
+	containsArrayConstructor,
+} from 'src/utils/constructors'
 import {
 	isFunction,
 	isObject,
@@ -73,7 +77,7 @@ export const createPropertySchema = <
 
 	validateSchemaType(schema)
 
-	metadata.set(schema, 'isArrayType', isArrayType(schema))
+	metadata.set(schema, 'isArrayType', containsArrayConstructor(schema.type))
 	metadata.set(schema, 'isPrimitiveType', isPrimitiveConstructors(schema.type))
 
 	validateSchemaDefault(schema)
@@ -111,14 +115,6 @@ export const usePropertySchema = <
 	isPropertySchema(settings)
 		? (settings as any)
 		: createPropertySchema(settings)
-
-/**
- * Helpers
- */
-const isArrayType = (schema: PropertySchemaTemplate) => {
-	for (const type of schema.type) if (type === Array) return true
-	return false
-}
 
 /**
  * Validators

@@ -19,6 +19,7 @@ import {
 	getConstructors,
 	isConstructors,
 	isPrimitiveConstructors,
+	containsArrayConstructor,
 } from './utils/constructors'
 
 export { parseProperty } from './lib/parseProperty'
@@ -37,6 +38,7 @@ export const utils = {
 	getConstructors,
 	isConstructors,
 	isPrimitiveConstructors,
+	containsArrayConstructor,
 	hasOwn,
 	isArray,
 	isObject,
