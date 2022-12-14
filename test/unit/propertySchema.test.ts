@@ -129,6 +129,22 @@ describe('default setting', () => {
 
 		expect(fn).toThrow()
 	})
+
+	it('should throw if a type is any and default is an object', () => {
+		expect(() =>
+			propertyFn({
+				required: false,
+				default: {},
+			})
+		).toThrow()
+
+		expect(() =>
+			propertyFn({
+				required: false,
+				default: [],
+			})
+		).toThrow()
+	})
 })
 
 describe('validator setting', () => {

@@ -146,10 +146,19 @@ const validateSchemaType = (schema: PropertySchemaTemplate) => {
 
 const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 	const _existsValue = schema.default !== null
-	const _typeNotPrimitive = !metadata.get(schema, 'isPrimitiveType')
-	const _isNotFunction = !isFunction(schema.default)
+	const _typeIsAny = schema.type.length === 0
+	const _typeIsNotAny = schema.type.length > 0
+	const _typeIsNotPrimitive = !metadata.get(schema, 'isPrimitiveType')
+	const _defaultIsObject = isObject(schema.default)
+	const _defaultIsNotFunction = !isFunction(schema.default)
 
-	if (_existsValue && _typeNotPrimitive && _isNotFunction)
+	if (
+		(_existsValue && _typeIsAny && _defaultIsObject) ||
+		(_existsValue &&
+			_typeIsNotAny &&
+			_typeIsNotPrimitive &&
+			_defaultIsNotFunction)
+	)
 		throw `use default setting as funtion for no primitive types`
 }
 
