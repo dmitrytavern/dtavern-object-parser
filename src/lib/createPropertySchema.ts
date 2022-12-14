@@ -1,5 +1,5 @@
 import { isConstructors, isPrimitiveConstructors } from 'src/utils/constructors'
-import { isFunction, isObject, isArray, toArray } from 'src/utils/objects'
+import { isFunction, isObject, isArray, toArray } from 'src/utils/shared'
 import { isHandledSchema, isPropertySchema } from '../utils/schema'
 import { metadata } from 'src/utils/metadata'
 import {
@@ -65,8 +65,7 @@ export const createPropertySchema = <
 	validateSchemaType(schema)
 
 	const _isArrayType = isArrayType(schema)
-	const _isPrimitiveType =
-		schema.type.length === 0 ? true : isPrimitiveConstructors(schema.type)
+	const _isPrimitiveType = isPrimitiveConstructors(schema.type)
 
 	metadata.set(schema, 'isArrayType', _isArrayType)
 	metadata.set(schema, 'isPrimitiveType', _isPrimitiveType)

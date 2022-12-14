@@ -1,4 +1,4 @@
-import { toArray, isFunction } from './objects'
+import { toArray, isFunction } from './shared'
 import {
 	Constructor,
 	AsyncFunctionConstructor,
@@ -117,7 +117,7 @@ export function isConstructors(arg: any): arg is ConstructorType {
 
 	if (arr.length === 0) return false
 
-	for (const constructor of toArray(arg)) {
+	for (const constructor of arr) {
 		if (!isFunction(constructor)) {
 			return false
 		}

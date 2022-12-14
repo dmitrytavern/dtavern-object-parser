@@ -1,5 +1,5 @@
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
-import { isArray, isFunction, isObject } from '../utils/objects'
+import { isArray, isFunction, isObject } from '../utils/shared'
 import { createPropertySchema } from './createPropertySchema'
 import { isHandledSchema, isSchema } from '../utils/schema'
 import { metadata } from '../utils/metadata'

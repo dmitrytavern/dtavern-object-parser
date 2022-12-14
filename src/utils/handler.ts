@@ -1,4 +1,4 @@
-import { toArray } from './objects'
+import { toArray } from './shared'
 import { metadata } from './metadata'
 
 const ERROR_LIST_KEY = 'e'

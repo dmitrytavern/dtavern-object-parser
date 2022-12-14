@@ -4,7 +4,7 @@ import { createSchema } from './lib/createSchema'
 import { createPropertySchema } from './lib/createPropertySchema'
 import { isSchema, isPropertySchema } from './utils/schema'
 
-import { hasOwn, isArray, isFunction, isObject } from './utils/objects'
+import { hasOwn, isArray, isFunction, isObject } from './utils/shared'
 import {
 	AsyncFunction,
 	GeneratorFunction,

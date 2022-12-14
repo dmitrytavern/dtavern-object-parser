@@ -1,4 +1,4 @@
-import { isObject } from './objects'
+import { isObject } from './shared'
 
 const metadataName = '__dtavern_object_parser'
 

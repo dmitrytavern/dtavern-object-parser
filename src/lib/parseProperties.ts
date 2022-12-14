@@ -1,6 +1,6 @@
 import { useConfig, PropertiesConfig, RequiredConfig } from '../utils/config'
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
-import { hasOwn, isArray, isObject } from '../utils/objects'
+import { hasOwn, isArray, isObject } from '../utils/shared'
 import { parseProperty } from './parseProperty'
 import { useSchema } from './createSchema'
 import { isSchema, isPropertySchema, isArrayTypeSchema } from '../utils/schema'
