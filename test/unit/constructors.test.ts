@@ -5,6 +5,7 @@ import { types } from './types'
 
 const compareFn = utils.compareConstructors
 const getterFn = utils.getConstructors
+const isPrimitveFn = utils.isPrimitiveConstructors
 
 describe('compare types', () => {
 	it.each(types)(
@@ -60,5 +61,23 @@ describe('ignoring no-function elements', () => {
 		expect(compareFn(['dfs'], [Function, 'dfs', String])).toBeFalsy()
 		expect(compareFn([{}], [Function, {}, String])).toBeFalsy()
 		expect(compareFn([[]], [Function, [], String])).toBeFalsy()
+	})
+})
+
+describe('isPrimitiveConstructors', () => {
+	it('should return true', () => {
+		expect(isPrimitveFn(String)).toBeTruthy()
+		expect(isPrimitveFn([Number, String])).toBeTruthy()
+		expect(isPrimitveFn([String, Number, Boolean, BigInt, Symbol])).toBeTruthy()
+	})
+
+	it('should return false', () => {
+		expect(isPrimitveFn(null)).toBeFalsy()
+		expect(isPrimitveFn(undefined)).toBeFalsy()
+		expect(isPrimitveFn(Object)).toBeFalsy()
+		expect(isPrimitveFn(Function)).toBeFalsy()
+		expect(isPrimitveFn([])).toBeFalsy()
+		expect(isPrimitveFn([String, Object])).toBeFalsy()
+		expect(isPrimitveFn('sdfs')).toBeFalsy()
 	})
 })

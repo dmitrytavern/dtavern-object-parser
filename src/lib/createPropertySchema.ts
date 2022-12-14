@@ -1,6 +1,6 @@
+import { isConstructors, isPrimitiveConstructors } from 'src/utils/constructors'
 import { isFunction, isObject, isArray, toArray } from 'src/utils/objects'
 import { isHandledSchema, isPropertySchema } from '../utils/schema'
-import { isConstructors } from 'src/utils/constructors'
 import { metadata } from 'src/utils/metadata'
 import {
 	PropertySchema,
@@ -25,15 +25,6 @@ const defaultSchema: PropertySchemaTemplate = {
 }
 
 const schemaAllowKeys = Object.keys(defaultSchema)
-const schemaPrimitiveTypes = [
-	null,
-	undefined,
-	String,
-	Number,
-	Boolean,
-	BigInt,
-	Symbol,
-]
 
 /**
  * @public
@@ -74,7 +65,8 @@ export const createPropertySchema = <
 	validateSchemaType(schema)
 
 	const _isArrayType = isArrayType(schema)
-	const _isPrimitiveType = isPrimitiveType(schema)
+	const _isPrimitiveType =
+		schema.type.length === 0 ? true : isPrimitiveConstructors(schema.type)
 
 	metadata.set(schema, 'isArrayType', _isArrayType)
 	metadata.set(schema, 'isPrimitiveType', _isPrimitiveType)
@@ -123,12 +115,6 @@ export const usePropertySchema = <
 const isArrayType = (schema: PropertySchemaTemplate) => {
 	for (const type of schema.type) if (type === Array) return true
 	return false
-}
-
-const isPrimitiveType = (schema: PropertySchemaTemplate) => {
-	for (const type of schema.type)
-		if (!schemaPrimitiveTypes.includes(type)) return false
-	return true
 }
 
 /**

@@ -6,6 +6,7 @@ import {
 } from '@types'
 
 type ConstructorType = Constructor | Constructor[]
+type ConstructorArgType = null | undefined | Constructor | Constructor[]
 
 /**
  * Compares two arrays of constructors and returns `true` when found
@@ -121,6 +122,39 @@ export function isConstructors(arg: any): arg is ConstructorType {
 			return false
 		}
 	}
+	return true
+}
+
+/**
+ * Returns `true` if the argument is a primitive constructor or the array of
+ * primitive constructors, otherwise returns `false`.
+ *
+ * Primitive constructors: `String`, `Number`, `Boolean`, `BigInt`, `Symbol`.
+ *
+ * Note:
+ * - If you pass `null` or `undefined` type, returns false. These types are not
+ * a constructor.
+ * - If you pass an empty array, returns `false`.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * isPrimitiveConstructors(String)           // Retunrs: true
+ * isPrimitiveConstructors(Object)           // Retunrs: false
+ * isPrimitiveConstructors([String, Object]) // Retunrs: false
+ * ```
+ *
+ * @param arg Constructor or array of constructors.
+ * @public
+ */
+export function isPrimitiveConstructors(arg: ConstructorArgType): boolean {
+	const arr = toArray(arg)
+
+	if (arr.length === 0) return false
+
+	for (const constructor of arr)
+		if (![String, Number, Boolean, BigInt, Symbol].includes(constructor as any))
+			return false
 	return true
 }
 
