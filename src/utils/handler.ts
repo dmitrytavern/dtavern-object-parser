@@ -1,5 +1,6 @@
-import { toArray } from './shared'
 import { metadata } from './metadata'
+import { PropertyKey } from '@types'
+import { mergeErrors, ParserError } from './errors'
 
 const ERROR_LIST_KEY = 'e'
 const NESTED_LIST_KEY = 'n'
@@ -12,8 +13,8 @@ const M_IS_HANDLED = 'isHandled'
  * @internal
  */
 export interface HandlerStore {
-	[ERROR_LIST_KEY]: string[]
-	[NESTED_LIST_KEY]: string[]
+	[ERROR_LIST_KEY]: ParserError[]
+	[NESTED_LIST_KEY]: PropertyKey[]
 	[HANDLED_LIST_KEY]: object[]
 }
 
@@ -24,7 +25,7 @@ export interface HandlerStore {
  * @param key The nested level name.
  * @internal
  */
-const set = (store: HandlerStore, key: string): void => {
+const set = (store: HandlerStore, key: PropertyKey): void => {
 	store[NESTED_LIST_KEY].push(key)
 }
 
@@ -52,7 +53,7 @@ const handle = (store: HandlerStore, object: object): void => {
 		? metadata.get(object, M_IS_HANDLED)
 		: false
 
-	if (isHandled) throw `detected a circular structure`
+	if (isHandled) throw new ParserError(`detected a circular structure`)
 
 	metadata.set(object, M_IS_HANDLED, true)
 
@@ -66,14 +67,21 @@ const handle = (store: HandlerStore, object: object): void => {
  * @param message An error message.
  * @internal
  */
-const error = (store: HandlerStore, message: string | string[]): void => {
+const error = (store: HandlerStore, error: ParserError): void => {
 	const path =
 		store[NESTED_LIST_KEY].length === 0
 			? 'root'
-			: store[NESTED_LIST_KEY].join('.')
+			: store[NESTED_LIST_KEY].reduce(
+					(acc, value) =>
+						acc + (typeof value === 'string' ? `.${value}` : `[${value}]`)
+			  )
 
-	toArray(message).forEach((message) =>
-		store[ERROR_LIST_KEY].push(`in "${path}" error: ${message}`)
+	store[ERROR_LIST_KEY].push(
+		new ParserError(
+			`in "${path}" error: ${
+				error.message.charAt(0).toLowerCase() + error.message.slice(1)
+			}`
+		)
 	)
 }
 
@@ -86,7 +94,7 @@ const error = (store: HandlerStore, message: string | string[]): void => {
  */
 const validate = (store: HandlerStore): void => {
 	if (store[ERROR_LIST_KEY].length > 0) {
-		throw new Error('\n' + store[ERROR_LIST_KEY].join('\n'))
+		throw mergeErrors(store[ERROR_LIST_KEY])
 	}
 }
 

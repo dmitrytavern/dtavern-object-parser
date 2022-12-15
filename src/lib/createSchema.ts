@@ -3,6 +3,7 @@ import { isArray, isObject, isUndefined } from '../utils/shared'
 import { isHandledSchema, isSchema } from '../utils/schema'
 import { createPropertySchema } from './createPropertySchema'
 import { isConstructors } from 'src/utils/constructors'
+import { ParserError } from 'src/utils/errors'
 import {
 	metadata,
 	M_IS_SCHEMA,
@@ -25,20 +26,24 @@ import {
 export const createSchema = <SRaw extends RawSchema>(
 	rawSchema: SRaw
 ): Schema<SRaw> => {
-	validateRawSchema(rawSchema)
+	try {
+		validateRawSchema(rawSchema)
 
-	const store = useHandlerStore()
-	const _rawSchema = isArray(rawSchema)
-		? generateRawSchemaByPaths(rawSchema)
-		: (rawSchema as RawSchemaAsObject)
+		const store = useHandlerStore()
+		const _rawSchema = isArray(rawSchema)
+			? generateRawSchemaByPaths(rawSchema)
+			: (rawSchema as RawSchemaAsObject)
 
-	const result = parseSchemaObject(_rawSchema, store)
+		const result = parseSchemaObject(_rawSchema, store)
 
-	handler.validate(store)
+		handler.validate(store)
 
-	handler.clear(store)
+		handler.clear(store)
 
-	return result
+		return result
+	} catch (error) {
+		throw error
+	}
 }
 
 export const useSchema = <SRaw extends RawSchema>(
@@ -50,7 +55,9 @@ export const useSchema = <SRaw extends RawSchema>(
 
 const validateRawSchema = (rawSchema: RawSchema) => {
 	if (isUndefined(rawSchema) || !isObject(rawSchema))
-		throw 'Argument is not an array or an object.'
+		throw new ParserError(
+			`The property schema argument must be an array or an object.`
+		)
 }
 
 const parseSchemaObject = (
@@ -103,7 +110,10 @@ const parseSchemaProperty = (
 		return
 	}
 
-	handler.error(store, 'property is not function, array or object')
+	handler.error(
+		store,
+		new ParserError('The property must be a function, an array or an object.')
+	)
 }
 
 const generateRawSchemaByPaths = (

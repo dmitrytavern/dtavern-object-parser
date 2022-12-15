@@ -93,6 +93,13 @@ describe('default checking', () => {
 		expect(object[objectKey]).toBe(defaultValue)
 		expect(array[arrayKey]).toBe(defaultValue)
 	})
+
+	it('should throw when a default is an object', () => {
+		const schema = { required: false, default: {} }
+
+		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
+		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
+	})
 })
 
 describe('validator checking', () => {
@@ -121,6 +128,16 @@ describe('validator checking', () => {
 
 	it('should throw when a validator returns false', () => {
 		const validator = () => false
+		const schema = { validator }
+
+		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
+		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
+	})
+
+	it('should throw when a validator throws', () => {
+		const validator = () => {
+			throw 'error'
+		}
 		const schema = { validator }
 
 		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
