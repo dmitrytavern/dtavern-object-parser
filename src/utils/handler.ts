@@ -4,6 +4,7 @@ import { metadata } from './metadata'
 const ERROR_LIST_KEY = 'e'
 const NESTED_LIST_KEY = 'n'
 const HANDLED_LIST_KEY = 'h'
+const M_IS_HANDLED = 'isHandled'
 
 /**
  * Type of the handler store.
@@ -48,12 +49,12 @@ const unset = (store: HandlerStore): void => {
  */
 const handle = (store: HandlerStore, object: object): void => {
 	const isHandled = metadata.has(object)
-		? metadata.get(object, 'isHandled')
+		? metadata.get(object, M_IS_HANDLED)
 		: false
 
 	if (isHandled) throw `detected a circular structure`
 
-	metadata.set(object, 'isHandled', true)
+	metadata.set(object, M_IS_HANDLED, true)
 
 	store[HANDLED_LIST_KEY].push(object)
 }

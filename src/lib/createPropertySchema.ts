@@ -1,5 +1,12 @@
 import { isHandledSchema, isPropertySchema } from '../utils/schema'
-import { metadata } from 'src/utils/metadata'
+import {
+	metadata,
+	M_IS_SCHEMA,
+	M_IS_PROPERTY_SCHEMA,
+	M_IS_HANDLED_SCHEMA,
+	M_IS_ARRAY_CONSTRUCTOR,
+	M_IS_PRIMITIVE_CONSTRUCTORS,
+} from 'src/utils/metadata'
 import {
 	isConstructors,
 	isPrimitiveConstructors,
@@ -72,21 +79,26 @@ export const createPropertySchema = <
 
 	validateSchemaKeys(schema)
 
-	metadata.set(schema, 'isSchema', false)
-	metadata.set(schema, 'isPropertySchema', true)
+	metadata.set(schema, M_IS_SCHEMA, false)
+	metadata.set(schema, M_IS_PROPERTY_SCHEMA, true)
+	metadata.set(schema, M_IS_HANDLED_SCHEMA, true)
+	metadata.set(
+		schema,
+		M_IS_ARRAY_CONSTRUCTOR,
+		containsArrayConstructor(schema.type)
+	)
+	metadata.set(
+		schema,
+		M_IS_PRIMITIVE_CONSTRUCTORS,
+		isPrimitiveConstructors(schema.type)
+	)
 
 	validateSchemaType(schema)
-
-	metadata.set(schema, 'isArrayType', containsArrayConstructor(schema.type))
-	metadata.set(schema, 'isPrimitiveType', isPrimitiveConstructors(schema.type))
-
 	validateSchemaDefault(schema)
 	validateSchemaValidator(schema)
 	validateSchemaElement(schema)
 
 	parseSchemaElement(schema)
-
-	metadata.set(schema, 'isHandledSchema', true)
 
 	return Object.freeze(schema) as any
 }
@@ -151,7 +163,7 @@ const validateSchemaType = (schema: PropertySchemaTemplate) => {
 const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 	const _typeIsAny = schema.type.length === 0
 	const _typeIsNotAny = schema.type.length > 0
-	const _typeIsNotPrimitive = !metadata.get(schema, 'isPrimitiveType')
+	const _typeIsNotPrimitive = !metadata.get(schema, M_IS_PRIMITIVE_CONSTRUCTORS)
 	const _defaultIsObject = isObject(schema.default)
 	const _defaultIsDefined = isDefined(schema.default)
 	const _defaultIsNotFunction = !isFunction(schema.default)
@@ -175,7 +187,7 @@ const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
 }
 
 const validateSchemaElement = (schema: PropertySchemaTemplate) => {
-	const _schemaIsArray = metadata.get(schema, 'isArrayType')
+	const _schemaIsArray = metadata.get(schema, M_IS_ARRAY_CONSTRUCTOR)
 	const _schemaIsNotArray = !_schemaIsArray
 	const _elementIsDefined = isDefined(schema.element)
 	const _elementIsNotObject = !isObject(schema.element)
@@ -214,7 +226,7 @@ const parseSchemaValidator = (schema: PropertySchemaTemplate) => {
 }
 
 const parseSchemaElement = (schema: PropertySchemaTemplate) => {
-	const _schemaIsNotArray = !metadata.get(schema, 'isArrayType')
+	const _schemaIsNotArray = !metadata.get(schema, M_IS_ARRAY_CONSTRUCTOR)
 
 	if (_schemaIsNotArray) {
 		schema.element = null

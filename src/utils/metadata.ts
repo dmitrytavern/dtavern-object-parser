@@ -1,6 +1,11 @@
 import { isObject } from './shared'
 
-const metadataName = '__dtavern_object_parser'
+const METADATA_NAME = '__dtavern_object_parser'
+export const M_IS_SCHEMA = 'isSchema'
+export const M_IS_PROPERTY_SCHEMA = 'isPropertySchema'
+export const M_IS_HANDLED_SCHEMA = 'isHandledSchema'
+export const M_IS_ARRAY_CONSTRUCTOR = 'containsArrayConstructor'
+export const M_IS_PRIMITIVE_CONSTRUCTORS = 'isPrimitiveConstructors'
 
 /**
  * Checks metadata exists in this object.
@@ -9,7 +14,7 @@ const metadataName = '__dtavern_object_parser'
  * @internal
  */
 const has = (object: object): object is object => {
-	return isObject(object) && isObject(object[metadataName])
+	return isObject(object) && isObject(object[METADATA_NAME])
 }
 
 /**
@@ -23,7 +28,7 @@ const has = (object: object): object is object => {
  */
 const get = (object: object, key: string): any => {
 	if (!has(object)) return undefined
-	return object[metadataName][key]
+	return object[METADATA_NAME][key]
 }
 
 /**
@@ -36,14 +41,14 @@ const get = (object: object, key: string): any => {
  */
 const set = (object: object, key: string, value: any): void => {
 	if (!has(object)) {
-		Object.defineProperty(object, metadataName, {
+		Object.defineProperty(object, METADATA_NAME, {
 			value: {},
 			enumerable: false,
 			writable: false,
 			configurable: true,
 		})
 	}
-	object[metadataName][key] = value
+	object[METADATA_NAME][key] = value
 }
 
 /**
@@ -53,7 +58,7 @@ const set = (object: object, key: string, value: any): void => {
  * @internal
  */
 const clear = (object: object): void => {
-	if (has(object)) delete object[metadataName]
+	if (has(object)) delete object[METADATA_NAME]
 }
 
 /**

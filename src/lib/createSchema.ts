@@ -3,7 +3,12 @@ import { isArray, isObject, isUndefined } from '../utils/shared'
 import { isHandledSchema, isSchema } from '../utils/schema'
 import { createPropertySchema } from './createPropertySchema'
 import { isConstructors } from 'src/utils/constructors'
-import { metadata } from '../utils/metadata'
+import {
+	metadata,
+	M_IS_SCHEMA,
+	M_IS_PROPERTY_SCHEMA,
+	M_IS_HANDLED_SCHEMA,
+} from '../utils/metadata'
 import {
 	Schema,
 	RawSchema,
@@ -59,9 +64,9 @@ const parseSchemaObject = (
 
 		const schemaCopy = {}
 
-		metadata.set(schemaCopy, 'isSchema', true)
-		metadata.set(schemaCopy, 'isPropertySchema', false)
-		metadata.set(schemaCopy, 'isHandledSchema', true)
+		metadata.set(schemaCopy, M_IS_SCHEMA, true)
+		metadata.set(schemaCopy, M_IS_PROPERTY_SCHEMA, false)
+		metadata.set(schemaCopy, M_IS_HANDLED_SCHEMA, true)
 
 		for (const propertyKey in schema) {
 			handler.set(store, propertyKey)
