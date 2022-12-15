@@ -153,20 +153,23 @@ const validateSchemaKeys = (schema: PropertySchemaTemplate) => {
 }
 
 const validateSchemaType = (schema: PropertySchemaTemplate) => {
-	const _typeIsNotAny = schema.type.length > 0
-	const _typeIsNotConstructors = !isConstructors(schema.type)
+	const typeProp = schema.type
+	const _typeIsNotAny = typeProp.length > 0
+	const _typeIsNotConstructors = !isConstructors(typeProp)
 
 	if (_typeIsNotAny && _typeIsNotConstructors)
 		throw `type setting have no-function type. Must be Function`
 }
 
 const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
-	const _typeIsAny = schema.type.length === 0
-	const _typeIsNotAny = schema.type.length > 0
+	const typeProp = schema.type
+	const defaultProp = schema.default
+	const _typeIsAny = typeProp.length === 0
+	const _typeIsNotAny = typeProp.length > 0
 	const _typeIsNotPrimitive = !metadata.get(schema, M_IS_PRIMITIVE_CONSTRUCTORS)
-	const _defaultIsObject = isObject(schema.default)
-	const _defaultIsDefined = isDefined(schema.default)
-	const _defaultIsNotFunction = !isFunction(schema.default)
+	const _defaultIsObject = isObject(defaultProp)
+	const _defaultIsDefined = isDefined(defaultProp)
+	const _defaultIsNotFunction = !isFunction(defaultProp)
 
 	if (
 		(_defaultIsDefined && _typeIsAny && _defaultIsObject) ||
@@ -179,19 +182,21 @@ const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 }
 
 const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
-	const _validatorIsDefined = isDefined(schema.validator)
-	const _validatorIsNotFunction = !isFunction(schema.validator)
+	const validatorProp = schema.validator
+	const _validatorIsDefined = isDefined(validatorProp)
+	const _validatorIsNotFunction = !isFunction(validatorProp)
 
 	if (_validatorIsDefined && _validatorIsNotFunction)
 		throw `validator setting is not function. Must be null or Function`
 }
 
 const validateSchemaElement = (schema: PropertySchemaTemplate) => {
+	const elementProp = schema.element
 	const _schemaIsArray = metadata.get(schema, M_IS_ARRAY_CONSTRUCTOR)
 	const _schemaIsNotArray = !_schemaIsArray
-	const _elementIsDefined = isDefined(schema.element)
-	const _elementIsNotObject = !isObject(schema.element)
-	const _elementIsNotFunction = !isFunction(schema.element)
+	const _elementIsDefined = isDefined(elementProp)
+	const _elementIsNotObject = !isObject(elementProp)
+	const _elementIsNotFunction = !isFunction(elementProp)
 
 	if (
 		_schemaIsArray &&
