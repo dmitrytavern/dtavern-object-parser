@@ -1,8 +1,11 @@
 import { parseProperty } from './lib/parseProperty'
 import { parseProperties } from './lib/parseProperties'
-import { createSchema } from './lib/createSchema'
-import { createPropertySchema } from './lib/createPropertySchema'
+import { createSchema, useSchema } from './lib/createSchema'
 import { isSchema, isPropertySchema } from './utils/schema'
+import {
+	createPropertySchema,
+	usePropertySchema,
+} from './lib/createPropertySchema'
 
 import {
 	isDefined,
@@ -25,10 +28,15 @@ import {
 export { parseProperty } from './lib/parseProperty'
 export { parseProperties } from './lib/parseProperties'
 export { createSchema } from './lib/createSchema'
-export { createPropertySchema } from './lib/createPropertySchema'
+export {
+	createPropertySchema,
+	usePropertySchema,
+} from './lib/createPropertySchema'
 export { isSchema, isPropertySchema } from './utils/schema'
 
 /**
+ * Package utils.
+ *
  * @public
  */
 export const utils = {
@@ -48,6 +56,8 @@ export const utils = {
 }
 
 /**
+ * Parser main functions.
+ *
  * @public
  */
 export const parser = {
@@ -55,6 +65,8 @@ export const parser = {
 	single: parseProperty,
 	schema: createSchema,
 	property: createPropertySchema,
+	useSchema: useSchema,
+	useProperty: usePropertySchema,
 	isSchema,
 	isProperty: isPropertySchema,
 	utils,

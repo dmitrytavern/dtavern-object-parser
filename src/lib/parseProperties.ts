@@ -16,6 +16,41 @@ import {
 } from '@types'
 
 /**
+ * Parses the object by the schema.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * const object = { a: 'Hello' }
+ * const config = { clone: true }
+ * const schema = createSchema({
+ *   a: String,
+ *   b: createPropertySchema({
+ *     type: String,
+ *     required: false,
+ *     default: 'World'
+ *   })
+ * })
+ *
+ * const newObject = parseProperties(object, schema, config)
+ *
+ * object.a // 'Hello'
+ * object.b // undefined
+ * newObject.a // 'Hello'
+ * newObject.b // 'World'
+ * ```
+ *
+ * Note: when you pass the raw schema to the function, this raw
+ * schema will be transformed to schema **on every parse**! It's bad
+ * for performance.
+ *
+ * @param object The object to parse.
+ * @param schema The schema or the raw schema for parse.
+ * @param config The parser config.
+ * @throws
+ * - If some property is invalid.
+ * - If original object has a circular structure.
+ *
  * @public
  */
 export function parseProperties<S extends Schema | RawSchema>(
@@ -48,6 +83,15 @@ export function parseProperties<S extends Schema | RawSchema>(
 	}
 }
 
+/**
+ * Handles every property in the schema.
+ *
+ * @param readonlyObject The original object.
+ * @param writableObject The object for writing properies.
+ * @param schema The schema of the original object.
+ * @param store The handler store.
+ * @param config The parser config.
+ */
 function handlePropertiesBySchema(
 	readonlyObject: ReadonlyObject,
 	writableObject: WritableObject,
@@ -56,7 +100,7 @@ function handlePropertiesBySchema(
 	config: RequiredConfig
 ) {
 	try {
-		validateReadonlyObject(readonlyObject)
+		validateReadonlyObject(readonlyObject, schema)
 
 		handler.handle(store, writableObject)
 
@@ -79,6 +123,15 @@ function handlePropertiesBySchema(
 	}
 }
 
+/**
+ * Handles every property in the original object by the schema.
+ *
+ * @param readonlyObject The original object.
+ * @param writableObject The object for writing properies.
+ * @param schema The schema of the original object.
+ * @param store The handler store.
+ * @param config The parser config.
+ */
 function handlePropertiesByOneSchema(
 	readonlyObject: ReadonlyObject,
 	writableObject: WritableObject,
@@ -110,6 +163,15 @@ function handlePropertiesByOneSchema(
 	}
 }
 
+/**
+ * Handles the property by the schema.
+ *
+ * @param readonlyObject The original object.
+ * @param writableObject The object for writing properies.
+ * @param schema The schema of the property.
+ * @param store The handler store.
+ * @param config The parser config.
+ */
 function handleProperty(
 	readonlyObject: ReadonlyObject,
 	writableObject: WritableObject,
@@ -144,6 +206,16 @@ function handleProperty(
 	)
 }
 
+/**
+ * Handles the property by the property schema.
+ *
+ * @param readonlyObject The original object.
+ * @param writableObject The object for writing the property.
+ * @param propertyKey The property key.
+ * @param propertySchema The property schema.
+ * @param store The handler store.
+ * @param config The parser config.
+ */
 function handlePropertyValue(
 	readonlyObject: ReadonlyObject,
 	writableObject: WritableObject,
@@ -183,8 +255,16 @@ function handlePropertyValue(
 	}
 }
 
-// Helpers
-
+/**
+ * Returns the object for writing properties. If in the config the
+ * key `clone` is `true`, the writable object will be the empty object.
+ * Otherwise, will be the original object.
+ *
+ * @param readonlyObject The original object.
+ * @param config The parser config.
+ * @returns The object for writing properties.
+ * @throws If the original object is not a null, undefined, or object.
+ */
 const useWritableObject = (
 	readonlyObject: ReadonlyObject,
 	config: RequiredConfig
@@ -200,13 +280,20 @@ const useWritableObject = (
 	)
 }
 
-const validateReadonlyObject = (obj: ReadonlyObject) => {
+/**
+ * Validate the original object keys by comparing object and schema keys.
+ *
+ * @param obj The original object.
+ * @param schema The schema of the original object.
+ * @throws If the original object has keys which not found in the schema.
+ */
+const validateReadonlyObject = (obj: ReadonlyObject, schema: Schema) => {
 	if (isUndefined(obj)) return
 
 	const errorKeys: string[] = []
 
 	for (const propertyKey in obj) {
-		if (!hasOwn(obj, propertyKey)) {
+		if (!hasOwn(schema, propertyKey)) {
 			errorKeys.push(propertyKey)
 		}
 	}

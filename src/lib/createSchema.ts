@@ -21,11 +21,43 @@ import {
 } from '@types'
 
 /**
+ * Returns ready the schema for parsing an object.
+ *
+ * Note: schema properties must be a `null`, `undefined`, `constructor`,
+ * `array of constructors`, or `object`. Also, allowed the use of other schemas.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * createSchema({})
+ * createSchema({
+ *   a1: String,
+ *   b1: [String, Number],
+ *   c1: {
+ *     a2: createPropertySchema({
+ *       type: String
+ *     }),
+ *     b2: createSchema({
+ *       a3: {
+ *         a4: String
+ *       }
+ *     })
+ *   }
+ * })
+ * ```
+ *
+ * @param rawSchema Raw schema.
+ * @returns The schema.
+ * @throws
+ * - If the argument is not an object.
+ * - If the raw schema has a circular structure.
+ * - If some property is not a funciton, an array or an object.
+ *
  * @public
  */
-export const createSchema = <SRaw extends RawSchema>(
+export function createSchema<SRaw extends RawSchema>(
 	rawSchema: SRaw
-): Schema<SRaw> => {
+): Schema<SRaw> {
 	try {
 		validateRawSchema(rawSchema)
 
@@ -46,13 +78,31 @@ export const createSchema = <SRaw extends RawSchema>(
 	}
 }
 
-export const useSchema = <SRaw extends RawSchema>(
+/**
+ * Returns the schema from the argument or create schema
+ * by the argument value.
+ *
+ * Use it if you are not sure the object is a schema.
+ *
+ * @param settings Schema or raw schema.
+ * @returns The schema.
+ * @public
+ */
+export function useSchema<SRaw extends RawSchema>(
 	rawSchema: SRaw
-): Schema<SRaw> =>
-	isSchema(rawSchema)
+): Schema<SRaw> {
+	return isSchema(rawSchema)
 		? (rawSchema as any)
 		: createSchema(rawSchema as RawSchema)
+}
 
+/**
+ * Validate the argument of `createSchema`.
+ *
+ * @param setting The argument of `createSchema`.
+ * @throws If the argument is `null`, `undefined`, or not an `object`.
+ * @internal
+ */
 const validateRawSchema = (rawSchema: RawSchema) => {
 	if (isUndefined(rawSchema) || !isObject(rawSchema))
 		throw new ParserError(
@@ -60,6 +110,14 @@ const validateRawSchema = (rawSchema: RawSchema) => {
 		)
 }
 
+/**
+ * Converts the raw schema to the schema.
+ *
+ * @param rawSchema Schema, a property schema or a raw schema.
+ * @param store The handler store.
+ * @returns The schema.
+ * @internal
+ */
 const parseSchemaObject = (
 	schema: RawSchemaAsObject,
 	store: HandlerStore
@@ -89,6 +147,18 @@ const parseSchemaObject = (
 	}
 }
 
+/**
+ * Write schema to the writable object by property key.
+ *
+ * Note: if the property value is not a `null`, `undefined`,
+ * `constructors` or `object`, adds an error to the handler store.
+ *
+ * @param readonlyObject Original raw schema.
+ * @param writableObject Schema.
+ * @param key Property key of original raw schema.
+ * @param store The handler store.
+ * @internal
+ */
 const parseSchemaProperty = (
 	readonlyObject: NonNullable<ReadonlyObject>,
 	writableObject: WritableObject,
@@ -116,6 +186,25 @@ const parseSchemaProperty = (
 	)
 }
 
+/**
+ * Returns raw schema created by strings from the array.
+ *
+ * @param rawArraySchema Array of string.
+ * @returns Raw schema.
+ * @example
+ *
+ * ```typescript
+ * generateRawSchemaByPaths(['a1.a2'])
+ * // Result:
+ * // {
+ * //   a1: {
+ * //     b2: null,
+ * //   }
+ * // }
+ * ```
+ *
+ * @internal
+ */
 const generateRawSchemaByPaths = (
 	rawArraySchema: RawSchemaAsArray
 ): RawSchemaAsObject => {

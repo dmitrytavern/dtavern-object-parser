@@ -35,6 +35,11 @@ import {
 	PropertySchemaTemplate,
 } from '@types'
 
+/**
+ * Default the property schema.
+ *
+ * @internal
+ */
 const defaultSchema: PropertySchemaTemplate = {
 	type: [],
 	element: null,
@@ -43,12 +48,52 @@ const defaultSchema: PropertySchemaTemplate = {
 	validator: null,
 }
 
+/**
+ * Allowed keys for the property schema.
+ *
+ * @internal
+ */
 const allowedKeys = Object.keys(defaultSchema)
 
 /**
+ * Returns ready the property schema for customizing the schema key.
+ *
+ * Use it for setting:
+ * - `type` - type of the object key value.
+ * - `element` - set a schema for array elements.
+ * - `required` - check the existence of a property in an object.
+ * - `default` - set default value of a property in an object.
+ * - `validator` - set custom validator for a value.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * createPropertySchema(null)
+ * createPropertySchema({})
+ * createPropertySchema({
+ *   type: String,
+ *   required: true,
+ *   default: 'Hello world',
+ *   validator: (str) => str.length > 0
+ * })
+ * ```
+ *
+ * Note:
+ * - If the argument is `null` or `undefined`, returns default property schema.
+ * - If the `type` is an ArrayConstructor or an array that contains ArrayConstructor,
+ * you can set the `element` key. Otherwise, skip this setting.
+ * - If the `type` is an object constructor, the `default` setting can be only a function.
+ *
+ * @param settings Property schema settings or the property schema.
+ * @returns The property schema.
+ * @throws
+ * - If the argument is not an object or already a schema.
+ * - If the argument constains not allowed keys.
+ * - If the argument keys is invalid type.
+ *
  * @public
  */
-export const createPropertySchema = <
+export function createPropertySchema<
 	TRaw extends PropertyTypeRaw,
 	ERaw extends PropertyElementTypeRaw,
 	RRaw extends PropertyRequiredRaw,
@@ -68,7 +113,7 @@ export const createPropertySchema = <
 	PropertyRequiredNormalize<RRaw>,
 	D,
 	V
-> => {
+> {
 	try {
 		validateSchemaSettings(settings)
 
@@ -108,7 +153,17 @@ export const createPropertySchema = <
 	}
 }
 
-export const usePropertySchema = <
+/**
+ * Returns the property schema from the argument or create property schema
+ * by the argument value.
+ *
+ * Use it if you are not sure the object is a property schema.
+ *
+ * @param settings Property schema settings or the property schema.
+ * @returns The property schema.
+ * @public
+ */
+export function usePropertySchema<
 	TRaw extends PropertyTypeRaw,
 	ERaw extends PropertyElementTypeRaw,
 	RRaw extends PropertyRequiredRaw,
@@ -128,13 +183,18 @@ export const usePropertySchema = <
 	PropertyRequiredNormalize<RRaw>,
 	D,
 	V
-> =>
-	isPropertySchema(settings)
+> {
+	return isPropertySchema(settings)
 		? (settings as any)
 		: createPropertySchema(settings)
+}
 
 /**
- * Validators
+ * Validate the argument of `createPropertySchema`.
+ *
+ * @param setting The argument of `createPropertySchema`.
+ * @throws If the argument is a schema or not null, undefined, object.
+ * @internal
  */
 const validateSchemaSettings = (
 	settings: PropertySchemaRaw | null | undefined
@@ -155,6 +215,13 @@ const validateSchemaSettings = (
 		)
 }
 
+/**
+ * Validate the schema by allowed keys.
+ *
+ * @param schema Not handled schema.
+ * @throws If the schema has unknown keys.
+ * @internal
+ */
 const validateSchemaKeys = (schema: PropertySchemaTemplate) => {
 	for (const key of Object.keys(schema))
 		if (!allowedKeys.includes(key))
@@ -163,6 +230,13 @@ const validateSchemaKeys = (schema: PropertySchemaTemplate) => {
 			)
 }
 
+/**
+ * Validate the schema `type` key.
+ *
+ * @param schema Not handled schema.
+ * @throws If the type key contains no constructor value.
+ * @internal
+ */
 const validateSchemaType = (schema: PropertySchemaTemplate) => {
 	const typeProp = schema.type
 	const _typeIsNotAny = typeProp.length > 0
@@ -174,6 +248,16 @@ const validateSchemaType = (schema: PropertySchemaTemplate) => {
 		)
 }
 
+/**
+ * Validate the schema `default` key.
+ *
+ * @param schema Not handled schema.
+ * @throws
+ * - If the "type" key is empty array (any type) and default value is an object.
+ * - If the "type" key has no primitive constructros and default is not a function.
+ *
+ * @internal
+ */
 const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 	const typeProp = schema.type
 	const defaultProp = schema.default
@@ -196,6 +280,13 @@ const validateSchemaDefault = (schema: PropertySchemaTemplate) => {
 		)
 }
 
+/**
+ * Validate the schema `validator` key.
+ *
+ * @param schema Not handled schema.
+ * @throws If the validator key is not a function.
+ * @internal
+ */
 const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
 	const validatorProp = schema.validator
 	const _validatorIsDefined = isDefined(validatorProp)
@@ -205,6 +296,16 @@ const validateSchemaValidator = (schema: PropertySchemaTemplate) => {
 		throw new ParserError(`Property "validator" must be a function.`)
 }
 
+/**
+ * Validate the schema `element` key.
+ *
+ * @param schema Not handled schema.
+ * @throws
+ * - If the `type` key not contains ArrayConstructor and the `element` key is defined.
+ * - If the `element` key is not null, Array, Constructors, or Schema.
+ *
+ * @internal
+ */
 const validateSchemaElement = (schema: PropertySchemaTemplate) => {
 	const elementProp = schema.element
 	const _schemaIsArray = metadata.get(schema, M_IS_ARRAY_CONSTRUCTOR)
@@ -215,35 +316,62 @@ const validateSchemaElement = (schema: PropertySchemaTemplate) => {
 
 	if (_schemaIsNotArray && _eIsDefined)
 		throw new ParserError(
-			`Property "element" must be null, Array, Function, or Schema.`
+			`Property "element" must be null if "type" is not an Array.`
 		)
 
 	if (_schemaIsArray && _eIsDefined && _eIsNotObject && _eIsNotFunction)
 		throw new ParserError(
-			`Property "element" must be null if "type" is not an Array.`
+			`Property "element" must be null, Array, Function, or Schema.`
 		)
 }
 
 /**
- * Parsers
+ * Converts the schema `type` key to freezed array.
+ *
+ * @param schema Not handled schema.
+ * @internal
  */
 const parseSchemaType = (schema: PropertySchemaTemplate) => {
 	const _types = isUndefined(schema.type) ? [] : toArray(schema.type)
 	schema.type = Object.freeze(_types)
 }
 
+/**
+ * Converts the schema `requried` key to boolean type.
+ *
+ * @param schema Not handled schema.
+ * @internal
+ */
 const parseSchemaRequired = (schema: PropertySchemaTemplate) => {
 	schema.required = !!schema.required
 }
 
+/**
+ * Converts the schema `default` key to null.
+ *
+ * @param schema Not handled schema.
+ * @internal
+ */
 const parseSchemaDefault = (schema: PropertySchemaTemplate) => {
 	if (isUndefined(schema.default)) schema.default = null
 }
 
+/**
+ * Converts the schema `validator` key to null.
+ *
+ * @param schema Not handled schema.
+ * @internal
+ */
 const parseSchemaValidator = (schema: PropertySchemaTemplate) => {
 	if (isUndefined(schema.validator)) schema.validator = null
 }
 
+/**
+ * Converts the schema `element` key to null or the property schema.
+ *
+ * @param schema Not handled schema.
+ * @internal
+ */
 const parseSchemaElement = (schema: PropertySchemaTemplate) => {
 	const _schemaIsNotArray = !metadata.get(schema, M_IS_ARRAY_CONSTRUCTOR)
 

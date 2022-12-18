@@ -1,4 +1,6 @@
 /**
+ * Error witch uses only in this package.
+ *
  * @internal
  */
 export class ParserError extends Error {
@@ -9,6 +11,9 @@ export class ParserError extends Error {
 }
 
 /**
+ * Merges messages from the array of ParserError to one error.
+ *
+ * @returns Merged ParserError.
  * @internal
  */
 export function mergeErrors(errors: ParserError[]) {
