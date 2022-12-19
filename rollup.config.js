@@ -32,9 +32,24 @@ const rollupConfig = {
 }
 
 if (NODE_ENV === 'production') {
+	const removeComments = terser({
+		compress: false,
+		mangle: false,
+		format: {
+			beautify: true,
+			comments: false,
+		},
+	})
+
+	rollupConfig.output[0].plugins = [removeComments]
 	rollupConfig.output.push(
 		...[
-			{ file: `${output}.esm.js`, format: 'esm', exports: 'named' },
+			{
+				file: `${output}.esm.js`,
+				format: 'esm',
+				exports: 'named',
+				plugins: [removeComments],
+			},
 			{
 				file: `${output}.min.js`,
 				format: 'umd',
