@@ -1,145 +1,289 @@
-;(function (fn) {
-	typeof window === 'undefined' ? fn(global) : fn(window)
-})(function (globalObject) {
-	const packages = {}
-	const packageVersions = {}
-	const groups = []
-	let totalGroups = 0
-	let totalTests = 0
-	let currectGroup = null
-	let currectResult = null
+/**
+ * Core environment.
+ */
+const isBrowser = typeof window !== 'undefined'
+const globalThis = isBrowser ? window : global
 
-	globalObject.run = function (count) {
-		currectResult = []
+/**
+ *  Core variables.
+ */
+const groupContext = {}
+const packages = []
+const groups = []
+const tests = []
 
-		logger.log('Benchmarks started....')
-		const start = new Date().getTime()
+/**
+ * Temp core variables.
+ */
+let currectGroup = null
+let currectResult = null
 
-		for (var i = 0; i < count; i++) {
-			const start = new Date().getTime()
-			for (const group of groups) runGroup(group)
-			const end = new Date().getTime()
+/**
+ * Creates group of tests.
+ *
+ * @param {String} name Name of this group.
+ * @param {Function} initFn Function for tests init.
+ * @param {Number} iterationsCount Number of repetitions of tests in this group.
+ * @public
+ */
+globalThis.createGroup = function (name, initFn, iterations = 10000) {
+	const newGroup = { name, iterations }
 
-			logger.log(`Iteration ${i + 1} ended. (${(end - start) / 1000}s)`)
-		}
+	currectGroup = newGroup
 
-		const end = new Date().getTime()
-		logger.log('Benchmarks ended.')
+	initFn(groupContext)
 
-		const currectPackages = []
-		for (const package in packages) {
-			currectPackages.push(package + ' ' + packageVersions[package])
-		}
+	currectGroup = null
 
-		return {
-			time: (end - start) / 1000,
-			result: currectResult,
-			packages: currectPackages,
-			totalGroups,
-			totalTests,
-		}
+	groups.push(newGroup)
+
+	log(`${name} \x1b[32m(group loaded)\x1b[0m`)
+}
+
+/**
+ * Creates test.
+ *
+ * @param {String} name Name of this test.
+ * @param {Function} fn Function with code to test.
+ * @throws If this function is called outside the group.
+ * @public
+ */
+globalThis.createTest = function (name, callback) {
+	if (!currectGroup) throw 'use createTest only in group!'
+
+	tests.push({
+		name,
+		callback,
+		group: currectGroup,
+	})
+}
+
+/**
+ * Loads the package to core.
+ *
+ * @param {Object} package Settings of package.
+ * @public
+ */
+globalThis.loadPackage = function (package) {
+	const settings = {
+		name: package.name,
+		contextName: package.contextName,
+		modulePath: package.modulePath,
 	}
 
-	globalObject.createGroup = function (groupName, groupTests, count = 10000) {
-		groups.push({
-			groupName: groupName,
-			groupTests: [],
-			groupRepeatCount: count,
+	try {
+		const module = require(package.modulePath)
+		const version = package.version(module)
+
+		packages.push({
+			...settings,
+			module,
+			version,
+			loaded: true,
 		})
 
-		currectGroup = groups[groups.length - 1]
+		groupContext[settings.contextName] = module
 
-		groupTests(packages)
+		log(`${settings.name} \x1b[32m(package loaded)\x1b[0m`)
+	} catch (e) {
+		packages.push({
+			...settings,
+			module: undefined,
+			version: 'v?.?.?',
+			loaded: false,
+		})
 
-		currectGroup = null
-
-		totalGroups++
-		console.log(`\x1b[32m[group]\x1b[0m: "${groupName}" loaded.`)
+		log(`${settings.name} \x1b[31m(package skipped)\x1b[0m`)
 	}
+}
 
-	globalObject.createTest = function (testName, testFn) {
-		if (currectGroup) {
-			currectGroup.groupTests.push({
-				testFn: testFn,
-				testName: testName,
-			})
+/**
+ * Runs benchmarks.
+ *
+ * @param {Number} iterationsCount Number of repetitions of all benchmarks.
+ * @returns The object with benchmark results.
+ * @public
+ */
+globalThis.run = function (iterationsCount = 4) {
+	currectResult = []
 
-			totalTests++
-		} else {
-			throw 'Use create test only in group!'
+	log('Benchmarks started...')
+
+	const time = benchmarkTime(() => {
+		for (let count = 0; count < iterationsCount; count++) {
+			const time = benchmarkTime(runTests)
+
+			log(`Iteration ${count + 1} ended. (${time / 1000}s)`)
+		}
+	})
+
+	log('Benchmarks ended.')
+
+	let successTests = 0
+	let skippedTests = 0
+
+	for (const groupResult of currectResult) {
+		for (const testResult of groupResult.results) {
+			testResult.pass ? successTests++ : skippedTests++
 		}
 	}
 
-	globalObject.loadPackage = function (
-		packageName,
-		packageVersion,
-		packagePath
-	) {
-		try {
-			packages[packageName] = require(packagePath)
-			packageVersions[packageName] = packageVersion
-			console.log(`\x1b[32m[package]\x1b[0m: "${packageName}" loaded.`)
-		} catch (error) {
-			console.log(`\x1b[91m[package]\x1b[0m: "${packageName}" skipped.`)
+	return {
+		time,
+		result: currectResult,
+		packages,
+		loadedTests: tests.length,
+		successTests,
+		skippedTests,
+	}
+}
+
+/**
+ * Runs all test in order of addition.
+ * @internal
+ */
+function runTests() {
+	const throws = []
+	const iterations = []
+	const results = []
+
+	for (const key in tests) {
+		iterations[key] = tests[key].group.iterations
+		results[key] = []
+		throws[key] = false
+	}
+
+	for (let i = 0; i < tests.length; i++) {
+		if (iterations[i] > 0) {
+			iterationsExists = true
+			try {
+				const result = benchmarkTime(tests[i].callback)
+				iterations[i]--
+				results[i].push(result)
+			} catch (e) {
+				iterations[i] = 0
+				results[i] = []
+				throws[i] = true
+			}
+		}
+
+		if (+i === +(tests.length - 1)) {
+			if (!iterationsExists) break
+			iterationsExists = false
+			i = -1
 		}
 	}
 
-	globalObject.logger = {
-		log: (str) => console.log('\x1b[36m[log]:\x1b[0m %s', str),
-	}
+	for (const key in tests) {
+		const test = tests[key]
+		const testTrown = throws[key]
+		let testResult = 0
 
-	function runGroup(group) {
-		for (const test of group.groupTests) {
-			const testResult = runTest(test, group.groupRepeatCount)
-			saveResult(group, test, Math.round(testResult))
+		if (!testTrown) {
+			let sum = 0
+			for (const num of results[key]) sum += num
+			testResult = tests[key].group.iterations / sum
 		}
-	}
 
-	function runTest(test, count) {
-		var start = new Date().getTime()
-		for (var i = 1; i < count; i++) test.testFn()
-		var end = new Date().getTime()
-		var time = end - start
-		return count / time
+		saveResult(test, testResult, testTrown)
 	}
+}
 
-	function saveResult(group, groupTest, testResult) {
-		const groupExists = currectResult.find(
-			(g) => g.groupName === group.groupName
+/**
+ * Save the test time to currectResults object. If the test thrown is `true`,
+ * then mark the test result object as not passed.
+ *
+ * @param {Object} test Test object.
+ * @param {Number} testTime Test time.
+ * @param {Boolean} testThowns Test throwns.
+ * @internal
+ */
+function saveResult(test, testTime, testThowns) {
+	const testResult = getTestResult(test.group, test)
+
+	if (testThowns) {
+		testResult.pass = false
+		testResult.result = 0
+	} else {
+		testResult.pass = true
+		testResult.results.push(testTime)
+		testResult.result = Math.round(
+			testResult.results.reduce((val, acc) => acc + val) /
+				testResult.results.length
 		)
-		let groupResultObject = groupExists
-			? groupExists
-			: {
-					groupName: group.groupName,
-					groupRepeats: group.groupRepeatCount,
-					groupResults: [],
-			  }
+	}
+}
 
-		if (!groupExists) {
-			currectResult.push(groupResultObject)
-		}
+/**
+ * Returns the object with test results from group results.
+ *
+ * @param {Object} group Group of tests.
+ * @param {Object} test Test object.
+ * @internal
+ */
+function getTestResult(group, test) {
+	const groupResult = getGroupResult(group)
 
-		const testExists = groupResultObject.groupResults.find(
-			(t) => t.testName === groupTest.testName
-		)
-		let testResultObject = testExists
-			? testExists
-			: {
-					testName: groupTest.testName,
-					testResult: testResult,
-					testResults: [testResult],
-			  }
+	const testExists = groupResult.results.find((t) => t.name === test.name)
 
-		if (!testExists) {
-			groupResultObject.groupResults.push(testResultObject)
-		} else {
-			testResultObject.testResults.push(testResult)
-			testResultObject.testResult = Math.round(
-				testResultObject.testResults.reduce((val, acc) => acc + val) /
-					testResultObject.testResults.length
-			)
-		}
+	let testResultObject = testExists
+		? testExists
+		: {
+				name: test.name,
+				pass: true,
+				result: 0,
+				results: [],
+		  }
+
+	if (!testExists) {
+		groupResult.results.push(testResultObject)
 	}
 
-	logger.log(`Loading...`)
-})
+	return testResultObject
+}
+
+/**
+ * Returns the object with group results from currectResult.
+ *
+ * @param {Object} group Group of tests.
+ * @internal
+ */
+function getGroupResult(group) {
+	const groupExists = currectResult.find((g) => g.name === group.name)
+
+	let groupResultObject = groupExists
+		? groupExists
+		: {
+				name: group.name,
+				iterations: group.iterations,
+				results: [],
+		  }
+
+	if (!groupExists) {
+		currectResult.push(groupResultObject)
+	}
+
+	return groupResultObject
+}
+
+/**
+ * Returns time diffs between after and before the callback.
+ *
+ * @param {Function} callback Function to benchmark.
+ * @returns {Number} Time diffs between after and befroe in ms.
+ * @internal
+ */
+function benchmarkTime(callback) {
+	const start = new Date().getTime()
+	callback()
+	const end = new Date().getTime()
+	return end - start
+}
+
+/**
+ * Logger
+ * @internal
+ */
+function log(str) {
+	console.log('\x1b[36m[log]\x1b[0m: %s', str)
+}

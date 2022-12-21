@@ -1,61 +1,97 @@
-const packageRoot = require('../package.json')
-const packageBenchmarks = require('./package.json')
-
-// Load global scripts
 require('./core')
 
-// Load packages
-loadPackage('objectParser', 'v' + packageRoot.version, '../dist/object-parser')
-loadPackage(
-	'validateParser',
-	packageBenchmarks.dependencies['validate.js'].replace('^', 'v'),
-	'validate.js'
-)
+loadPackage({
+	name: 'Object Parser',
+	contextName: 'objectParser',
+	modulePath: '../dist/object-parser.min.js',
+	version: (module) => module.version.toString(),
+})
 
-// Load benchmark tests
+loadPackage({
+	name: 'Validate.js',
+	contextName: 'validateParser',
+	modulePath: 'validate.js',
+	version: (module) => module.version.toString(),
+})
+
 require('./groups/existance')
 
-const RUN_COUNT = 4
-
 function bootstrap() {
-	const { time, result, totalGroups, totalTests, packages } = run(RUN_COUNT)
+	const benchmarks = run()
 
-	console.log('\x1b[1mResult\x1b[0m:')
-	for (const key in result) {
-		const groupResult = result[key]
+	console.log('\x1b[1mBenchmarks:\x1b[0m')
 
-		console.log(
-			'  \x1b[1mGroup\x1b[0m: %s \x1b[36m(%d repeats)\x1b[0m',
-			groupResult.groupName,
-			groupResult.groupRepeats
-		)
+	for (const key in benchmarks.result) {
+		printGroup(benchmarks.result[key])
+		console.log('')
+	}
 
-		let min = Number.MAX_SAFE_INTEGER
-		let max = 0
+	printTime(benchmarks)
+	printTests(benchmarks)
+	printPackages(benchmarks)
 
-		for (const testResult of groupResult.groupResults) {
-			min = min > testResult.testResult ? testResult.testResult : min
-			max = max < testResult.testResult ? testResult.testResult : max
-		}
+	console.log('Exit.')
+}
 
-		for (const testResult of groupResult.groupResults) {
-			const resultPersent = (testResult.testResult / max) * 100
+function printGroup(groupResult) {
+	console.log(
+		'  %s \x1b[36m(%d repeats)\x1b[0m',
+		groupResult.name,
+		groupResult.iterations
+	)
+
+	let min = Number.MAX_SAFE_INTEGER
+	let max = 0
+
+	for (const testResult of groupResult.results) {
+		min = min > testResult.result ? testResult.result : min
+		max = max < testResult.result ? testResult.result : max
+	}
+
+	for (const testResult of groupResult.results) {
+		if (testResult.pass) {
+			const resultPersent = (testResult.result / max) * 100
 			let color = resultPersent > 75 ? '32' : resultPersent > 40 ? '33' : '31'
 
 			console.log(
-				'    Test: %s \x1b[' + color + 'm(%d iterations per 1 ms)\x1b[0m',
-				testResult.testName,
-				testResult.testResult
+				`    \x1b[32m✓\x1b[0m %s \x1b[${color}m(%d iterations per 1 ms)\x1b[0m`,
+				testResult.name,
+				testResult.result
+			)
+		} else {
+			console.log(
+				`    \x1b[31m✕\x1b[0m %s \x1b[33m(skipped)\x1b[0m`,
+				testResult.name
 			)
 		}
+	}
+}
 
-		console.log('') // \n
+function printTime({ time }) {
+	console.log('\x1b[1mTime:\x1b[0m     %ss', time / 1000)
+}
+
+function printTests({ loadedTests, successTests, skippedTests }) {
+	let string = `\x1b[1mTests:\x1b[0m    ${loadedTests} loaded`
+	if (successTests > 0) string += `, \x1b[32m${successTests} success\x1b[0m`
+	if (skippedTests > 0) string += `, \x1b[32m${skippedTests} skipped\x1b[0m`
+	console.log(string)
+}
+
+function printPackages({ packages }) {
+	let strings = []
+
+	for (const package of packages) {
+		strings.push(
+			`${package.name} ${package.version} ${
+				package.loaded
+					? '\x1b[32m(loaded)\x1b[0m'
+					: '\x1b[31m(not loaded)\x1b[0m'
+			}`
+		)
 	}
 
-	console.log('\x1b[1mTime:\x1b[0m %ss', time)
-	console.log('\x1b[1mTotal groups:\x1b[0m %s', totalGroups)
-	console.log('\x1b[1mTotal tests:\x1b[0m %s', totalTests)
-	console.log('\x1b[1mPackages:\x1b[0m %s', packages.join(', '))
+	console.log('\x1b[1mPackages:\x1b[0m %s', strings.join(', '))
 }
 
 bootstrap()

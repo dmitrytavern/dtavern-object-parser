@@ -25,10 +25,9 @@ createGroup('Existance validator', ({ objectParser, validateParser }) => {
 		objectParser.parser.parse(object, parserSchema)
 	})
 
-	validateParser &&
-		createTest('Validate.js', () => {
-			validateParser(object, validateParserSchema)
-		})
+	createTest('Validate.js', () => {
+		validateParser(object, validateParserSchema)
+	})
 })
 
 createGroup(
@@ -54,9 +53,8 @@ createGroup(
 			objectParser.parser.parse(object, parserSchema)
 		})
 
-		validateParser &&
-			createTest('Validate.js', () => {
-				validateParser(object, validateParserSchema)
-			})
+		createTest('Validate.js', () => {
+			validateParser(object, validateParserSchema)
+		})
 	}
 )
