@@ -1,3 +1,4 @@
+import { version } from './version'
 import { parseProperty } from './lib/parseProperty'
 import { parseProperties } from './lib/parseProperties'
 import { createSchema, useSchema } from './lib/createSchema'
@@ -25,6 +26,7 @@ import {
 	containsArrayConstructor,
 } from './utils/constructors'
 
+export { version } from './version'
 export { parseProperty } from './lib/parseProperty'
 export { parseProperties } from './lib/parseProperties'
 export { createSchema } from './lib/createSchema'
@@ -70,6 +72,7 @@ export const parser = {
 	isSchema,
 	isProperty: isPropertySchema,
 	utils,
+	version,
 }
 
 export default parser
