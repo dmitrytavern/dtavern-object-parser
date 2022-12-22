@@ -56,7 +56,7 @@ function printTime({ time }) {
 function printTests({ loadedTests, successTests, skippedTests }) {
 	let string = `\x1b[1mTests:\x1b[0m    ${loadedTests} loaded`
 	if (successTests > 0) string += `, \x1b[32m${successTests} success\x1b[0m`
-	if (skippedTests > 0) string += `, \x1b[32m${skippedTests} skipped\x1b[0m`
+	if (skippedTests > 0) string += `, \x1b[33m${skippedTests} skipped\x1b[0m`
 	console.log(string)
 }
 

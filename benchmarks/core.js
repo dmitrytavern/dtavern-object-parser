@@ -76,6 +76,10 @@ globalThis.loadPackage = function (package) {
 		const module = isBrowser ? package.module : require(package.modulePath)
 		const version = package.version(module)
 
+		if (typeof package.config === 'function') {
+			package.config(module)
+		}
+
 		packages.push({
 			...settings,
 			module,
