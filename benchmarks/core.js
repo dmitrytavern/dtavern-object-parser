@@ -3,6 +3,7 @@
  */
 const isBrowser = typeof window !== 'undefined'
 const globalThis = isBrowser ? window : global
+globalThis.globalThis = globalThis
 
 /**
  *  Core variables.
@@ -72,7 +73,7 @@ globalThis.loadPackage = function (package) {
 	}
 
 	try {
-		const module = require(package.modulePath)
+		const module = isBrowser ? package.module : require(package.modulePath)
 		const version = package.version(module)
 
 		packages.push({

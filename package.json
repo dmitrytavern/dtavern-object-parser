@@ -37,7 +37,7 @@
 		"test": "npm run build:lib && npm run test:unit && npm run test:e2e",
 		"test:unit": "jest test/unit",
 		"test:e2e": "jest test/e2e",
-		"benchmark:node": "node benchmarks/node.js",
+		"benchmark": "node benchmarks/node.js",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
