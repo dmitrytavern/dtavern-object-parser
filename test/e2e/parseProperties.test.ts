@@ -59,7 +59,9 @@ describe('e2e: parse object', () => {
 	}
 
 	it('should parse object without errors', () => {
-		expect(parseFn(user_object, user_schema)).toStrictEqual(user_object)
+		const { value, errors } = parseFn(user_object, user_schema)
+		expect(value).toStrictEqual(user_object)
+		expect(errors.length).toBe(0)
 	})
 })
 
@@ -80,7 +82,7 @@ describe('e2e: copy object', () => {
 			c1: Object,
 		})
 
-		const cloneObject = parseFn(object, schema, config)
+		const { value: cloneObject, errors } = parseFn(object, schema, config)
 
 		cloneObject.a1 = 'Any'
 		cloneObject.b1 = 123
@@ -89,6 +91,7 @@ describe('e2e: copy object', () => {
 		expect(object.a1).toBe('Jack')
 		expect(object.b1).toBe(23)
 		expect(object.c1.a2).toBe('Any')
+		expect(errors.length).toBe(0)
 	})
 
 	it('deep copy', () => {
@@ -116,12 +119,13 @@ describe('e2e: copy object', () => {
 			},
 		})
 
-		const cloneObject = parseFn(object, schema, config)
+		const { value: cloneObject, errors } = parseFn(object, schema, config)
 
 		cloneObject.a1.a2.a3.a4.hello = 'Any'
 
 		expect(object.a1.a2.a3.a4.hello).toBe('Hello world')
 		expect(cloneObject.a1.a2.a3.a4.hello).toBe('Any')
+		expect(errors.length).toBe(0)
 	})
 })
 
@@ -135,12 +139,13 @@ describe('e2e: copy array', () => {
 			a1: Array,
 		})
 
-		const cloneObject = parseFn(object, schema, config)
+		const { value: cloneObject, errors } = parseFn(object, schema, config)
 
 		cloneObject.a1[0] = 'any'
 
 		expect(object.a1).toStrictEqual([...arr])
 		expect(cloneObject.a1[0]).toBe('any')
+		expect(errors.length).toBe(0)
 	})
 
 	it('default copy', () => {
@@ -153,9 +158,10 @@ describe('e2e: copy array', () => {
 			}),
 		})
 
-		const cloneObject = parseFn(object, schema, config)
+		const { value: cloneObject, errors } = parseFn(object, schema, config)
 
 		expect(object.b1).toBeUndefined()
 		expect(cloneObject.b1).toStrictEqual(arr)
+		expect(errors.length).toBe(0)
 	})
 })

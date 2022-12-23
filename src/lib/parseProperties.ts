@@ -1,9 +1,9 @@
+import { createObjectError, GeneralError, ObjectError } from '../utils/errors'
 import { useConfig, PropertiesConfig, RequiredConfig } from '../utils/config'
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { hasOwn, isArray, isObject, isUndefined } from '../utils/shared'
 import { isSchema, isArrayTypeSchema } from '../utils/schema'
 import { parseProperty } from './parseProperty'
-import { ParserError } from 'src/utils/errors'
 import { useSchema } from './createSchema'
 import {
 	Schema,
@@ -14,6 +14,14 @@ import {
 	ReadonlyObject,
 	WritableObject,
 } from '@types'
+
+/**
+ * The result object type of parsing.
+ */
+type ParserReturns<T> = {
+	value: T
+	errors: GeneralError[]
+}
 
 /**
  * Parses the object by the schema.
@@ -32,12 +40,13 @@ import {
  *   })
  * })
  *
- * const newObject = parseProperties(object, schema, config)
+ * const { value: newObject, errors } = parseProperties(object, schema, config)
  *
  * object.a // 'Hello'
  * object.b // undefined
  * newObject.a // 'Hello'
  * newObject.b // 'World'
+ * errors // []
  * ```
  *
  * Note: when you pass the raw schema to the function, this raw
@@ -47,39 +56,34 @@ import {
  * @param object The object to parse.
  * @param schema The schema or the raw schema for parse.
  * @param config The parser config.
- * @throws
- * - If some property is invalid.
- * - If original object has a circular structure.
- *
+ * @throws If arguments is invalid.
+ * @returns Object with `value` and `errors` props.
  * @public
  */
 export function parseProperties<S extends Schema | RawSchema>(
 	object: ReadonlyObject,
 	schema: PropertiesSchema,
 	config?: PropertiesConfig
-): SchemaReturn<S> {
-	try {
-		const readonlyObject = object
-		const propertiesConfig = useConfig(config)
-		const propertiesSchema = useSchema(schema)
-		const writableObject = useWritableObject(readonlyObject, propertiesConfig)
-		const store = useHandlerStore()
+): ParserReturns<SchemaReturn<S>> {
+	const readonlyObject = object
+	const propertiesConfig = useConfig(config)
+	const propertiesSchema = useSchema(schema)
+	const writableObject = useWritableObject(readonlyObject, propertiesConfig)
+	const store = useHandlerStore()
 
-		handlePropertiesBySchema(
-			readonlyObject,
-			writableObject,
-			propertiesSchema,
-			store,
-			propertiesConfig
-		)
+	handlePropertiesBySchema(
+		readonlyObject,
+		writableObject,
+		propertiesSchema,
+		store,
+		propertiesConfig
+	)
 
-		handler.validate(store)
+	handler.clear(store)
 
-		handler.clear(store)
-
-		return writableObject as any
-	} catch (error) {
-		throw error
+	return {
+		errors: handler.validate(store),
+		value: writableObject as any,
 	}
 }
 
@@ -99,27 +103,27 @@ function handlePropertiesBySchema(
 	store: HandlerStore,
 	config: RequiredConfig
 ) {
-	try {
-		validateReadonlyObject(readonlyObject, schema)
+	const readonlyObjectError = validateReadonlyObject(readonlyObject, schema)
+	if (readonlyObjectError) return handler.error(store, readonlyObjectError)
 
-		handler.handle(store, writableObject)
+	const writableObjectError = validateWritableObject(writableObject)
+	if (writableObjectError) return handler.error(store, writableObjectError)
 
-		for (const propertyKey in schema) {
-			handler.set(store, propertyKey)
+	handler.handle(store, writableObject)
 
-			handleProperty(
-				readonlyObject,
-				writableObject,
-				propertyKey,
-				schema[propertyKey],
-				store,
-				config
-			)
+	for (const propertyKey in schema) {
+		handler.set(store, propertyKey)
 
-			handler.unset(store)
-		}
-	} catch (e: any) {
-		handler.error(store, e)
+		handleProperty(
+			readonlyObject,
+			writableObject,
+			propertyKey,
+			schema[propertyKey],
+			store,
+			config
+		)
+
+		handler.unset(store)
 	}
 }
 
@@ -141,25 +145,24 @@ function handlePropertiesByOneSchema(
 ) {
 	if (!readonlyObject) return
 
-	try {
-		handler.handle(store, writableObject)
+	const writableObjectError = validateWritableObject(writableObject)
+	if (writableObjectError) return handler.error(store, writableObjectError)
 
-		for (const propertyKey in readonlyObject) {
-			handler.set(store, +propertyKey)
+	handler.handle(store, writableObject)
 
-			handleProperty(
-				readonlyObject,
-				writableObject,
-				propertyKey,
-				propertySchema,
-				store,
-				config
-			)
+	for (const propertyKey in readonlyObject) {
+		handler.set(store, +propertyKey)
 
-			handler.unset(store)
-		}
-	} catch (e: any) {
-		handler.error(store, e)
+		handleProperty(
+			readonlyObject,
+			writableObject,
+			propertyKey,
+			propertySchema,
+			store,
+			config
+		)
+
+		handler.unset(store)
 	}
 }
 
@@ -224,34 +227,39 @@ function handlePropertyValue(
 	store: HandlerStore,
 	config: RequiredConfig
 ) {
-	try {
-		parseProperty(readonlyObject, writableObject, propertyKey, propertySchema)
+	const propertyError = parseProperty(
+		readonlyObject,
+		writableObject,
+		propertyKey,
+		propertySchema
+	)
 
-		if (
-			isArrayTypeSchema(propertySchema) &&
-			isArray(writableObject[propertyKey])
-		) {
-			const readonlyArray =
-				readonlyObject && isArray(readonlyObject[propertyKey])
-					? readonlyObject[propertyKey]
-					: writableObject[propertyKey]
+	if (propertyError) {
+		handler.error(store, propertyError)
+		return
+	}
 
-			writableObject[propertyKey] =
-				config.clone && readonlyObject && isArray(readonlyObject[propertyKey])
-					? []
-					: writableObject[propertyKey]
+	if (
+		isArrayTypeSchema(propertySchema) &&
+		isArray(writableObject[propertyKey])
+	) {
+		const readonlyArray =
+			readonlyObject && isArray(readonlyObject[propertyKey])
+				? readonlyObject[propertyKey]
+				: writableObject[propertyKey]
 
-			handlePropertiesByOneSchema(
-				readonlyArray,
-				writableObject[propertyKey],
-				propertySchema['element'],
-				store,
-				config
-			)
-			return
-		}
-	} catch (e: any) {
-		handler.error(store, e)
+		writableObject[propertyKey] =
+			config.clone && readonlyObject && isArray(readonlyObject[propertyKey])
+				? []
+				: writableObject[propertyKey]
+
+		handlePropertiesByOneSchema(
+			readonlyArray,
+			writableObject[propertyKey],
+			propertySchema['element'],
+			store,
+			config
+		)
 	}
 }
 
@@ -275,24 +283,25 @@ const useWritableObject = (
 
 	if (isObject(readonlyObject)) return readonlyObject as object
 
-	throw new ParserError(
-		`The first argument must be null, undefined, or an object.`
-	)
+	throw `The first argument must be null, undefined, or an object.`
 }
 
 /**
  * Validate the original object keys by comparing object and schema keys.
  *
- * @param obj The original object.
+ * @param readonlyObject The original object.
  * @param schema The schema of the original object.
- * @throws If the original object has keys which not found in the schema.
+ * @returns ObjectError or undefined.
  */
-const validateReadonlyObject = (obj: ReadonlyObject, schema: Schema) => {
-	if (isUndefined(obj)) return
+const validateReadonlyObject = (
+	readonlyObject: ReadonlyObject,
+	schema: Schema
+): ObjectError | undefined => {
+	if (isUndefined(readonlyObject)) return
 
 	const errorKeys: string[] = []
 
-	for (const propertyKey in obj) {
+	for (const propertyKey in readonlyObject) {
 		if (!hasOwn(schema, propertyKey)) {
 			errorKeys.push(propertyKey)
 		}
@@ -300,8 +309,21 @@ const validateReadonlyObject = (obj: ReadonlyObject, schema: Schema) => {
 
 	if (errorKeys.length > 0) {
 		const s = errorKeys.join(' | ')
-		throw new ParserError(
+		return createObjectError(
 			`The object has "${s}" keys which not found in the schema`
 		)
 	}
+}
+
+/**
+ * Validate the writable object by a circular structure.
+ *
+ * @param writableObject The writable object.
+ * @returns ObjectError or undefined.
+ */
+const validateWritableObject = (
+	writableObject: WritableObject
+): ObjectError | undefined => {
+	if (handler.isHandled(writableObject))
+		return createObjectError(`detected a circular structure`)
 }

@@ -3,6 +3,9 @@
 import { parseProperty } from '../../dist/object-parser.js'
 
 const propertyParseFn = parseProperty
+const matchValidatorError = /did not pass the validator/
+const matchExsitsError = /not exists/
+const matchTypeError = /invalid type/
 
 describe('type checking', () => {
 	const value = 'Value'
@@ -12,18 +15,22 @@ describe('type checking', () => {
 	const arrayKey = 0
 	const array = [value]
 
-	it('should not throw when a type is valid', () => {
+	it('should return undefined when a type is valid', () => {
 		const schema = { type: String }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).not.toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).not.toThrow()
+		expect(propertyParseFn(object, objectKey, schema)).toBeUndefined()
+		expect(propertyParseFn(array, arrayKey, schema)).toBeUndefined()
 	})
 
-	it('should throw when a type is not valid', () => {
+	it('should return an error when a type is not valid', () => {
 		const schema = { type: Number }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
+		expect(propertyParseFn(object, objectKey, schema).message).toMatch(
+			matchTypeError
+		)
+		expect(propertyParseFn(array, arrayKey, schema).message).toMatch(
+			matchTypeError
+		)
 	})
 })
 
@@ -35,29 +42,29 @@ describe('required checking', () => {
 	const schemaTrue = { required: true }
 	const schemaFalse = { required: false }
 
-	it('should not throw when an object key exists', () => {
+	it('should return undefined when an object key exists', () => {
 		const object = { [objectKey]: value }
 		const array = [value]
 
-		expect(() => propertyParseFn(object, objectKey, schemaTrue)).not.toThrow()
-		expect(() => propertyParseFn(object, objectKey, schemaFalse)).not.toThrow()
-		expect(() =>
-			propertyParseFn(object, {}, objectKey, schemaFalse)
-		).not.toThrow()
+		expect(propertyParseFn(object, objectKey, schemaTrue)).toBeUndefined()
+		expect(propertyParseFn(object, objectKey, schemaFalse)).toBeUndefined()
+		expect(propertyParseFn(object, {}, objectKey, schemaFalse)).toBeUndefined()
 
-		expect(() => propertyParseFn(array, arrayKey, schemaTrue)).not.toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schemaFalse)).not.toThrow()
-		expect(() =>
-			propertyParseFn(array, [], arrayKey, schemaFalse)
-		).not.toThrow()
+		expect(propertyParseFn(array, arrayKey, schemaTrue)).toBeUndefined()
+		expect(propertyParseFn(array, arrayKey, schemaFalse)).toBeUndefined()
+		expect(propertyParseFn(array, [], arrayKey, schemaFalse)).toBeUndefined()
 	})
 
-	it('should throw when an object key not exists', () => {
+	it('should return an error when an object key not exists', () => {
 		const object = {}
 		const array = []
 
-		expect(() => propertyParseFn(object, objectKey, schemaTrue)).toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schemaTrue)).toThrow()
+		expect(propertyParseFn(object, objectKey, schemaTrue).message).toMatch(
+			matchExsitsError
+		)
+		expect(propertyParseFn(array, arrayKey, schemaTrue).message).toMatch(
+			matchExsitsError
+		)
 	})
 })
 
@@ -93,13 +100,6 @@ describe('default checking', () => {
 		expect(object[objectKey]).toBe(defaultValue)
 		expect(array[arrayKey]).toBe(defaultValue)
 	})
-
-	it('should throw when a default is an object', () => {
-		const schema = { required: false, default: {} }
-
-		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
-	})
 })
 
 describe('validator checking', () => {
@@ -114,34 +114,55 @@ describe('validator checking', () => {
 		const validator = (val) => val === value
 		const schema = { validator }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).not.toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).not.toThrow()
+		expect(propertyParseFn(object, objectKey, schema)).toBeUndefined()
+		expect(propertyParseFn(array, arrayKey, schema)).toBeUndefined()
 	})
 
-	it('should not throw when a validator returns true', () => {
+	it('should return undefined when a validator returns true', () => {
 		const validator = () => true
 		const schema = { validator }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).not.toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).not.toThrow()
+		expect(propertyParseFn(object, objectKey, schema)).toBeUndefined()
+		expect(propertyParseFn(array, arrayKey, schema)).toBeUndefined()
 	})
 
-	it('should throw when a validator returns false', () => {
+	it('should return an error when a validator returns false', () => {
 		const validator = () => false
 		const schema = { validator }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
+		expect(propertyParseFn(object, objectKey, schema).message).toMatch(
+			matchValidatorError
+		)
+		expect(propertyParseFn(array, arrayKey, schema).message).toMatch(
+			matchValidatorError
+		)
 	})
 
-	it('should throw when a validator throws', () => {
-		const validator = () => {
-			throw 'error'
+	it('should returns an error when a validator throws', () => {
+		const validatorThrowsString = () => {
+			throw 'some errors'
 		}
-		const schema = { validator }
 
-		expect(() => propertyParseFn(object, objectKey, schema)).toThrow()
-		expect(() => propertyParseFn(array, arrayKey, schema)).toThrow()
+		const validatorThrowsError = () => {
+			throw new Error('some errors')
+		}
+
+		const schema1 = { validator: validatorThrowsString }
+		const schema2 = { validator: validatorThrowsError }
+
+		expect(propertyParseFn(object, objectKey, schema1).message).toMatch(
+			/some errors/
+		)
+		expect(propertyParseFn(array, arrayKey, schema1).message).toMatch(
+			/some errors/
+		)
+
+		expect(propertyParseFn(object, objectKey, schema2).message).toMatch(
+			/some errors/
+		)
+		expect(propertyParseFn(array, arrayKey, schema2).message).toMatch(
+			/some errors/
+		)
 	})
 })
 

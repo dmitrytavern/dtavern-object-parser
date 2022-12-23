@@ -1,13 +1,16 @@
 import { compareConstructors, getConstructors } from '../utils/constructors'
+import { createPropertyError, PropertyError } from '../utils/errors'
 import { hasOwn, isFunction, isObject } from '../utils/shared'
 import { usePropertySchema } from './createPropertySchema'
-import { ParserError } from 'src/utils/errors'
 import {
 	PropertyKey,
 	PropertySchemaRaw,
 	ReadonlyObject,
 	WritableObject,
+	Constructor,
 } from '@types'
+
+type ParserReturns = PropertyError | undefined
 
 /**
  * Parses the property key in the object by the property schema.
@@ -61,12 +64,7 @@ import {
  * @param writableObject The object for writing the value.
  * @param key The property key.
  * @param schema The schema of the property.
- * @throws
- * - If the second argument is not an object.
- * - If the property not exists but required.
- * - If the property has invalid type.
- * - If the property didn't pass the schema validator.
- *
+ * @throws If the second argument is not an object.
  * @public
  */
 export function parseProperty(
@@ -74,7 +72,7 @@ export function parseProperty(
 	writableObject: WritableObject,
 	key: PropertyKey,
 	schema: PropertySchemaRaw
-): void
+): ParserReturns
 
 /**
  * Parses the property key in the object by the property schema.
@@ -125,26 +123,21 @@ export function parseProperty(
  * @param object The object for reading and writing the value.
  * @param key The property key.
  * @param schema The schema of the property.
- * @throws
- * - If the first argument is not an object.
- * - If the property not exists but required.
- * - If the property has invalid type.
- * - If the property didn't pass the schema validator.
- *
+ * @throws If the first argument is not an object.
  * @public
  */
 export function parseProperty(
 	writableObject: WritableObject,
 	key: PropertyKey,
 	schema: PropertySchemaRaw
-): void
+): ParserReturns
 
 export function parseProperty(
 	object?,
 	objectOrKey?,
 	schemaOrKey?,
 	objectSchema?
-): void {
+): ParserReturns {
 	const _isFull = isObject(objectOrKey)
 	const _schema = _isFull ? objectSchema : schemaOrKey
 	const readonlyObject = object
@@ -155,12 +148,12 @@ export function parseProperty(
 	if (!isObject(writableObject)) {
 		const order = _isFull ? 'second' : 'first'
 		const count = _isFull ? '4' : '3'
-
-		throw new ParserError(
-			`The ${order} argument must be an object if you have ${count} arguments`
-		)
+		throw `The ${order} argument must be an object if you have ${count} arguments`
 	}
 
+	let error = false
+	let errorMessage = ''
+	let _propertyValueContructors: Constructor[] = []
 	let _propertyValueIsDefault = false
 	let _propertyValue = readonlyObject ? readonlyObject[propertyKey] : undefined
 	let _propertyExists = readonlyObject
@@ -174,11 +167,12 @@ export function parseProperty(
 
 	// Exists checker
 	if (!_propertyExists && required) {
-		throw new ParserError('The property not exists in the object.')
+		error = true
+		errorMessage = 'The property not exists in the object'
 	}
 
 	// Default setter
-	if (!_propertyExists && !required && defaultValue !== null) {
+	if (!error && !_propertyExists && !required && defaultValue !== null) {
 		_propertyExists = true
 		_propertyValueIsDefault = true
 		_propertyValue = isFunction(defaultValue)
@@ -187,38 +181,36 @@ export function parseProperty(
 	}
 
 	// Type checker
-	if (_propertyExists && type.length > 0) {
-		const _valueContructors = getConstructors(_propertyValue)
-		if (!compareConstructors(_valueContructors, type)) {
-			const typeConstructorsString =
-				'Must be: ' +
-				(type.length === 1
-					? `the ${type[0].prototype.constructor.name}`
-					: `${type.map((x) => x.prototype.constructor.name).join(', ')}`)
+	if (!error && _propertyExists && type.length > 0) {
+		_propertyValueContructors = getConstructors(_propertyValue)
 
-			const valueConstructorsString =
-				'Value constructors: ' +
-				_valueContructors.map((x) => x.prototype.constructor.name).join(', ')
-
-			const defaultString = _propertyValueIsDefault ? ' (default)' : ''
-
-			throw new ParserError(
-				`The property has an invalid type.\n    Value: ${_propertyValue}${defaultString}.\n    ${valueConstructorsString}.\n    ${typeConstructorsString}.`
-			)
+		if (!compareConstructors(_propertyValueContructors, type)) {
+			error = true
+			errorMessage = 'The property has an invalid type.'
 		}
 	}
 
 	// Validator
-	if (_propertyExists && validator !== null) {
+	if (!error && _propertyExists && validator !== null) {
 		try {
-			if (!validator.call(null, _propertyValue)) throw `returns false`
-		} catch (error) {
-			const s = isObject(error) ? (error as any).message : error
-
-			throw new ParserError(
-				`The property did not pass the validator.\n    Value: ${_propertyValue}.\n    Error: ${s}`
-			)
+			if (!validator.call(null, _propertyValue))
+				throw `The property did not pass the validator. Error: returns false`
+		} catch (e) {
+			const s = isObject(e) ? (e as any).message : e
+			error = true
+			errorMessage = s
 		}
+	}
+
+	if (error) {
+		return createPropertyError(
+			errorMessage,
+			_propertyExists,
+			_propertyValue,
+			_propertyValueIsDefault,
+			_propertyValueContructors,
+			propertySchema
+		)
 	}
 
 	writableObject[propertyKey] = _propertyValue

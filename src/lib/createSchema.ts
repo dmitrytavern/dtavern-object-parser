@@ -1,9 +1,9 @@
 import { handler, useHandlerStore, HandlerStore } from '../utils/handler'
 import { isArray, isObject, isUndefined } from '../utils/shared'
+import { createObjectError, ObjectError } from '../utils/errors'
 import { isHandledSchema, isSchema } from '../utils/schema'
 import { createPropertySchema } from './createPropertySchema'
-import { isConstructors } from 'src/utils/constructors'
-import { ParserError } from 'src/utils/errors'
+import { isConstructors } from '../utils/constructors'
 import {
 	metadata,
 	M_IS_SCHEMA,
@@ -58,24 +58,22 @@ import {
 export function createSchema<SRaw extends RawSchema>(
 	rawSchema: SRaw
 ): Schema<SRaw> {
-	try {
-		validateRawSchema(rawSchema)
+	validateRawSchema(rawSchema)
 
-		const store = useHandlerStore()
-		const _rawSchema = isArray(rawSchema)
-			? generateRawSchemaByPaths(rawSchema)
-			: (rawSchema as RawSchemaAsObject)
+	const store = useHandlerStore()
+	const _rawSchema = isArray(rawSchema)
+		? generateRawSchemaByPaths(rawSchema)
+		: (rawSchema as RawSchemaAsObject)
 
-		const result = parseSchemaObject(_rawSchema, store)
+	const result = parseSchemaObject(_rawSchema, store)
 
-		handler.validate(store)
+	const errors = handler.validate(store)
 
-		handler.clear(store)
+	handler.clear(store)
 
-		return result
-	} catch (error) {
-		throw error
-	}
+	if (errors.length > 0) throw errors
+
+	return result
 }
 
 /**
@@ -86,6 +84,7 @@ export function createSchema<SRaw extends RawSchema>(
  *
  * @param settings Schema or raw schema.
  * @returns The schema.
+ * @throws If the raw schema is invalid schema.
  * @public
  */
 export function useSchema<SRaw extends RawSchema>(
@@ -105,9 +104,7 @@ export function useSchema<SRaw extends RawSchema>(
  */
 const validateRawSchema = (rawSchema: RawSchema) => {
 	if (isUndefined(rawSchema) || !isObject(rawSchema))
-		throw new ParserError(
-			`The property schema argument must be an array or an object.`
-		)
+		throw `The property schema argument must be an array or an object.`
 }
 
 /**
@@ -122,29 +119,28 @@ const parseSchemaObject = (
 	schema: RawSchemaAsObject,
 	store: HandlerStore
 ): any => {
-	try {
-		if (isHandledSchema(schema)) return schema as Schema<any>
+	if (isHandledSchema(schema)) return schema as Schema<any>
 
-		handler.handle(store, schema)
+	const schemaObjectError = validateSchemaObject(schema)
+	if (schemaObjectError) return handler.error(store, schemaObjectError)
 
-		const schemaCopy = {}
+	handler.handle(store, schema)
 
-		metadata.set(schemaCopy, M_IS_SCHEMA, true)
-		metadata.set(schemaCopy, M_IS_PROPERTY_SCHEMA, false)
-		metadata.set(schemaCopy, M_IS_HANDLED_SCHEMA, true)
+	const schemaCopy = {}
 
-		for (const propertyKey in schema) {
-			handler.set(store, propertyKey)
+	metadata.set(schemaCopy, M_IS_SCHEMA, true)
+	metadata.set(schemaCopy, M_IS_PROPERTY_SCHEMA, false)
+	metadata.set(schemaCopy, M_IS_HANDLED_SCHEMA, true)
 
-			parseSchemaProperty(schema, schemaCopy, propertyKey, store)
+	for (const propertyKey in schema) {
+		handler.set(store, propertyKey)
 
-			handler.unset(store)
-		}
+		parseSchemaProperty(schema, schemaCopy, propertyKey, store)
 
-		return Object.freeze(schemaCopy)
-	} catch (e: any) {
-		handler.error(store, e)
+		handler.unset(store)
 	}
+
+	return Object.freeze(schemaCopy)
 }
 
 /**
@@ -182,7 +178,7 @@ const parseSchemaProperty = (
 
 	handler.error(
 		store,
-		new ParserError('The property must be a function, an array or an object.')
+		createObjectError('The property must be a function, an array or an object.')
 	)
 }
 
@@ -228,4 +224,16 @@ const generateRawSchemaByPaths = (
 	}
 
 	return rawObjectSchema
+}
+
+/**
+ * Validate the schema object by a circular structure.
+ *
+ * @param schema The schema object.
+ */
+const validateSchemaObject = (
+	schema: RawSchemaAsObject
+): ObjectError | undefined => {
+	if (handler.isHandled(schema))
+		return createObjectError(`detected a circular structure`)
 }
