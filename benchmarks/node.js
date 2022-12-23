@@ -38,6 +38,7 @@ require('./groups/existence')
 require('./groups/type')
 require('./groups/default')
 require('./groups/validator')
+require('./groups/clone')
 
 require('./bootstrap')
 
