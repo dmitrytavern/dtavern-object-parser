@@ -7,9 +7,8 @@
  * the object.
  */
 
-const OBJECT_PROPERTIES_COUNT = 100
-
 createGroup('Default setter', ({ objectParser }) => {
+	const OBJECT_PROPERTIES_COUNT = 100
 	const parserRawSchemaPrimitive = {}
 	const parserRawSchemaNoPrimitive = {}
 

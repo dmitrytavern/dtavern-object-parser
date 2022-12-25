@@ -6,9 +6,8 @@
  * - For validate.js can't clone original object.
  */
 
-const OBJECT_PROPERTIES_COUNT = 250
-
 createGroup('Clone object', ({ objectParser }) => {
+	const OBJECT_PROPERTIES_COUNT = 250
 	const object = {}
 	const parserRawSchema = {}
 

@@ -3,10 +3,8 @@
  * This benchmark tests speed of property existence validator.
  */
 
-const OBJECT_PROPERTIES_COUNT = 250
-const OBJECT_PROPERTIES_NESTED_LENGTH = 100
-
 createGroup('Existence validator', ({ objectParser, validateParser }) => {
+	const OBJECT_PROPERTIES_COUNT = 250
 	const object = {}
 	const parserRawSchema = {}
 	const parserRawSchemaArr = []
@@ -41,6 +39,7 @@ createGroup('Existence validator', ({ objectParser, validateParser }) => {
 createGroup(
 	'Existence validator of nested object',
 	({ objectParser, validateParser }) => {
+		const OBJECT_PROPERTIES_NESTED_LENGTH = 100
 		const key = 'target'
 		const object = {}
 		const parserRawSchema = {}

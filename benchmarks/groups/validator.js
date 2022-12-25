@@ -3,9 +3,8 @@
  * This benchmark tests speed of property custom validator.
  */
 
-const OBJECT_PROPERTIES_COUNT = 100
-
 createGroup('Custom validator', ({ objectParser, validateParser }) => {
+	const OBJECT_PROPERTIES_COUNT = 100
 	const object = {}
 	const parserRawSchema = {}
 	const validateParserSchema = {}
