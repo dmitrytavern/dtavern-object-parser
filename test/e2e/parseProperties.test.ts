@@ -3,6 +3,7 @@
 import { parser } from '../../dist/object-parser.js'
 
 const parseFn = parser.parse
+const parseAsyncFn = parser.parseAsync
 const schemaFn = parser.schema
 const propertyFn = parser.property
 
@@ -159,5 +160,23 @@ describe('e2e: copy array', () => {
 		expect(object.b1).toBeUndefined()
 		expect(cloneObject.b1).toStrictEqual(arr)
 		expect(errors.length).toBe(0)
+	})
+})
+
+describe('e2e: async parser', () => {
+	const user_schema = schemaFn({ id: Number, name: String })
+	const user_object = { id: 123, name: 'Jack' }
+
+	it('should parse object', async () => {
+		const object = await parseAsyncFn(user_object, user_schema)
+		expect(object).toStrictEqual(user_object)
+	})
+
+	it('should throws an error', async () => {
+		try {
+			await parseAsyncFn({}, user_schema)
+		} catch (errors) {
+			expect(errors.length).toBe(2)
+		}
 	})
 })

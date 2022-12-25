@@ -1,6 +1,6 @@
 import { version } from './version'
 import { parseProperty } from './lib/parseProperty'
-import { parseProperties } from './lib/parseProperties'
+import { parseProperties, parsePropertiesAsync } from './lib/parseProperties'
 import { createSchema, useSchema } from './lib/createSchema'
 import { isSchema, isPropertySchema } from './utils/schema'
 import {
@@ -26,8 +26,11 @@ import {
 } from './utils/constructors'
 
 export { version } from './version'
-export { parseProperties as parse } from './lib/parseProperties'
 export { parseProperty as single } from './lib/parseProperty'
+export {
+	parseProperties as parse,
+	parsePropertiesAsync as parseAsync,
+} from './lib/parseProperties'
 export {
 	isSchema as isSchema,
 	isPropertySchema as isProperty,
@@ -67,6 +70,7 @@ export const utils = {
  */
 export const parser = {
 	parse: parseProperties,
+	parseAsync: parsePropertiesAsync,
 	single: parseProperty,
 	schema: createSchema,
 	property: createPropertySchema,

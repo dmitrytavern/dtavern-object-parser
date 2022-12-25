@@ -88,6 +88,54 @@ export function parseProperties<S extends Schema | RawSchema>(
 }
 
 /**
+ * Async parses the object by the schema.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * const object = { a: 'Hello' }
+ * const config = { clone: true }
+ * const schema = createSchema({
+ *   a: String,
+ *   b: createPropertySchema({
+ *     type: String,
+ *     required: false,
+ *     default: 'World'
+ *   })
+ * })
+ *
+ * async function() {
+ *   const newObject = await parseProperties(object, schema, config)
+ *
+ *   object.a // 'Hello'
+ *   object.b // undefined
+ *   newObject.a // 'Hello'
+ *   newObject.b // 'World'
+ * }
+ * ```
+ *
+ * Note: when you pass the raw schema to the function, this raw
+ * schema will be transformed to schema **on every parse**! It's bad
+ * for performance.
+ *
+ * @param object The object to parse.
+ * @param schema The schema or the raw schema for parse.
+ * @param config The parser config.
+ * @throws If the parser has errors.
+ * @returns Parsed object.
+ * @public
+ */
+export async function parsePropertiesAsync<S extends Schema | RawSchema>(
+	object: ReadonlyObject,
+	schema: PropertiesSchema,
+	config?: PropertiesConfig
+): Promise<SchemaReturn<S>> {
+	const { value, errors } = parseProperties<S>(object, schema, config)
+	if (errors.length) throw errors
+	return value
+}
+
+/**
  * Handles every property in the schema.
  *
  * @param readonlyObject The original object.
