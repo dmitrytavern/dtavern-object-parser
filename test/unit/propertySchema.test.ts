@@ -1,16 +1,11 @@
 // @ts-nocheck
 
-import {
-	createSchema,
-	createPropertySchema,
-	isSchema,
-	isPropertySchema,
-} from '../../dist/object-parser'
+import { parser } from '../../dist/object-parser'
 
-const schemaFn = createSchema
-const propertyFn = createPropertySchema
-const isSchemaFn = isSchema
-const isPropertyFn = isPropertySchema
+const schemaFn = parser.schema
+const propertyFn = parser.property
+const isSchemaFn = parser.isSchema
+const isPropertyFn = parser.isProperty
 const defaultSchema = {
 	type: [],
 	element: null,

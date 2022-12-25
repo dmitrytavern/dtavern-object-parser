@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import { parseProperty } from '../../dist/object-parser.js'
+import { parser } from '../../dist/object-parser.js'
 
-const propertyParseFn = parseProperty
+const propertyParseFn = parser.single
 const matchValidatorError = /did not pass the validator/
 const matchExsitsError = /not exists/
 const matchTypeError = /invalid type/

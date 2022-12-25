@@ -1,14 +1,10 @@
 // @ts-nocheck
 
-import {
-	parseProperties,
-	createSchema,
-	createPropertySchema,
-} from '../../dist/object-parser.js'
+import { parser } from '../../dist/object-parser.js'
 
-const parseFn = parseProperties
-const schemaFn = createSchema
-const propertyFn = createPropertySchema
+const parseFn = parser.parse
+const schemaFn = parser.schema
+const propertyFn = parser.property
 
 describe('e2e: parse object', () => {
 	const role_schema = schemaFn({

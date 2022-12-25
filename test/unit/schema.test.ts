@@ -1,14 +1,10 @@
 // @ts-nocheck
 
-import {
-	createSchema,
-	isSchema,
-	isPropertySchema,
-} from '../../dist/object-parser'
+import { parser } from '../../dist/object-parser'
 
-const schemaFn = createSchema
-const isSchemaFn = isSchema
-const isPropertyFn = isPropertySchema
+const schemaFn = parser.schema
+const isSchemaFn = parser.isSchema
+const isPropertyFn = parser.isProperty
 
 it('should be a schema', () => {
 	expect(isSchemaFn(schemaFn({}))).toBeTruthy()
