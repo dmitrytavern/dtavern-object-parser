@@ -34,7 +34,7 @@
 		"build": "npm run build:lib && npm run build:types",
 		"build:lib": "cross-env NODE_ENV=production rollup -c rollup.config.js",
 		"build:types": "tsc --declaration --emitDeclarationOnly --outDir .temp && api-extractor run",
-		"test": "npm run build:lib && npm run test:unit && npm run test:e2e",
+		"test": "npm run test:unit && npm run test:e2e",
 		"test:unit": "jest test/unit",
 		"test:e2e": "jest test/e2e",
 		"benchmark": "node benchmarks/node.js",
