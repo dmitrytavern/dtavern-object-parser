@@ -60,9 +60,9 @@ type ParserReturns<T> = {
  * @returns Object with `value` and `errors` props.
  * @public
  */
-export function parseProperties<S extends Schema | RawSchema>(
+export function parseProperties<S extends PropertiesSchema>(
 	object: ReadonlyObject,
-	schema: PropertiesSchema,
+	schema: S,
 	config?: PropertiesConfig
 ): ParserReturns<SchemaReturn<S>> {
 	const readonlyObject = object
@@ -125,9 +125,9 @@ export function parseProperties<S extends Schema | RawSchema>(
  * @returns Parsed object.
  * @public
  */
-export async function parsePropertiesAsync<S extends Schema | RawSchema>(
+export async function parsePropertiesAsync<S extends PropertiesSchema>(
 	object: ReadonlyObject,
-	schema: PropertiesSchema,
+	schema: S,
 	config?: PropertiesConfig
 ): Promise<SchemaReturn<S>> {
 	const { value, errors } = parseProperties<S>(object, schema, config)

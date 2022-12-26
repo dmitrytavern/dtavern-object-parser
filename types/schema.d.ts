@@ -42,7 +42,7 @@ import {
  * ```
  */
 export type Schema<SRaw extends RawSchema = any> =
-	SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : any
+	SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : SchemaAsObject<any>
 
 type SchemaAsObject<SRaw extends RawSchemaAsObject> = {
 	[P in keyof SRaw]: SchemaTypeProperty<SRaw[P]>
@@ -122,8 +122,11 @@ export type SchemaReturn<S extends Schema = any> = {
 	[P in keyof S]: SchemaReturnProperty<S[P]>
 }
 
-type SchemaReturnProperty<P> = P extends PropertySchema
-	? PropertySchemaReturn<P>
-	: P extends PropertyTypeRaw
-	? PropertySchemaReturn<PropertySchema<PropertyTypeNormalize<P>>>
-	: SchemaReturn<P>
+type SchemaReturnProperty<P extends Schema | PropertySchema | PropertyTypeRaw> =
+	P extends PropertySchema
+		? PropertySchemaReturn<P>
+		: P extends PropertyTypeRaw
+		? PropertySchemaReturn<PropertySchema<PropertyTypeNormalize<P>>>
+		: P extends Schema
+		? SchemaReturn<P>
+		: never

@@ -87,9 +87,9 @@ export function createSchema<SRaw extends RawSchema>(
  * @throws If the raw schema is invalid schema.
  * @public
  */
-export function useSchema<SRaw extends RawSchema>(
+export function useSchema<SRaw extends Schema | RawSchema>(
 	rawSchema: SRaw
-): Schema<SRaw> {
+): SRaw extends RawSchema ? Schema<SRaw> : SRaw {
 	return isSchema(rawSchema)
 		? (rawSchema as any)
 		: createSchema(rawSchema as RawSchema)
