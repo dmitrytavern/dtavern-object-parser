@@ -7,8 +7,8 @@ import { parseProperty } from './parseProperty'
 import { useSchema } from './createSchema'
 import {
 	Schema,
-	RawSchema,
 	SchemaReturn,
+	SchemaReturnKeys,
 	PropertySchema,
 	PropertiesSchema,
 	ReadonlyObject,
@@ -18,10 +18,17 @@ import {
 /**
  * The result object type of parsing.
  */
-type ParserReturns<T> = {
+type ParserReturns<T extends SchemaReturn> = {
 	value: T
-	errors: GeneralError[]
+	errors: ParserErrorsReturn<T>[]
 }
+
+type ParserErrorsReturn<S extends SchemaReturn> =
+	SchemaReturnKeys<S> extends infer Error
+		? Error extends PropertyKey
+			? GeneralError<Error>
+			: never
+		: never
 
 /**
  * Parses the object by the schema.
@@ -82,7 +89,7 @@ export function parseProperties<S extends PropertiesSchema>(
 	handler.clear(store)
 
 	return {
-		errors: handler.validate(store),
+		errors: handler.validate(store) as any,
 		value: writableObject as any,
 	}
 }

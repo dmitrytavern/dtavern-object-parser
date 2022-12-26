@@ -33,8 +33,8 @@ export interface ObjectError extends Error {
 /**
  * Property error wrapper for the parser.
  */
-export interface GeneralError {
-	key: PropertyKey
+export interface GeneralError<Key extends PropertyKey = PropertyKey> {
+	key: Key
 	error: PropertyError | ObjectError
 }
 

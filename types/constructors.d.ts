@@ -42,10 +42,10 @@ type ConstructorReturnTypes<Constructors> =
 		: never
 
 type ConstructorReturnType<Constructor> =
-	Constructor extends ConstructorClass<any>
+	Constructor extends ConstructorFunction
+		? ReturnType<Constructor>
+		: Constructor extends ConstructorClass
 		? InstanceType<Constructor>
-		: Constructor extends (...args: any) => infer R
-		? R
 		: any
 
 interface Generator<T = unknown, TReturn = any, TNext = unknown>
