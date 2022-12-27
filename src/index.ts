@@ -37,6 +37,7 @@ export {
 	ArrayConstructor,
 	AsyncFunctionConstructor,
 	GeneratorFunctionConstructor,
+	PropertyKey,
 	PropertySchema,
 	PropertySchemaRaw,
 	PropertySchemaReturn,
