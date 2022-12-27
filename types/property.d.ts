@@ -153,7 +153,7 @@ export type PropertyTypeRaw<T = any> =
  * @public
  */
 export type PropertyTypeNormalize<TRaw extends PropertyTypeRaw> =
-	TRaw extends any[] ? TRaw : TRaw extends Constructor ? [TRaw] : never
+	TRaw extends any[] ? TRaw : TRaw extends Constructor ? [TRaw] : any
 
 /**
  * Finished type of property `required` key.
