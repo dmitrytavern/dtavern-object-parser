@@ -70,7 +70,7 @@ const error = (store: HandlerStore, error: GeneralError['error']): void => {
 	const key =
 		store[NESTED_LIST_KEY].length === 0
 			? 'root'
-			: store[NESTED_LIST_KEY].reduce((acc, value) => acc + (value + ''))
+			: store[NESTED_LIST_KEY].reduce((acc, value) => acc + ('.' + value))
 
 	store[ERROR_LIST_KEY].push({ key, error })
 }
