@@ -8,7 +8,6 @@ import { useSchema } from './createSchema'
 import {
 	Schema,
 	SchemaReturn,
-	SchemaReturnKeys,
 	PropertySchema,
 	PropertiesSchema,
 	ReadonlyObject,
@@ -20,15 +19,8 @@ import {
  */
 type ParserReturns<T extends SchemaReturn> = {
 	value: T
-	errors: ParserErrorsReturn<T>[]
+	errors: GeneralError[]
 }
-
-type ParserErrorsReturn<S extends SchemaReturn> =
-	SchemaReturnKeys<S> extends infer Error
-		? Error extends PropertyKey
-			? GeneralError<Error>
-			: never
-		: never
 
 /**
  * Parses the object by the schema.
