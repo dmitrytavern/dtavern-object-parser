@@ -40,6 +40,8 @@ import {
  *   }
  * }
  * ```
+ *
+ * @public
  */
 export type Schema<SRaw extends RawSchema = any> =
 	SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : SchemaAsObject<any>
@@ -79,16 +81,20 @@ type SchemaTypeProperty<P> = P extends PropertyTypeRaw
  *  }
  * }
  * ```
+ *
+ * @public
  */
 export type RawSchema = RawSchemaAsArray | RawSchemaAsObject
 
 /**
  * Raw schema as an array.
+ * @public
  */
 export type RawSchemaAsArray = string[]
 
 /**
  * Raw schema as an object.
+ * @public
  */
 export type RawSchemaAsObject = {
 	[key: string]: RawSchemaProperty
@@ -96,6 +102,7 @@ export type RawSchemaAsObject = {
 
 /**
  * Property of raw schema if the schema is an object.
+ * @public
  */
 export type RawSchemaProperty =
 	| PropertyTypeRaw
@@ -117,6 +124,8 @@ export type RawSchemaProperty =
  *   }
  * }
  * ```
+ *
+ * @public
  */
 export type SchemaReturn<S extends Schema = any> = {
 	[P in keyof S]: SchemaReturnProperty<S[P]>
@@ -142,6 +151,8 @@ type SchemaReturnProperty<P extends Schema | PropertySchema | PropertyTypeRaw> =
  * // Returns:
  * ['a1', 'b1.a2']
  * ```
+ *
+ * @public
  */
 export type SchemaReturnKeys<S extends SchemaReturn> = (
 	S extends object

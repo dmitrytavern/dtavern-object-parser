@@ -25,6 +25,22 @@ import {
 	containsArrayConstructor,
 } from './utils/constructors'
 
+export {
+	Schema,
+	SchemaReturn,
+	SchemaReturnKeys,
+	RawSchema,
+	RawSchemaProperty,
+	Constructor,
+	ConstructorReturn,
+	ArrayConstructor,
+	AsyncFunctionConstructor,
+	GeneratorFunctionConstructor,
+	PropertySchema,
+	PropertySchemaRaw,
+	PropertySchemaReturn,
+} from '@types'
+
 export { version } from './version'
 export { parseProperty as single } from './lib/parseProperty'
 export {

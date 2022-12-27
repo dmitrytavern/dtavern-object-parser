@@ -58,6 +58,8 @@ import {
  *   validator: null,
  * }
  * ```
+ *
+ * @public
  */
 export type PropertySchema<
 	T extends PropertyType = any,
@@ -87,6 +89,8 @@ export type PropertySchema<
  *   element: String,
  * }
  * ```
+ *
+ * @public
  */
 export type PropertySchemaRaw<
 	TRaw extends PropertyTypeRaw = any,
@@ -112,6 +116,8 @@ export type PropertySchemaRaw<
  * ```typescript
  * const type: PropertyType = [String, Array, Number]
  * ```
+ *
+ * @public
  */
 export type PropertyType<T = any> = Constructor<T>[]
 
@@ -125,6 +131,8 @@ export type PropertyType<T = any> = Constructor<T>[]
  * const rawType: PropertyTypeRaw = String
  * const rawType: PropertyTypeRaw = [String]
  * ```
+ *
+ * @public
  */
 export type PropertyTypeRaw<T = any> =
 	| null
@@ -141,17 +149,21 @@ export type PropertyTypeRaw<T = any> =
  * const rawType: PropertyTypeRaw = String
  * const type: PropertyTypeNormalize<typeof rawType> = [String]
  * ```
+ *
+ * @public
  */
 export type PropertyTypeNormalize<TRaw extends PropertyTypeRaw> =
 	TRaw extends any[] ? TRaw : TRaw extends Constructor ? [TRaw] : never
 
 /**
  * Finished type of property `required` key.
+ * @public
  */
 export type PropertyRequired = boolean
 
 /**
  * Raw type of property `required` key.
+ * @public
  */
 export type PropertyRequiredRaw = null | undefined | boolean
 
@@ -164,6 +176,8 @@ export type PropertyRequiredRaw = null | undefined | boolean
  * const rawRequired: PropertyRequiredRaw = null
  * const required: PropertyRequiredNormalize<typeof rawRequired> = false
  * ```
+ *
+ * @public
  */
 export type PropertyRequiredNormalize<RRaw extends PropertyRequiredRaw> =
 	RRaw extends null | undefined ? false : RRaw
@@ -177,6 +191,8 @@ export type PropertyRequiredNormalize<RRaw extends PropertyRequiredRaw> =
  * const el: PropertyElementType = createSchema({})
  * const el: PropertyElementType = createPropertySchema(null)
  * ```
+ *
+ * @public
  */
 export type PropertyElementType = PropertySchema | Schema
 
@@ -193,6 +209,8 @@ export type PropertyElementType = PropertySchema | Schema
  * const el: PropertyElementTypeRaw = createSchema({})
  * const el: PropertyElementTypeRaw = createPropertySchema(null)
  * ```
+ *
+ * @public
  */
 export type PropertyElementTypeRaw =
 	| PropertyTypeRaw
@@ -242,6 +260,8 @@ export type PropertyElementTypeRaw =
  *   }
  * }
  * ```
+ *
+ * @public
  */
 export type PropertyElementNormalize<ERaw extends PropertyElementTypeRaw> =
 	ERaw extends PropertyTypeRaw
@@ -254,6 +274,7 @@ export type PropertyElementNormalize<ERaw extends PropertyElementTypeRaw> =
 
 /**
  * Type of property `default` key.
+ * @public
  */
 export type PropertyDefault<
 	T extends PropertyType,
@@ -265,6 +286,7 @@ export type PropertyDefault<
 
 /**
  * Type of property `validator` key.
+ * @public
  */
 export type PropertyValidator<
 	T extends PropertyType,
@@ -273,6 +295,7 @@ export type PropertyValidator<
 
 /**
  * Template with all keys of property schema.
+ * @public
  */
 export type PropertySchemaTemplate<
 	T = any,
@@ -308,6 +331,8 @@ export type PropertySchemaTemplate<
  *   >
  * > = [1, 2, 3]
  * ```
+ *
+ * @public
  */
 export type PropertySchemaReturn<P extends PropertySchema> =
 	HaveArrayConstructor<P['type']> extends true
@@ -317,6 +342,7 @@ export type PropertySchemaReturn<P extends PropertySchema> =
 
 /**
  * Returns the property type by types in the property schema.
+ * @public
  */
 type PropertyContructorReturn<
 	T extends PropertyType,
@@ -336,6 +362,7 @@ type PropertyContructorReturn<
  * - If the `element` is `PropertySchema` then returns the type of
  * `type` key.
  * - If the `element` is `Schema` then returns the schema.
+ * @public
  */
 type PropertyContructorReturnAsArray<E extends Schema | PropertySchema> =
 	E extends PropertySchema
