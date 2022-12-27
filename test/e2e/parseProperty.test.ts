@@ -164,6 +164,31 @@ describe('validator checking', () => {
 			/some errors/
 		)
 	})
+
+	it('should return undefined when a skipDefaultValidate is true', () => {
+		const validator = () => false
+		const schema = {
+			required: false,
+			default: 'Default',
+			validator,
+			skipDefaultValidate: true,
+		}
+
+		expect(propertyParseFn({}, objectKey, schema)).toBeUndefined()
+		expect(propertyParseFn([], arrayKey, schema)).toBeUndefined()
+	})
+
+	it('should return an error when a default value is invalid', () => {
+		const validator = () => false
+		const schema = { required: false, default: 'Default', validator }
+
+		expect(propertyParseFn({}, objectKey, schema).message).toMatch(
+			matchValidatorError
+		)
+		expect(propertyParseFn([], arrayKey, schema).message).toMatch(
+			matchValidatorError
+		)
+	})
 })
 
 describe('object writable', () => {

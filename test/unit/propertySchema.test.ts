@@ -12,6 +12,7 @@ const defaultSchema = {
 	required: true,
 	default: null,
 	validator: null,
+	skipDefaultValidate: false,
 }
 
 it('should be a property schema', () => {
@@ -81,26 +82,6 @@ describe('type setting', () => {
 
 	it('should throw if is undefined in an array', () => {
 		expect(() => propertyFn({ type: [undefined, String] })).toThrow()
-	})
-})
-
-describe('required setting', () => {
-	it('should be true', () => {
-		const result = { ...defaultSchema, required: true }
-
-		expect(propertyFn({ required: true })).toEqual(result)
-		expect(propertyFn({ required: {} })).toEqual(result)
-		expect(propertyFn({ required: 'he' })).toEqual(result)
-		expect(propertyFn({ required: [] })).toEqual(result)
-	})
-
-	it('should be false', () => {
-		const result = { ...defaultSchema, required: false }
-
-		expect(propertyFn({ required: false })).toEqual(result)
-		expect(propertyFn({ required: '' })).toEqual(result)
-		expect(propertyFn({ required: null })).toEqual(result)
-		expect(propertyFn({ required: undefined })).toEqual(result)
 	})
 })
 
@@ -208,6 +189,34 @@ describe('type element setting', () => {
 
 	it('should throw if type is not array and type element have value', () => {
 		expect(() => propertyFn({ type: Number, element: Number })).toThrow()
+	})
+})
+
+describe('boolean setting keys', () => {
+	const keys = ['required', 'skipDefaultValidate']
+
+	const getFilledObject = (value: any) => {
+		const obj = {}
+		keys.map((key) => (obj[key] = value))
+		return obj
+	}
+
+	it('should be true', () => {
+		const result = { ...defaultSchema, ...getFilledObject(true) }
+
+		expect(propertyFn(getFilledObject(true))).toEqual(result)
+		expect(propertyFn(getFilledObject({}))).toEqual(result)
+		expect(propertyFn(getFilledObject([]))).toEqual(result)
+		expect(propertyFn(getFilledObject('value'))).toEqual(result)
+	})
+
+	it('should be false', () => {
+		const result = { ...defaultSchema, ...getFilledObject(false) }
+
+		expect(propertyFn(getFilledObject(false))).toEqual(result)
+		expect(propertyFn(getFilledObject(''))).toEqual(result)
+		expect(propertyFn(getFilledObject(null))).toEqual(result)
+		expect(propertyFn(getFilledObject(undefined))).toEqual(result)
 	})
 })
 

@@ -164,6 +164,7 @@ export function parseProperty(
 	const required = propertySchema.required
 	const defaultValue = propertySchema.default
 	const validator = propertySchema.validator
+	const skipDefaultValidate = propertySchema.skipDefaultValidate
 
 	// Exists checker
 	if (!_propertyExists && required) {
@@ -191,7 +192,17 @@ export function parseProperty(
 	}
 
 	// Validator
-	if (!error && _propertyExists && validator !== null) {
+	if (
+		(!error &&
+			_propertyExists &&
+			!_propertyValueIsDefault &&
+			validator !== null) ||
+		(!error &&
+			_propertyExists &&
+			_propertyValueIsDefault &&
+			!skipDefaultValidate &&
+			validator !== null)
+	) {
 		try {
 			if (!validator.call(null, _propertyValue))
 				throw `The property did not pass the validator. Error: returns false`

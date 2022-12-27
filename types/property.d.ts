@@ -309,6 +309,7 @@ export type PropertySchemaTemplate<
 	default?: D
 	required?: R
 	validator?: V
+	skipDefaultValidate?: boolean
 }
 
 /**

@@ -45,6 +45,7 @@ const defaultSchema: PropertySchemaTemplate = {
 	required: true,
 	default: null,
 	validator: null,
+	skipDefaultValidate: false,
 }
 
 /**
@@ -118,8 +119,9 @@ export function createPropertySchema<
 
 		const schema = Object.assign({}, defaultSchema, settings)
 
+		parseSchemaBooleanKey(schema, 'required')
+		parseSchemaBooleanKey(schema, 'skipDefaultValidate')
 		parseSchemaType(schema)
-		parseSchemaRequired(schema)
 		parseSchemaDefault(schema)
 		parseSchemaValidator(schema)
 
@@ -322,13 +324,17 @@ const parseSchemaType = (schema: PropertySchemaTemplate) => {
 }
 
 /**
- * Converts the schema `requried` key to boolean type.
+ * Converts the schema key to boolean type.
  *
  * @param schema Not handled schema.
+ * @param key Key of property schema template.
  * @internal
  */
-const parseSchemaRequired = (schema: PropertySchemaTemplate) => {
-	schema.required = !!schema.required
+const parseSchemaBooleanKey = (
+	schema: PropertySchemaTemplate,
+	key: keyof PropertySchemaTemplate
+) => {
+	schema[key] = !!schema[key]
 }
 
 /**
