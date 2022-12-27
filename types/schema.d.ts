@@ -141,12 +141,11 @@ type SchemaReturnProperty<P extends Schema | PropertySchema | PropertyTypeRaw> =
 		: never
 
 /**
- * Returns keys of returns object.
+ * Returns keys of the schema.
  *
  * ```typescript
  * const obj = { a1: String, b1: { a2: [Number, Boolean] } }
- * type e = SchemaReturn<Schema<typeof obj>>
- * type d = SchemaReturnKeys<e>
+ * type e = SchemaReturnKeys<Schema<typeof obj>>
  *
  * // Returns:
  * ['a1', 'b1.a2']
@@ -154,13 +153,15 @@ type SchemaReturnProperty<P extends Schema | PropertySchema | PropertyTypeRaw> =
  *
  * @public
  */
-export type SchemaReturnKeys<S extends SchemaReturn> = (
+export type SchemaReturnKeys<S extends Schema = any> = (
 	S extends object
-		? {
-				[K in Exclude<keyof S, symbol>]: `${K}${SchemaReturnKeyPrefix<
-					SchemaReturnKeys<S[K]>
-				>}`
-		  }[Exclude<keyof S, symbol>]
+		? S extends PropertySchema
+			? ''
+			: {
+					[K in Exclude<keyof S, symbol>]: `${K}${SchemaReturnKeyPrefix<
+						SchemaReturnKeys<S[K]>
+					>}`
+			  }[Exclude<keyof S, symbol>]
 		: ''
 ) extends infer D
 	? Extract<D, string>
