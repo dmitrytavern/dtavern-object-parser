@@ -1,4 +1,5 @@
 import { version } from './version'
+import { Errors } from './utils/errors'
 import { parseProperty } from './lib/parseProperty'
 import { parseProperties, parsePropertiesAsync } from './lib/parseProperties'
 import { createSchema, useSchema } from './lib/createSchema'
@@ -41,6 +42,13 @@ export {
 	PropertySchemaReturn,
 } from '@types'
 
+export {
+	Errors,
+	ObjectError,
+	PropertyError,
+	GeneralError,
+} from './utils/errors'
+
 export { version } from './version'
 export { parseProperty as single } from './lib/parseProperty'
 export {
@@ -78,6 +86,7 @@ export const utils = {
 	isFunction,
 	isDefined,
 	isUndefined,
+	Errors,
 }
 
 /**

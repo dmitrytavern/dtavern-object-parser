@@ -1,5 +1,9 @@
 import { Constructor, PropertySchema } from '@types'
 
+/**
+ * Enum of error names.
+ * @public
+ */
 export enum Errors {
 	ObjectError = 'ObjectError',
 	PropertyError = 'PropertyError',
@@ -11,6 +15,7 @@ interface Error {
 
 /**
  * Property error during the object property parsing.
+ * @public
  */
 export interface PropertyError extends Error {
 	name: Errors.PropertyError
@@ -24,6 +29,7 @@ export interface PropertyError extends Error {
 
 /**
  * Schema error during the schema creating.
+ * @public
  */
 export interface ObjectError extends Error {
 	name: Errors.ObjectError
@@ -32,6 +38,7 @@ export interface ObjectError extends Error {
 
 /**
  * Property error wrapper for the parser.
+ * @public
  */
 export interface GeneralError<Key extends PropertyKey = PropertyKey> {
 	key: Key
