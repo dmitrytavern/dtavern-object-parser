@@ -23,7 +23,7 @@ import {
  * to options and get the `Schema` type which building by the raw schema.
  *
  * Note:
- * - If you use an array as `RawSchema`, you get `any` type. Currently, the
+ * - If you use an array as `RawSchema`, you get default `Schema` type. Currently, the
  * array type is not supported.
  *
  * ### Example
@@ -44,10 +44,14 @@ import {
  * @public
  */
 export type Schema<SRaw extends RawSchema = any> =
-	SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : SchemaAsObject<any>
+	SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : SchemaAsAnyObject
 
 type SchemaAsObject<SRaw extends RawSchemaAsObject> = {
 	[P in keyof SRaw]: SchemaTypeProperty<SRaw[P]>
+}
+
+type SchemaAsAnyObject = {
+	[key: string]: Schema | PropertySchema
 }
 
 type SchemaTypeProperty<P> = P extends PropertyTypeRaw
