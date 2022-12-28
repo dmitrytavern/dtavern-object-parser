@@ -109,13 +109,13 @@ export function createPropertySchema<
 
 		const schema = Object.assign({}, defaultSchema, settings)
 
+		validateSchemaKeys(schema)
+
 		parseSchemaBooleanKey(schema, 'required')
 		parseSchemaBooleanKey(schema, 'skipDefaultValidate')
 		parseSchemaType(schema)
 		parseSchemaDefault(schema)
 		parseSchemaValidator(schema)
-
-		validateSchemaKeys(schema)
 
 		metadata.set(schema, M_IS_SCHEMA, false)
 		metadata.set(schema, M_IS_PROPERTY_SCHEMA, true)
