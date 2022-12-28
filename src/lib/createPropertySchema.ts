@@ -26,8 +26,6 @@ import {
 	PropertyRequiredRaw,
 	PropertyTypeRaw,
 	PropertyElementTypeRaw,
-	PropertyDefault,
-	PropertyValidator,
 	PropertyTypeNormalize,
 	PropertyElementNormalize,
 	PropertyRequiredNormalize,
@@ -64,6 +62,7 @@ const allowedKeys = Object.keys(defaultSchema)
  * - `required` - check the existence of a property in an object.
  * - `default` - set default value of a property in an object.
  * - `validator` - set custom validator for a value.
+ * - `skipDefaultValidate` - skip calling validator on default value.
  *
  * ### Example
  *
@@ -74,7 +73,8 @@ const allowedKeys = Object.keys(defaultSchema)
  *   type: String,
  *   required: true,
  *   default: 'Hello world',
- *   validator: (str) => str.length > 0
+ *   validator: (str) => str.length > 0,
+ *   skipDefaultValidate: false,
  * })
  * ```
  *
@@ -96,23 +96,13 @@ const allowedKeys = Object.keys(defaultSchema)
 export function createPropertySchema<
 	TRaw extends PropertyTypeRaw,
 	ERaw extends PropertyElementTypeRaw,
-	RRaw extends PropertyRequiredRaw,
-	D extends PropertyDefault<
-		PropertyTypeNormalize<TRaw>,
-		PropertyElementNormalize<ERaw>
-	>,
-	V extends PropertyValidator<
-		PropertyTypeNormalize<TRaw>,
-		PropertyElementNormalize<ERaw>
-	>
+	RRaw extends PropertyRequiredRaw
 >(
-	settings: PropertySchemaRaw<TRaw, ERaw, RRaw, D, V> | null | undefined
+	settings: PropertySchemaRaw<TRaw, ERaw, RRaw> | null | undefined
 ): PropertySchema<
 	PropertyTypeNormalize<TRaw>,
 	PropertyElementNormalize<ERaw>,
-	PropertyRequiredNormalize<RRaw>,
-	D,
-	V
+	PropertyRequiredNormalize<RRaw>
 > {
 	try {
 		validateSchemaSettings(settings)
@@ -167,23 +157,13 @@ export function createPropertySchema<
 export function usePropertySchema<
 	TRaw extends PropertyTypeRaw,
 	ERaw extends PropertyElementTypeRaw,
-	RRaw extends PropertyRequiredRaw,
-	D extends PropertyDefault<
-		PropertyTypeNormalize<TRaw>,
-		PropertyElementNormalize<ERaw>
-	>,
-	V extends PropertyValidator<
-		PropertyTypeNormalize<TRaw>,
-		PropertyElementNormalize<ERaw>
-	>
+	RRaw extends PropertyRequiredRaw
 >(
-	settings: PropertySchemaRaw<TRaw, ERaw, RRaw, D, V>
+	settings: PropertySchemaRaw<TRaw, ERaw, RRaw>
 ): PropertySchema<
 	PropertyTypeNormalize<TRaw>,
 	PropertyElementNormalize<ERaw>,
-	PropertyRequiredNormalize<RRaw>,
-	D,
-	V
+	PropertyRequiredNormalize<RRaw>
 > {
 	return isPropertySchema(settings)
 		? (settings as any)
