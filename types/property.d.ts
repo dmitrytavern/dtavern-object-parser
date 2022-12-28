@@ -25,14 +25,35 @@ import {
 } from './constructors'
 
 /**
+ * Template with all keys of property schema.
+ * @public
+ */
+export interface PropertySchemaTemplate<
+	T extends PropertyType | PropertyTypeRaw = any,
+	E extends PropertyElementType | PropertyElementTypeRaw = any,
+	R = any
+> {
+	type?: T
+	element?: E
+	required?: R
+	default?: PropertyDefault<
+		PropertyTypeNormalize<T>,
+		PropertyElementNormalize<E>
+	>
+	validator?: PropertyValidator<
+		PropertyTypeNormalize<T>,
+		PropertyElementNormalize<E>
+	>
+	skipDefaultValidate?: boolean
+}
+
+/**
  * Finished property schema for further parsing.
  *
  * When you use functions for creating property schema, you transfer
  * the `PropertySchemaRaw` and get the `PropertySchema` type.
  *
- * Note: if `Type` has an array type, the property will have an `element` key.
- *
- * Generics: `<Type, ElementType, Required, Default, Validator>`.
+ * Generics: `<Type, ElementType, Required>`.
  *
  * ### Example
  *
@@ -48,12 +69,12 @@ import {
  *     required: true,
  *     default: null,
  *     validator: null,
- *     skipDefaultValidate: flase
+ *     skipDefaultValidate: false
  *   },
  *   required: true,
  *   default: null,
  *   validator: null,
- *   skipDefaultValidate: flase
+ *   skipDefaultValidate: false
  * }
  * ```
  *
@@ -63,9 +84,7 @@ export type PropertySchema<
 	T extends PropertyType = any,
 	E extends PropertyElementType = any,
 	R extends PropertyRequired = any
-> = HaveArrayConstructor<T> extends true
-	? Required<PropertySchemaTemplate<T, E, R>>
-	: Required<Omit<PropertySchemaTemplate<T, E, R>, 'element'>>
+> = Required<PropertySchemaTemplate<T, E, R>>
 
 /**
  * For creating the `PropertySchema` object you need to pass some options
@@ -73,9 +92,7 @@ export type PropertySchema<
  * where all properties are not required, not readonly, and have `Raw`
  * type versions.
  *
- * Note: if `Type` has an array type, the property will have an `element` key.
- *
- * Generics: `<TypeRaw, ElementTypeRaw, RequiredRaw, Default, Validator>`.
+ * Generics: `<TypeRaw, ElementTypeRaw, RequiredRaw>`.
  *
  * ### Example
  *
@@ -92,9 +109,7 @@ export type PropertySchemaRaw<
 	TRaw extends PropertyTypeRaw = any,
 	ERaw extends PropertyElementTypeRaw = any,
 	RRaw extends PropertyRequiredRaw = any
-> = HaveArrayConstructor<TRaw> extends true
-	? PropertySchemaTemplate<TRaw, ERaw, RRaw>
-	: Omit<PropertySchemaTemplate<TRaw, ERaw, RRaw>, 'element'>
+> = PropertySchemaTemplate<TRaw, ERaw, RRaw>
 
 /**
  * Finished type of property `type` key.
@@ -222,7 +237,8 @@ export type PropertyElementTypeRaw =
  *   type: [String],
  *   required: true,
  *   default: null,
- *   validator: null
+ *   validator: null,
+ *   skipDefaultValidate: false
  * }
  *
  * // Normalize from property schema
@@ -233,6 +249,7 @@ export type PropertyElementTypeRaw =
  *   required: true,
  *   default: null,
  *   validator: null,
+ *   skipDefaultValidate: false
  * }
  *
  * // Normalize from schema
@@ -244,7 +261,8 @@ export type PropertyElementTypeRaw =
  *     type: [String],
  *     required: true,
  *     default: null,
- *     validator: null
+ *     validator: null,
+ *     skipDefaultValidate: false
  *   }
  * }
  * ```
@@ -280,29 +298,6 @@ export type PropertyValidator<
 	T extends PropertyType,
 	E extends PropertyElementType
 > = null | ((value: PropertyContructorReturn<T, E>) => boolean)
-
-/**
- * Template with all keys of property schema.
- * @public
- */
-export type PropertySchemaTemplate<
-	T extends PropertyType | PropertyTypeRaw = any,
-	E extends PropertyElementType | PropertyElementTypeRaw = any,
-	R = any
-> = {
-	type?: T
-	element?: E
-	required?: R
-	default?: PropertyDefault<
-		PropertyTypeNormalize<T>,
-		PropertyElementNormalize<E>
-	>
-	validator?: PropertyValidator<
-		PropertyTypeNormalize<T>,
-		PropertyElementNormalize<E>
-	>
-	skipDefaultValidate?: boolean
-}
 
 /**
  * Returns the property type by the property schema.
