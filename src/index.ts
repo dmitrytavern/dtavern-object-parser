@@ -9,21 +9,11 @@ import {
   usePropertySchema,
 } from './lib/createPropertySchema'
 import {
-  isDefined,
-  isUndefined,
-  hasOwn,
-  isArray,
-  isFunction,
-  isObject,
-} from './utils/shared'
-import {
   AsyncFunction,
   GeneratorFunction,
-  compareConstructors,
   getConstructors,
   isConstructors,
   isPrimitiveConstructors,
-  containsArrayConstructor,
 } from './utils/constructors'
 
 export {
@@ -76,17 +66,9 @@ export {
 export const utils = {
   AsyncFunction,
   GeneratorFunction,
-  compareConstructors,
   getConstructors,
   isConstructors,
   isPrimitiveConstructors,
-  containsArrayConstructor,
-  hasOwn,
-  isArray,
-  isObject,
-  isFunction,
-  isDefined,
-  isUndefined,
   Errors,
 }
 

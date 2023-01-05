@@ -30,7 +30,7 @@ type ConstructorArgType = null | undefined | Constructor | Constructor[]
  *
  * @param arg1 First an array of constructors.
  * @param arg2 Second an array of constructors.
- * @public
+ * @internal
  */
 export function compareConstructors(
   arg1: ConstructorType,
@@ -174,7 +174,7 @@ export function isPrimitiveConstructors(arg: ConstructorArgType): boolean {
  * ```
  *
  * @param arg Constructor or array of constructors.
- * @public
+ * @internal
  */
 export function containsArrayConstructor(arg: ConstructorType): boolean {
   const arr = toArray(arg)

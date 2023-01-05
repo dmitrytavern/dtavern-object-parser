@@ -1,20 +1,25 @@
 // @ts-nocheck
 
-import { utils } from '../../dist/object-parser'
 import { types } from './types'
+import {
+  getConstructors,
+  isConstructors,
+  isPrimitiveConstructors,
+  compareConstructors,
+  containsArrayConstructor,
+} from '../../src/utils/constructors'
 
-const compareFn = utils.compareConstructors
-const getterFn = utils.getConstructors
-const getConstructorsFn = utils.getConstructors
-const isConstructorsFn = utils.isConstructors
-const isPrimitveFn = utils.isPrimitiveConstructors
-const containsArrayFn = utils.containsArrayConstructor
+const compareFn = compareConstructors
+const getConstructorsFn = getConstructors
+const isConstructorsFn = isConstructors
+const isPrimitveFn = isPrimitiveConstructors
+const containsArrayFn = containsArrayConstructor
 
 describe('compare types', () => {
   it.each(types)(
     'compare instance constructors with own "$name" type',
     ({ instance, type }) => {
-      expect(compareFn(getterFn(instance), type)).toBeTruthy()
+      expect(compareFn(getConstructorsFn(instance), type)).toBeTruthy()
     }
   )
 
@@ -25,7 +30,9 @@ describe('compare types', () => {
         if (type === otherType.type) continue
         if (ignore.includes(otherType.type)) continue
 
-        expect(compareFn(getterFn(instance), [otherType.type])).toBeFalsy()
+        expect(
+          compareFn(getConstructorsFn(instance), [otherType.type])
+        ).toBeFalsy()
       }
     }
   )
@@ -41,19 +48,19 @@ describe('type upcasting', () => {
   const animal = new Animal()
 
   it('should return true for all hierarchy', () => {
-    expect(compareFn(getterFn(whiteBunny), WhiteBunny)).toBeTruthy()
-    expect(compareFn(getterFn(whiteBunny), Bunny)).toBeTruthy()
-    expect(compareFn(getterFn(whiteBunny), Animal)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(whiteBunny), WhiteBunny)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(whiteBunny), Bunny)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(whiteBunny), Animal)).toBeTruthy()
 
-    expect(compareFn(getterFn(bunny), WhiteBunny)).toBeFalsy()
-    expect(compareFn(getterFn(bunny), Bunny)).toBeTruthy()
-    expect(compareFn(getterFn(bunny), Animal)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(bunny), WhiteBunny)).toBeFalsy()
+    expect(compareFn(getConstructorsFn(bunny), Bunny)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(bunny), Animal)).toBeTruthy()
 
-    expect(compareFn(getterFn(animal), WhiteBunny)).toBeFalsy()
-    expect(compareFn(getterFn(animal), Bunny)).toBeFalsy()
-    expect(compareFn(getterFn(animal), Animal)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(animal), WhiteBunny)).toBeFalsy()
+    expect(compareFn(getConstructorsFn(animal), Bunny)).toBeFalsy()
+    expect(compareFn(getConstructorsFn(animal), Animal)).toBeTruthy()
 
-    expect(compareFn(getterFn(animal), Object)).toBeTruthy()
+    expect(compareFn(getConstructorsFn(animal), Object)).toBeTruthy()
   })
 })
 

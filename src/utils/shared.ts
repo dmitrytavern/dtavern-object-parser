@@ -4,7 +4,7 @@ export const isArray = Array.isArray
  * Returns `true` if the arg is `null` or `undefined`, otherwise returns `false`.
  *
  * @param arg
- * @public
+ * @internal
  */
 export function isUndefined(arg: any): arg is undefined | null {
   return arg === undefined || arg === null
@@ -14,7 +14,7 @@ export function isUndefined(arg: any): arg is undefined | null {
  * Returns `true` if the arg is not `null` or `undefined`, otherwise returns `false`.
  *
  * @param arg
- * @public
+ * @internal
  */
 export function isDefined<T>(arg: T): arg is NonNullable<T> {
   return arg !== undefined && arg !== null
@@ -28,7 +28,7 @@ export function isDefined<T>(arg: T): arg is NonNullable<T> {
  * - If the arg is `null`, returns false.
  *
  * @param arg
- * @public
+ * @internal
  */
 export function isObject(arg: any): boolean {
   return arg !== null && typeof arg === 'object'
@@ -38,7 +38,7 @@ export function isObject(arg: any): boolean {
  * Returns `true` if the arg is a function, otherwise returns `false`.
  *
  * @param arg
- * @public
+ * @internal
  */
 export function isFunction(arg: any): arg is (...args: any[]) => any {
   return typeof arg === 'function'
@@ -49,7 +49,7 @@ export function isFunction(arg: any): arg is (...args: any[]) => any {
  *
  * @param object Any object or an array.
  * @param key Object property name or array element index.
- * @public
+ * @internal
  */
 export function hasOwn(
   object: Object | Array<any>,
@@ -69,7 +69,7 @@ export function hasOwn(
  * ```
  *
  * @param arg
- * @public
+ * @internal
  */
 export function toArray<T>(arg: T | T[]): T[] {
   return isArray(arg) ? arg : [arg]
