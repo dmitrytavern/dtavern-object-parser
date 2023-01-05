@@ -1,2 +1,5 @@
-{"dependencies":{"validate.js":"^0.13.1"}}
-
+{
+  "dependencies": {
+    "validate.js": "^0.13.1"
+  }
+}

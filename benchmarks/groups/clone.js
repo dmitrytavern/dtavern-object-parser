@@ -7,18 +7,18 @@
  */
 
 createGroup('Clone object', ({ objectParser }) => {
-	const OBJECT_PROPERTIES_COUNT = 250
-	const object = {}
-	const parserRawSchema = {}
+  const OBJECT_PROPERTIES_COUNT = 250
+  const object = {}
+  const parserRawSchema = {}
 
-	for (let i = 0; i < OBJECT_PROPERTIES_COUNT; i++) {
-		object[i] = 'Value' + i
-		parserRawSchema[i] = null
-	}
+  for (let i = 0; i < OBJECT_PROPERTIES_COUNT; i++) {
+    object[i] = 'Value' + i
+    parserRawSchema[i] = null
+  }
 
-	const objectParserSchema = objectParser.parser.schema(parserRawSchema)
+  const objectParserSchema = objectParser.parser.schema(parserRawSchema)
 
-	createTest('ObjectParser', () => {
-		objectParser.parser.parse(object, objectParserSchema)
-	})
+  createTest('ObjectParser', () => {
+    objectParser.parser.parse(object, objectParserSchema)
+  })
 })

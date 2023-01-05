@@ -1,21 +1,21 @@
 {
-	"compilerOptions": {
-		"baseUrl": ".",
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "node",
-		"newLine": "LF",
-		"strict": true,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "newLine": "LF",
+    "strict": true,
 
-		"allowJs": false,
+    "allowJs": false,
     "noImplicitAny": false,
     "noImplicitThis": false,
 
-		"esModuleInterop": true,
-		"paths": {
-			"@types": ["types/index.d.ts"],
-		}
-	},
-	"include": ["src", "types"],
-	"exclude": ["node_modules", "test"]
+    "esModuleInterop": true,
+    "paths": {
+      "@types": ["types/index.d.ts"]
+    }
+  },
+  "include": ["src", "types"],
+  "exclude": ["node_modules", "test"]
 }

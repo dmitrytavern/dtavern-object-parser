@@ -7,7 +7,7 @@ export const isArray = Array.isArray
  * @public
  */
 export function isUndefined(arg: any): arg is undefined | null {
-	return arg === undefined || arg === null
+  return arg === undefined || arg === null
 }
 
 /**
@@ -17,7 +17,7 @@ export function isUndefined(arg: any): arg is undefined | null {
  * @public
  */
 export function isDefined<T>(arg: T): arg is NonNullable<T> {
-	return arg !== undefined && arg !== null
+  return arg !== undefined && arg !== null
 }
 
 /**
@@ -31,7 +31,7 @@ export function isDefined<T>(arg: T): arg is NonNullable<T> {
  * @public
  */
 export function isObject(arg: any): boolean {
-	return arg !== null && typeof arg === 'object'
+  return arg !== null && typeof arg === 'object'
 }
 
 /**
@@ -41,7 +41,7 @@ export function isObject(arg: any): boolean {
  * @public
  */
 export function isFunction(arg: any): arg is (...args: any[]) => any {
-	return typeof arg === 'function'
+  return typeof arg === 'function'
 }
 
 /**
@@ -52,10 +52,10 @@ export function isFunction(arg: any): arg is (...args: any[]) => any {
  * @public
  */
 export function hasOwn(
-	object: Object | Array<any>,
-	key: string | number
+  object: Object | Array<any>,
+  key: string | number
 ): boolean {
-	return Object.prototype.hasOwnProperty.call(object, key)
+  return Object.prototype.hasOwnProperty.call(object, key)
 }
 
 /**
@@ -72,5 +72,5 @@ export function hasOwn(
  * @public
  */
 export function toArray<T>(arg: T | T[]): T[] {
-	return isArray(arg) ? arg : [arg]
+  return isArray(arg) ? arg : [arg]
 }

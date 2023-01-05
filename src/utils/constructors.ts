@@ -1,8 +1,8 @@
 import { toArray, isFunction } from './shared'
 import {
-	Constructor,
-	AsyncFunctionConstructor,
-	GeneratorFunctionConstructor,
+  Constructor,
+  AsyncFunctionConstructor,
+  GeneratorFunctionConstructor,
 } from '@types'
 
 type ConstructorType = Constructor | Constructor[]
@@ -33,17 +33,17 @@ type ConstructorArgType = null | undefined | Constructor | Constructor[]
  * @public
  */
 export function compareConstructors(
-	arg1: ConstructorType,
-	arg2: ConstructorType
+  arg1: ConstructorType,
+  arg2: ConstructorType
 ): boolean {
-	const _constructors1 = toArray(arg1)
-	const _constructors2 = toArray(arg2)
+  const _constructors1 = toArray(arg1)
+  const _constructors2 = toArray(arg2)
 
-	for (const _class of _constructors1)
-		if (isFunction(_class) && _constructors2.includes(_class)) {
-			return true
-		}
-	return false
+  for (const _class of _constructors1)
+    if (isFunction(_class) && _constructors2.includes(_class)) {
+      return true
+    }
+  return false
 }
 
 /**
@@ -69,25 +69,25 @@ export function compareConstructors(
  * @public
  */
 export function getConstructors(instance: any): Constructor[] {
-	if (instance === null || instance === undefined) return []
+  if (instance === null || instance === undefined) return []
 
-	let next = Object.getPrototypeOf(instance)
+  let next = Object.getPrototypeOf(instance)
 
-	if (next) {
-		const constructors: Constructor[] = []
-		constructors.push(next.constructor)
+  if (next) {
+    const constructors: Constructor[] = []
+    constructors.push(next.constructor)
 
-		while (next) {
-			if (!constructors.includes(next.constructor))
-				constructors.push(next.constructor)
-			next = Object.getPrototypeOf(next)
-		}
+    while (next) {
+      if (!constructors.includes(next.constructor))
+        constructors.push(next.constructor)
+      next = Object.getPrototypeOf(next)
+    }
 
-		return constructors
-	} else {
-		// Handle Object.create(null)
-		return [Object]
-	}
+    return constructors
+  } else {
+    // Handle Object.create(null)
+    return [Object]
+  }
 }
 
 /**
@@ -113,16 +113,16 @@ export function getConstructors(instance: any): Constructor[] {
  * @public
  */
 export function isConstructors(arg: any): arg is ConstructorType {
-	const arr = toArray(arg)
+  const arr = toArray(arg)
 
-	if (arr.length === 0) return false
+  if (arr.length === 0) return false
 
-	for (const constructor of arr) {
-		if (!isFunction(constructor)) {
-			return false
-		}
-	}
-	return true
+  for (const constructor of arr) {
+    if (!isFunction(constructor)) {
+      return false
+    }
+  }
+  return true
 }
 
 /**
@@ -148,14 +148,14 @@ export function isConstructors(arg: any): arg is ConstructorType {
  * @public
  */
 export function isPrimitiveConstructors(arg: ConstructorArgType): boolean {
-	const arr = toArray(arg)
+  const arr = toArray(arg)
 
-	if (arr.length === 0) return false
+  if (arr.length === 0) return false
 
-	for (const constructor of arr)
-		if (![String, Number, Boolean, BigInt, Symbol].includes(constructor as any))
-			return false
-	return true
+  for (const constructor of arr)
+    if (![String, Number, Boolean, BigInt, Symbol].includes(constructor as any))
+      return false
+  return true
 }
 
 /**
@@ -177,14 +177,14 @@ export function isPrimitiveConstructors(arg: ConstructorArgType): boolean {
  * @public
  */
 export function containsArrayConstructor(arg: ConstructorType): boolean {
-	const arr = toArray(arg)
+  const arr = toArray(arg)
 
-	if (arr.length === 0) return false
+  if (arr.length === 0) return false
 
-	for (const constructor of arr) {
-		if (constructor === Array) return true
-	}
-	return false
+  for (const constructor of arr) {
+    if (constructor === Array) return true
+  }
+  return false
 }
 
 /**
@@ -194,7 +194,7 @@ export function containsArrayConstructor(arg: ConstructorType): boolean {
  * @public
  */
 export const AsyncFunction: AsyncFunctionConstructor = new Function(
-	`return async () => {}`
+  `return async () => {}`
 )().constructor
 
 /**
@@ -204,5 +204,5 @@ export const AsyncFunction: AsyncFunctionConstructor = new Function(
  * @public
  */
 export const GeneratorFunction: GeneratorFunctionConstructor = new Function(
-	`return function* t() {}`
+  `return function* t() {}`
 )().constructor

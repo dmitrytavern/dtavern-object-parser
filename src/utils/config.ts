@@ -4,7 +4,7 @@
 export type RequiredConfig = Required<Config>
 export type PropertiesConfig = null | undefined | Config
 export type Config = {
-	clone?: boolean
+  clone?: boolean
 }
 
 /**
@@ -14,7 +14,7 @@ export type Config = {
  * @returns
  */
 export function useConfig(config?: PropertiesConfig): Required<Config> {
-	return {
-		clone: config && config.clone ? config.clone : false,
-	}
+  return {
+    clone: config && config.clone ? config.clone : false,
+  }
 }

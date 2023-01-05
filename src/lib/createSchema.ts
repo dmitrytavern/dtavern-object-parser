@@ -5,19 +5,19 @@ import { isHandledSchema, isSchema } from '../utils/schema'
 import { createPropertySchema } from './createPropertySchema'
 import { isConstructors } from '../utils/constructors'
 import {
-	metadata,
-	M_IS_SCHEMA,
-	M_IS_PROPERTY_SCHEMA,
-	M_IS_HANDLED_SCHEMA,
+  metadata,
+  M_IS_SCHEMA,
+  M_IS_PROPERTY_SCHEMA,
+  M_IS_HANDLED_SCHEMA,
 } from '../utils/metadata'
 import {
-	Schema,
-	RawSchema,
-	ReadonlyObject,
-	WritableObject,
-	PropertyKey,
-	RawSchemaAsArray,
-	RawSchemaAsObject,
+  Schema,
+  RawSchema,
+  ReadonlyObject,
+  WritableObject,
+  PropertyKey,
+  RawSchemaAsArray,
+  RawSchemaAsObject,
 } from '@types'
 
 /**
@@ -56,24 +56,24 @@ import {
  * @public
  */
 export function createSchema<SRaw extends RawSchema>(
-	rawSchema: SRaw
+  rawSchema: SRaw
 ): Schema<SRaw> {
-	validateRawSchema(rawSchema)
+  validateRawSchema(rawSchema)
 
-	const store = useHandlerStore()
-	const _rawSchema = isArray(rawSchema)
-		? generateRawSchemaByPaths(rawSchema)
-		: (rawSchema as RawSchemaAsObject)
+  const store = useHandlerStore()
+  const _rawSchema = isArray(rawSchema)
+    ? generateRawSchemaByPaths(rawSchema)
+    : (rawSchema as RawSchemaAsObject)
 
-	const result = parseSchemaObject(_rawSchema, store)
+  const result = parseSchemaObject(_rawSchema, store)
 
-	const errors = handler.validate(store)
+  const errors = handler.validate(store)
 
-	handler.clear(store)
+  handler.clear(store)
 
-	if (errors.length > 0) throw errors
+  if (errors.length > 0) throw errors
 
-	return result
+  return result
 }
 
 /**
@@ -88,11 +88,11 @@ export function createSchema<SRaw extends RawSchema>(
  * @public
  */
 export function useSchema<SRaw extends Schema | RawSchema>(
-	rawSchema: SRaw
+  rawSchema: SRaw
 ): SRaw extends RawSchema ? Schema<SRaw> : SRaw {
-	return isSchema(rawSchema)
-		? (rawSchema as any)
-		: createSchema(rawSchema as RawSchema)
+  return isSchema(rawSchema)
+    ? (rawSchema as any)
+    : createSchema(rawSchema as RawSchema)
 }
 
 /**
@@ -103,8 +103,8 @@ export function useSchema<SRaw extends Schema | RawSchema>(
  * @internal
  */
 const validateRawSchema = (rawSchema: RawSchema) => {
-	if (isUndefined(rawSchema) || !isObject(rawSchema))
-		throw `The property schema argument must be an array or an object.`
+  if (isUndefined(rawSchema) || !isObject(rawSchema))
+    throw `The property schema argument must be an array or an object.`
 }
 
 /**
@@ -116,31 +116,31 @@ const validateRawSchema = (rawSchema: RawSchema) => {
  * @internal
  */
 const parseSchemaObject = (
-	schema: RawSchemaAsObject,
-	store: HandlerStore
+  schema: RawSchemaAsObject,
+  store: HandlerStore
 ): any => {
-	if (isHandledSchema(schema)) return schema as Schema<any>
+  if (isHandledSchema(schema)) return schema as Schema<any>
 
-	const schemaObjectError = validateSchemaObject(schema)
-	if (schemaObjectError) return handler.error(store, schemaObjectError)
+  const schemaObjectError = validateSchemaObject(schema)
+  if (schemaObjectError) return handler.error(store, schemaObjectError)
 
-	handler.handle(store, schema)
+  handler.handle(store, schema)
 
-	const schemaCopy = {}
+  const schemaCopy = {}
 
-	metadata.set(schemaCopy, M_IS_SCHEMA, true)
-	metadata.set(schemaCopy, M_IS_PROPERTY_SCHEMA, false)
-	metadata.set(schemaCopy, M_IS_HANDLED_SCHEMA, true)
+  metadata.set(schemaCopy, M_IS_SCHEMA, true)
+  metadata.set(schemaCopy, M_IS_PROPERTY_SCHEMA, false)
+  metadata.set(schemaCopy, M_IS_HANDLED_SCHEMA, true)
 
-	for (const propertyKey in schema) {
-		handler.set(store, propertyKey)
+  for (const propertyKey in schema) {
+    handler.set(store, propertyKey)
 
-		parseSchemaProperty(schema, schemaCopy, propertyKey, store)
+    parseSchemaProperty(schema, schemaCopy, propertyKey, store)
 
-		handler.unset(store)
-	}
+    handler.unset(store)
+  }
 
-	return Object.freeze(schemaCopy)
+  return Object.freeze(schemaCopy)
 }
 
 /**
@@ -156,30 +156,30 @@ const parseSchemaObject = (
  * @internal
  */
 const parseSchemaProperty = (
-	readonlyObject: NonNullable<ReadonlyObject>,
-	writableObject: WritableObject,
-	key: PropertyKey,
-	store: HandlerStore
+  readonlyObject: NonNullable<ReadonlyObject>,
+  writableObject: WritableObject,
+  key: PropertyKey,
+  store: HandlerStore
 ) => {
-	const property = readonlyObject[key]
+  const property = readonlyObject[key]
 
-	if (isUndefined(property) || isConstructors(property)) {
-		writableObject[key] = createPropertySchema({
-			type: property,
-		})
+  if (isUndefined(property) || isConstructors(property)) {
+    writableObject[key] = createPropertySchema({
+      type: property,
+    })
 
-		return
-	}
+    return
+  }
 
-	if (isObject(property)) {
-		writableObject[key] = parseSchemaObject(property, store)
-		return
-	}
+  if (isObject(property)) {
+    writableObject[key] = parseSchemaObject(property, store)
+    return
+  }
 
-	handler.error(
-		store,
-		createObjectError('The property must be a function, an array or an object.')
-	)
+  handler.error(
+    store,
+    createObjectError('The property must be a function, an array or an object.')
+  )
 }
 
 /**
@@ -202,28 +202,28 @@ const parseSchemaProperty = (
  * @internal
  */
 const generateRawSchemaByPaths = (
-	rawArraySchema: RawSchemaAsArray
+  rawArraySchema: RawSchemaAsArray
 ): RawSchemaAsObject => {
-	const rawObjectSchema = {}
+  const rawObjectSchema = {}
 
-	for (const stringPath of rawArraySchema) {
-		const arrayPath = stringPath.split('.')
-		let objectLink = rawObjectSchema
+  for (const stringPath of rawArraySchema) {
+    const arrayPath = stringPath.split('.')
+    let objectLink = rawObjectSchema
 
-		for (let i = 0; i < arrayPath.length; i++) {
-			const key = arrayPath[i]
-			const isObj = isObject(objectLink[key])
+    for (let i = 0; i < arrayPath.length; i++) {
+      const key = arrayPath[i]
+      const isObj = isObject(objectLink[key])
 
-			if (i === arrayPath.length - 1) {
-				if (!isObj) objectLink[key] = null
-			} else {
-				if (!isObj) objectLink[key] = {}
-				objectLink = objectLink[key]
-			}
-		}
-	}
+      if (i === arrayPath.length - 1) {
+        if (!isObj) objectLink[key] = null
+      } else {
+        if (!isObj) objectLink[key] = {}
+        objectLink = objectLink[key]
+      }
+    }
+  }
 
-	return rawObjectSchema
+  return rawObjectSchema
 }
 
 /**
@@ -232,8 +232,8 @@ const generateRawSchemaByPaths = (
  * @param schema The schema object.
  */
 const validateSchemaObject = (
-	schema: RawSchemaAsObject
+  schema: RawSchemaAsObject
 ): ObjectError | undefined => {
-	if (handler.isHandled(schema))
-		return createObjectError(`detected a circular structure`)
+  if (handler.isHandled(schema))
+    return createObjectError(`detected a circular structure`)
 }

@@ -5,12 +5,12 @@ import { Constructor, PropertySchema } from '@types'
  * @public
  */
 export enum Errors {
-	ObjectError = 'ObjectError',
-	PropertyError = 'PropertyError',
+  ObjectError = 'ObjectError',
+  PropertyError = 'PropertyError',
 }
 
 interface Error {
-	name: keyof typeof Errors
+  name: keyof typeof Errors
 }
 
 /**
@@ -18,13 +18,13 @@ interface Error {
  * @public
  */
 export interface PropertyError extends Error {
-	name: Errors.PropertyError
-	message: string
-	exists: boolean
-	value: any
-	valueIsDefault: boolean
-	valueConstructors: Constructor[]
-	schema: PropertySchema
+  name: Errors.PropertyError
+  message: string
+  exists: boolean
+  value: any
+  valueIsDefault: boolean
+  valueConstructors: Constructor[]
+  schema: PropertySchema
 }
 
 /**
@@ -32,8 +32,8 @@ export interface PropertyError extends Error {
  * @public
  */
 export interface ObjectError extends Error {
-	name: Errors.ObjectError
-	message: string
+  name: Errors.ObjectError
+  message: string
 }
 
 /**
@@ -41,8 +41,8 @@ export interface ObjectError extends Error {
  * @public
  */
 export interface GeneralError<Key extends PropertyKey = PropertyKey> {
-	key: Key
-	error: PropertyError | ObjectError
+  key: Key
+  error: PropertyError | ObjectError
 }
 
 /**
@@ -50,10 +50,10 @@ export interface GeneralError<Key extends PropertyKey = PropertyKey> {
  * @internal
  */
 export const createObjectError = (
-	message: ObjectError['message']
+  message: ObjectError['message']
 ): ObjectError => ({
-	name: Errors.ObjectError,
-	message,
+  name: Errors.ObjectError,
+  message,
 })
 
 /**
@@ -61,18 +61,18 @@ export const createObjectError = (
  * @internal
  */
 export const createPropertyError = (
-	message: PropertyError['message'],
-	exists: PropertyError['exists'],
-	value: PropertyError['value'],
-	valueIsDefault: PropertyError['valueIsDefault'],
-	valueConstructors: PropertyError['valueConstructors'],
-	schema: PropertyError['schema']
+  message: PropertyError['message'],
+  exists: PropertyError['exists'],
+  value: PropertyError['value'],
+  valueIsDefault: PropertyError['valueIsDefault'],
+  valueConstructors: PropertyError['valueConstructors'],
+  schema: PropertyError['schema']
 ): PropertyError => ({
-	name: Errors.PropertyError,
-	message,
-	exists,
-	value,
-	valueIsDefault,
-	valueConstructors,
-	schema,
+  name: Errors.PropertyError,
+  message,
+  exists,
+  value,
+  valueIsDefault,
+  valueConstructors,
+  schema,
 })

@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Benchmarks web</title>
-</head>
-<body>
-  <h2>Object parser benchmarks</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benchmarks web</title>
+  </head>
+  <body>
+    <h2>Object parser benchmarks</h2>
 
-  <button onclick="bootstrap()">Start</button>
+    <button onclick="bootstrap()">Start</button>
 
-  <script src="../dist/object-parser.min.js"></script>
-  <script src="./node_modules/validate.js/validate.min.js"></script>
-  <script src="./core.js"></script>
-  <script src="./bootstrap.js"></script>
-  <script>
-    loadPackage({
-      name: 'Object Parser',
-      contextName: 'objectParser',
-      module: objectParser,
-      version: (module) => module.version.toString(),
-    })
+    <script src="../dist/object-parser.min.js"></script>
+    <script src="./node_modules/validate.js/validate.min.js"></script>
+    <script src="./core.js"></script>
+    <script src="./bootstrap.js"></script>
+    <script>
+      loadPackage({
+        name: 'Object Parser',
+        contextName: 'objectParser',
+        module: objectParser,
+        version: (module) => module.version.toString(),
+      })
 
-    loadPackage({
-      name: 'Validate.js',
-      contextName: 'validateParser',
-      module: validate,
-      version: (module) => module.version.toString(),
-      config: (module) => {
-        module.validators.array = (arrayItems, itemConstraints) => {
-          const arrayItemErrors = arrayItems.reduce((errors, item, index) => {
-            const error = module(item, itemConstraints)
-            if (error) errors[index] = { error: error }
-            return errors
-          }, {})
+      loadPackage({
+        name: 'Validate.js',
+        contextName: 'validateParser',
+        module: validate,
+        version: (module) => module.version.toString(),
+        config: (module) => {
+          module.validators.array = (arrayItems, itemConstraints) => {
+            const arrayItemErrors = arrayItems.reduce((errors, item, index) => {
+              const error = module(item, itemConstraints)
+              if (error) errors[index] = { error: error }
+              return errors
+            }, {})
 
-          return isEmpty(arrayItemErrors) ? null : { errors: arrayItemErrors }
-        }
-      },
-    })
-  </script>
-  <script src="./groups/existence.js"></script>
-  <script src="./groups/type.js"></script>
-  <script src="./groups/default.js"></script>
-  <script src="./groups/validator.js"></script>
-  <script src="./groups/clone.js"></script>
-</body>
+            return isEmpty(arrayItemErrors) ? null : { errors: arrayItemErrors }
+          }
+        },
+      })
+    </script>
+    <script src="./groups/existence.js"></script>
+    <script src="./groups/type.js"></script>
+    <script src="./groups/default.js"></script>
+    <script src="./groups/validator.js"></script>
+    <script src="./groups/clone.js"></script>
+  </body>
 </html>

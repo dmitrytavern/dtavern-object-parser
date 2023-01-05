@@ -3,11 +3,11 @@ import { createPropertyError, PropertyError } from '../utils/errors'
 import { hasOwn, isFunction, isObject } from '../utils/shared'
 import { usePropertySchema } from './createPropertySchema'
 import {
-	PropertyKey,
-	PropertySchemaRaw,
-	ReadonlyObject,
-	WritableObject,
-	Constructor,
+  PropertyKey,
+  PropertySchemaRaw,
+  ReadonlyObject,
+  WritableObject,
+  Constructor,
 } from '@types'
 
 type ParserReturns = PropertyError | undefined
@@ -68,10 +68,10 @@ type ParserReturns = PropertyError | undefined
  * @public
  */
 export function parseProperty(
-	readonlyObject: ReadonlyObject,
-	writableObject: WritableObject,
-	key: PropertyKey,
-	schema: PropertySchemaRaw
+  readonlyObject: ReadonlyObject,
+  writableObject: WritableObject,
+  key: PropertyKey,
+  schema: PropertySchemaRaw
 ): ParserReturns
 
 /**
@@ -127,102 +127,102 @@ export function parseProperty(
  * @public
  */
 export function parseProperty(
-	writableObject: WritableObject,
-	key: PropertyKey,
-	schema: PropertySchemaRaw
+  writableObject: WritableObject,
+  key: PropertyKey,
+  schema: PropertySchemaRaw
 ): ParserReturns
 
 export function parseProperty(
-	object?,
-	objectOrKey?,
-	schemaOrKey?,
-	objectSchema?
+  object?,
+  objectOrKey?,
+  schemaOrKey?,
+  objectSchema?
 ): ParserReturns {
-	const _isFull = isObject(objectOrKey)
-	const _schema = _isFull ? objectSchema : schemaOrKey
-	const readonlyObject = object
-	const writableObject = _isFull ? objectOrKey : object
-	const propertyKey = _isFull ? schemaOrKey : objectOrKey
-	const propertySchema = usePropertySchema(_schema)
+  const _isFull = isObject(objectOrKey)
+  const _schema = _isFull ? objectSchema : schemaOrKey
+  const readonlyObject = object
+  const writableObject = _isFull ? objectOrKey : object
+  const propertyKey = _isFull ? schemaOrKey : objectOrKey
+  const propertySchema = usePropertySchema(_schema)
 
-	if (!isObject(writableObject)) {
-		const order = _isFull ? 'second' : 'first'
-		const count = _isFull ? '4' : '3'
-		throw `The ${order} argument must be an object if you have ${count} arguments`
-	}
+  if (!isObject(writableObject)) {
+    const order = _isFull ? 'second' : 'first'
+    const count = _isFull ? '4' : '3'
+    throw `The ${order} argument must be an object if you have ${count} arguments`
+  }
 
-	let error = false
-	let errorMessage = ''
-	let _propertyValueContructors: Constructor[] = []
-	let _propertyValueIsDefault = false
-	let _propertyValue = readonlyObject ? readonlyObject[propertyKey] : undefined
-	let _propertyExists = readonlyObject
-		? hasOwn(readonlyObject, propertyKey)
-		: false
+  let error = false
+  let errorMessage = ''
+  let _propertyValueContructors: Constructor[] = []
+  let _propertyValueIsDefault = false
+  let _propertyValue = readonlyObject ? readonlyObject[propertyKey] : undefined
+  let _propertyExists = readonlyObject
+    ? hasOwn(readonlyObject, propertyKey)
+    : false
 
-	const type = propertySchema.type
-	const required = propertySchema.required
-	const defaultValue = propertySchema.default
-	const validator = propertySchema.validator
-	const skipDefaultValidate = propertySchema.skipDefaultValidate
+  const type = propertySchema.type
+  const required = propertySchema.required
+  const defaultValue = propertySchema.default
+  const validator = propertySchema.validator
+  const skipDefaultValidate = propertySchema.skipDefaultValidate
 
-	// Exists checker
-	if (!_propertyExists && required) {
-		error = true
-		errorMessage = 'The property not exists in the object'
-	}
+  // Exists checker
+  if (!_propertyExists && required) {
+    error = true
+    errorMessage = 'The property not exists in the object'
+  }
 
-	// Default setter
-	if (!error && !_propertyExists && !required && defaultValue !== null) {
-		_propertyExists = true
-		_propertyValueIsDefault = true
-		_propertyValue = isFunction(defaultValue)
-			? defaultValue.apply(null)
-			: defaultValue
-	}
+  // Default setter
+  if (!error && !_propertyExists && !required && defaultValue !== null) {
+    _propertyExists = true
+    _propertyValueIsDefault = true
+    _propertyValue = isFunction(defaultValue)
+      ? defaultValue.apply(null)
+      : defaultValue
+  }
 
-	// Type checker
-	if (!error && _propertyExists && type.length > 0) {
-		_propertyValueContructors = getConstructors(_propertyValue)
+  // Type checker
+  if (!error && _propertyExists && type.length > 0) {
+    _propertyValueContructors = getConstructors(_propertyValue)
 
-		if (!compareConstructors(_propertyValueContructors, type)) {
-			error = true
-			errorMessage = 'The property has an invalid type.'
-		}
-	}
+    if (!compareConstructors(_propertyValueContructors, type)) {
+      error = true
+      errorMessage = 'The property has an invalid type.'
+    }
+  }
 
-	// Validator
-	if (
-		(!error &&
-			_propertyExists &&
-			!_propertyValueIsDefault &&
-			validator !== null) ||
-		(!error &&
-			_propertyExists &&
-			_propertyValueIsDefault &&
-			!skipDefaultValidate &&
-			validator !== null)
-	) {
-		try {
-			if (!validator.call(null, _propertyValue))
-				throw `The property did not pass the validator. Error: returns false`
-		} catch (e) {
-			const s = isObject(e) ? (e as any).message : e
-			error = true
-			errorMessage = s
-		}
-	}
+  // Validator
+  if (
+    (!error &&
+      _propertyExists &&
+      !_propertyValueIsDefault &&
+      validator !== null) ||
+    (!error &&
+      _propertyExists &&
+      _propertyValueIsDefault &&
+      !skipDefaultValidate &&
+      validator !== null)
+  ) {
+    try {
+      if (!validator.call(null, _propertyValue))
+        throw `The property did not pass the validator. Error: returns false`
+    } catch (e) {
+      const s = isObject(e) ? (e as any).message : e
+      error = true
+      errorMessage = s
+    }
+  }
 
-	if (error) {
-		return createPropertyError(
-			errorMessage,
-			_propertyExists,
-			_propertyValue,
-			_propertyValueIsDefault,
-			_propertyValueContructors,
-			propertySchema
-		)
-	}
+  if (error) {
+    return createPropertyError(
+      errorMessage,
+      _propertyExists,
+      _propertyValue,
+      _propertyValueIsDefault,
+      _propertyValueContructors,
+      propertySchema
+    )
+  }
 
-	writableObject[propertyKey] = _propertyValue
+  writableObject[propertyKey] = _propertyValue
 }

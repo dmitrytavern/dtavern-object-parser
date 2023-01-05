@@ -1,10 +1,10 @@
 import { Schema, PropertySchema } from '@types'
 import {
-	metadata,
-	M_IS_SCHEMA,
-	M_IS_PROPERTY_SCHEMA,
-	M_IS_HANDLED_SCHEMA,
-	M_IS_ARRAY_CONSTRUCTOR,
+  metadata,
+  M_IS_SCHEMA,
+  M_IS_PROPERTY_SCHEMA,
+  M_IS_HANDLED_SCHEMA,
+  M_IS_ARRAY_CONSTRUCTOR,
 } from 'src/utils/metadata'
 
 /**
@@ -14,7 +14,7 @@ import {
  * @public
  */
 export function isSchema(object: object): object is Schema {
-	return metadata.get(object, M_IS_SCHEMA)
+  return metadata.get(object, M_IS_SCHEMA)
 }
 
 /**
@@ -24,7 +24,7 @@ export function isSchema(object: object): object is Schema {
  * @public
  */
 export function isPropertySchema(object: object): object is PropertySchema {
-	return metadata.get(object, M_IS_PROPERTY_SCHEMA)
+  return metadata.get(object, M_IS_PROPERTY_SCHEMA)
 }
 
 /**
@@ -34,7 +34,7 @@ export function isPropertySchema(object: object): object is PropertySchema {
  * @internal
  */
 export function isHandledSchema(object: any): boolean {
-	return metadata.get(object, M_IS_HANDLED_SCHEMA)
+  return metadata.get(object, M_IS_HANDLED_SCHEMA)
 }
 
 /**
@@ -45,5 +45,5 @@ export function isHandledSchema(object: any): boolean {
  * @internal
  */
 export function isArrayTypeSchema(object: any): boolean {
-	return metadata.get(object, M_IS_ARRAY_CONSTRUCTOR)
+  return metadata.get(object, M_IS_ARRAY_CONSTRUCTOR)
 }

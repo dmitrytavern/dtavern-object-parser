@@ -14,7 +14,7 @@ export const M_IS_PRIMITIVE_CONSTRUCTORS = 'isPrimitiveConstructors'
  * @internal
  */
 const has = (object: object): object is object => {
-	return isObject(object) && isObject(object[METADATA_NAME])
+  return isObject(object) && isObject(object[METADATA_NAME])
 }
 
 /**
@@ -27,8 +27,8 @@ const has = (object: object): object is object => {
  * @internal
  */
 const get = (object: object, key: string): any => {
-	if (!has(object)) return undefined
-	return object[METADATA_NAME][key]
+  if (!has(object)) return undefined
+  return object[METADATA_NAME][key]
 }
 
 /**
@@ -40,15 +40,15 @@ const get = (object: object, key: string): any => {
  * @internal
  */
 const set = (object: object, key: string, value: any): void => {
-	if (!has(object)) {
-		Object.defineProperty(object, METADATA_NAME, {
-			value: {},
-			enumerable: false,
-			writable: false,
-			configurable: true,
-		})
-	}
-	object[METADATA_NAME][key] = value
+  if (!has(object)) {
+    Object.defineProperty(object, METADATA_NAME, {
+      value: {},
+      enumerable: false,
+      writable: false,
+      configurable: true,
+    })
+  }
+  object[METADATA_NAME][key] = value
 }
 
 /**
@@ -58,7 +58,7 @@ const set = (object: object, key: string, value: any): void => {
  * @internal
  */
 const clear = (object: object): void => {
-	if (has(object)) delete object[METADATA_NAME]
+  if (has(object)) delete object[METADATA_NAME]
 }
 
 /**
@@ -67,8 +67,8 @@ const clear = (object: object): void => {
  * @internal
  */
 export const metadata = {
-	has,
-	get,
-	set,
-	clear,
+  has,
+  get,
+  set,
+  clear,
 }

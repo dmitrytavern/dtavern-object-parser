@@ -28,17 +28,17 @@ let currectResult = null
  * @public
  */
 globalThis.createGroup = function (name, initFn, iterations = 10000) {
-	const newGroup = { name, iterations }
+  const newGroup = { name, iterations }
 
-	currectGroup = newGroup
+  currectGroup = newGroup
 
-	initFn(groupContext)
+  initFn(groupContext)
 
-	currectGroup = null
+  currectGroup = null
 
-	groups.push(newGroup)
+  groups.push(newGroup)
 
-	log(`${name} \x1b[32m(group loaded)\x1b[0m`)
+  log(`${name} \x1b[32m(group loaded)\x1b[0m`)
 }
 
 /**
@@ -50,13 +50,13 @@ globalThis.createGroup = function (name, initFn, iterations = 10000) {
  * @public
  */
 globalThis.createTest = function (name, callback) {
-	if (!currectGroup) throw 'use createTest only in group!'
+  if (!currectGroup) throw 'use createTest only in group!'
 
-	tests.push({
-		name,
-		callback,
-		group: currectGroup,
-	})
+  tests.push({
+    name,
+    callback,
+    group: currectGroup,
+  })
 }
 
 /**
@@ -66,40 +66,40 @@ globalThis.createTest = function (name, callback) {
  * @public
  */
 globalThis.loadPackage = function (package) {
-	const settings = {
-		name: package.name,
-		contextName: package.contextName,
-		modulePath: package.modulePath,
-	}
+  const settings = {
+    name: package.name,
+    contextName: package.contextName,
+    modulePath: package.modulePath,
+  }
 
-	try {
-		const module = isBrowser ? package.module : require(package.modulePath)
-		const version = package.version(module)
+  try {
+    const module = isBrowser ? package.module : require(package.modulePath)
+    const version = package.version(module)
 
-		if (typeof package.config === 'function') {
-			package.config(module)
-		}
+    if (typeof package.config === 'function') {
+      package.config(module)
+    }
 
-		packages.push({
-			...settings,
-			module,
-			version,
-			loaded: true,
-		})
+    packages.push({
+      ...settings,
+      module,
+      version,
+      loaded: true,
+    })
 
-		groupContext[settings.contextName] = module
+    groupContext[settings.contextName] = module
 
-		log(`${settings.name} \x1b[32m(package loaded)\x1b[0m`)
-	} catch (e) {
-		packages.push({
-			...settings,
-			module: undefined,
-			version: 'v?.?.?',
-			loaded: false,
-		})
+    log(`${settings.name} \x1b[32m(package loaded)\x1b[0m`)
+  } catch (e) {
+    packages.push({
+      ...settings,
+      module: undefined,
+      version: 'v?.?.?',
+      loaded: false,
+    })
 
-		log(`${settings.name} \x1b[31m(package skipped)\x1b[0m`)
-	}
+    log(`${settings.name} \x1b[31m(package skipped)\x1b[0m`)
+  }
 }
 
 /**
@@ -110,37 +110,37 @@ globalThis.loadPackage = function (package) {
  * @public
  */
 globalThis.run = function (iterationsCount = 4) {
-	currectResult = []
+  currectResult = []
 
-	log('Benchmarks started...')
+  log('Benchmarks started...')
 
-	const time = benchmarkTime(() => {
-		for (let count = 0; count < iterationsCount; count++) {
-			const time = benchmarkTime(runTests)
+  const time = benchmarkTime(() => {
+    for (let count = 0; count < iterationsCount; count++) {
+      const time = benchmarkTime(runTests)
 
-			log(`Iteration ${count + 1} ended. (${time / 1000}s)`)
-		}
-	})
+      log(`Iteration ${count + 1} ended. (${time / 1000}s)`)
+    }
+  })
 
-	log('Benchmarks ended.')
+  log('Benchmarks ended.')
 
-	let successTests = 0
-	let skippedTests = 0
+  let successTests = 0
+  let skippedTests = 0
 
-	for (const groupResult of currectResult) {
-		for (const testResult of groupResult.results) {
-			testResult.pass ? successTests++ : skippedTests++
-		}
-	}
+  for (const groupResult of currectResult) {
+    for (const testResult of groupResult.results) {
+      testResult.pass ? successTests++ : skippedTests++
+    }
+  }
 
-	return {
-		time,
-		result: currectResult,
-		packages,
-		loadedTests: tests.length,
-		successTests,
-		skippedTests,
-	}
+  return {
+    time,
+    result: currectResult,
+    packages,
+    loadedTests: tests.length,
+    successTests,
+    skippedTests,
+  }
 }
 
 /**
@@ -148,50 +148,50 @@ globalThis.run = function (iterationsCount = 4) {
  * @internal
  */
 function runTests() {
-	const throws = []
-	const iterations = []
-	const results = []
+  const throws = []
+  const iterations = []
+  const results = []
 
-	for (const key in tests) {
-		iterations[key] = tests[key].group.iterations
-		results[key] = []
-		throws[key] = false
-	}
+  for (const key in tests) {
+    iterations[key] = tests[key].group.iterations
+    results[key] = []
+    throws[key] = false
+  }
 
-	for (let i = 0; i < tests.length; i++) {
-		if (iterations[i] > 0) {
-			iterationsExists = true
-			try {
-				const result = benchmarkTime(tests[i].callback)
-				iterations[i]--
-				results[i].push(result)
-			} catch (e) {
-				iterations[i] = 0
-				results[i] = []
-				throws[i] = true
-			}
-		}
+  for (let i = 0; i < tests.length; i++) {
+    if (iterations[i] > 0) {
+      iterationsExists = true
+      try {
+        const result = benchmarkTime(tests[i].callback)
+        iterations[i]--
+        results[i].push(result)
+      } catch (e) {
+        iterations[i] = 0
+        results[i] = []
+        throws[i] = true
+      }
+    }
 
-		if (+i === +(tests.length - 1)) {
-			if (!iterationsExists) break
-			iterationsExists = false
-			i = -1
-		}
-	}
+    if (+i === +(tests.length - 1)) {
+      if (!iterationsExists) break
+      iterationsExists = false
+      i = -1
+    }
+  }
 
-	for (const key in tests) {
-		const test = tests[key]
-		const testTrown = throws[key]
-		let testResult = 0
+  for (const key in tests) {
+    const test = tests[key]
+    const testTrown = throws[key]
+    let testResult = 0
 
-		if (!testTrown) {
-			let sum = 0
-			for (const num of results[key]) sum += num
-			testResult = tests[key].group.iterations / sum
-		}
+    if (!testTrown) {
+      let sum = 0
+      for (const num of results[key]) sum += num
+      testResult = tests[key].group.iterations / sum
+    }
 
-		saveResult(test, testResult, testTrown)
-	}
+    saveResult(test, testResult, testTrown)
+  }
 }
 
 /**
@@ -204,19 +204,19 @@ function runTests() {
  * @internal
  */
 function saveResult(test, testTime, testThowns) {
-	const testResult = getTestResult(test.group, test)
+  const testResult = getTestResult(test.group, test)
 
-	if (testThowns) {
-		testResult.pass = false
-		testResult.result = 0
-	} else {
-		testResult.pass = true
-		testResult.results.push(testTime)
-		testResult.result = Math.round(
-			testResult.results.reduce((val, acc) => acc + val) /
-				testResult.results.length
-		)
-	}
+  if (testThowns) {
+    testResult.pass = false
+    testResult.result = 0
+  } else {
+    testResult.pass = true
+    testResult.results.push(testTime)
+    testResult.result = Math.round(
+      testResult.results.reduce((val, acc) => acc + val) /
+        testResult.results.length
+    )
+  }
 }
 
 /**
@@ -227,24 +227,24 @@ function saveResult(test, testTime, testThowns) {
  * @internal
  */
 function getTestResult(group, test) {
-	const groupResult = getGroupResult(group)
+  const groupResult = getGroupResult(group)
 
-	const testExists = groupResult.results.find((t) => t.name === test.name)
+  const testExists = groupResult.results.find((t) => t.name === test.name)
 
-	let testResultObject = testExists
-		? testExists
-		: {
-				name: test.name,
-				pass: true,
-				result: 0,
-				results: [],
-		  }
+  let testResultObject = testExists
+    ? testExists
+    : {
+        name: test.name,
+        pass: true,
+        result: 0,
+        results: [],
+      }
 
-	if (!testExists) {
-		groupResult.results.push(testResultObject)
-	}
+  if (!testExists) {
+    groupResult.results.push(testResultObject)
+  }
 
-	return testResultObject
+  return testResultObject
 }
 
 /**
@@ -254,21 +254,21 @@ function getTestResult(group, test) {
  * @internal
  */
 function getGroupResult(group) {
-	const groupExists = currectResult.find((g) => g.name === group.name)
+  const groupExists = currectResult.find((g) => g.name === group.name)
 
-	let groupResultObject = groupExists
-		? groupExists
-		: {
-				name: group.name,
-				iterations: group.iterations,
-				results: [],
-		  }
+  let groupResultObject = groupExists
+    ? groupExists
+    : {
+        name: group.name,
+        iterations: group.iterations,
+        results: [],
+      }
 
-	if (!groupExists) {
-		currectResult.push(groupResultObject)
-	}
+  if (!groupExists) {
+    currectResult.push(groupResultObject)
+  }
 
-	return groupResultObject
+  return groupResultObject
 }
 
 /**
@@ -279,10 +279,10 @@ function getGroupResult(group) {
  * @internal
  */
 function benchmarkTime(callback) {
-	const start = new Date().getTime()
-	callback()
-	const end = new Date().getTime()
-	return end - start
+  const start = new Date().getTime()
+  callback()
+  const end = new Date().getTime()
+  return end - start
 }
 
 /**
@@ -290,5 +290,5 @@ function benchmarkTime(callback) {
  * @internal
  */
 function log(str) {
-	console.log('\x1b[36m[log]\x1b[0m: %s', str)
+  console.log('\x1b[36m[log]\x1b[0m: %s', str)
 }

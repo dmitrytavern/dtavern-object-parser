@@ -4,7 +4,7 @@
     "baseUrl": "./.temp",
     "types": [],
     "paths": {
-			"@types": ["../types/index.d.ts"]
-		}
+      "@types": ["../types/index.d.ts"]
+    }
   }
 }

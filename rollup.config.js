@@ -19,65 +19,65 @@ const output = path.join(APP_BUILD_DIRNAME, `${APP_BUILD_FILENAME}`)
 const splitedVersion = pkg.version.split('.')
 
 if (fs.existsSync(APP_BUILD_DIRNAME)) {
-	fs.rmSync(APP_BUILD_DIRNAME, { recursive: true, force: true })
+  fs.rmSync(APP_BUILD_DIRNAME, { recursive: true, force: true })
 }
 
 const rollupConfig = {
-	input,
-	output: [
-		{
-			file: `${output}.js`,
-			format: 'umd',
-			exports: 'named',
-			name: APP_BUILD_UMD_NAME,
-		},
-	],
-	plugins: [
-		typescript(),
-		replace({
-			preventAssignment: true,
-			'process.env.VERSION_MAJOR': splitedVersion[0],
-			'process.env.VERSION_MINOR': splitedVersion[1],
-			'process.env.VERSION_PATCH': splitedVersion[2],
-		}),
-	],
+  input,
+  output: [
+    {
+      file: `${output}.js`,
+      format: 'umd',
+      exports: 'named',
+      name: APP_BUILD_UMD_NAME,
+    },
+  ],
+  plugins: [
+    typescript(),
+    replace({
+      preventAssignment: true,
+      'process.env.VERSION_MAJOR': splitedVersion[0],
+      'process.env.VERSION_MINOR': splitedVersion[1],
+      'process.env.VERSION_PATCH': splitedVersion[2],
+    }),
+  ],
 }
 
 if (NODE_ENV === 'production') {
-	const removeComments = terser({
-		compress: false,
-		mangle: false,
-		format: {
-			beautify: true,
-			comments: false,
-		},
-	})
+  const removeComments = terser({
+    compress: false,
+    mangle: false,
+    format: {
+      beautify: true,
+      comments: false,
+    },
+  })
 
-	rollupConfig.output[0].plugins = [removeComments]
-	rollupConfig.output.push(
-		...[
-			{
-				file: `${output}.esm.js`,
-				format: 'esm',
-				exports: 'named',
-				plugins: [removeComments],
-			},
-			{
-				file: `${output}.min.js`,
-				format: 'umd',
-				exports: 'named',
-				name: APP_BUILD_UMD_NAME,
-				plugins: [terser({ compress: { unsafe_arrows: true, passes: 2 } })],
-			},
-		]
-	)
+  rollupConfig.output[0].plugins = [removeComments]
+  rollupConfig.output.push(
+    ...[
+      {
+        file: `${output}.esm.js`,
+        format: 'esm',
+        exports: 'named',
+        plugins: [removeComments],
+      },
+      {
+        file: `${output}.min.js`,
+        format: 'umd',
+        exports: 'named',
+        name: APP_BUILD_UMD_NAME,
+        plugins: [terser({ compress: { unsafe_arrows: true, passes: 2 } })],
+      },
+    ]
+  )
 
-	rollupConfig.plugins.push(
-		babel({
-			babelHelpers: 'bundled',
-			exclude: 'node_modules/**',
-		})
-	)
+  rollupConfig.plugins.push(
+    babel({
+      babelHelpers: 'bundled',
+      exclude: 'node_modules/**',
+    })
+  )
 }
 
 export default rollupConfig

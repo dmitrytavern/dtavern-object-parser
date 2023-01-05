@@ -13,9 +13,9 @@ const M_IS_HANDLED = 'isHandled'
  * @internal
  */
 export interface HandlerStore {
-	[ERROR_LIST_KEY]: GeneralError[]
-	[NESTED_LIST_KEY]: PropertyKey[]
-	[HANDLED_LIST_KEY]: object[]
+  [ERROR_LIST_KEY]: GeneralError[]
+  [NESTED_LIST_KEY]: PropertyKey[]
+  [HANDLED_LIST_KEY]: object[]
 }
 
 /**
@@ -26,7 +26,7 @@ export interface HandlerStore {
  * @internal
  */
 const set = (store: HandlerStore, key: PropertyKey): void => {
-	store[NESTED_LIST_KEY].push(key)
+  store[NESTED_LIST_KEY].push(key)
 }
 
 /**
@@ -36,7 +36,7 @@ const set = (store: HandlerStore, key: PropertyKey): void => {
  * @internal
  */
 const unset = (store: HandlerStore): void => {
-	store[NESTED_LIST_KEY].pop()
+  store[NESTED_LIST_KEY].pop()
 }
 
 /**
@@ -47,8 +47,8 @@ const unset = (store: HandlerStore): void => {
  * @internal
  */
 const handle = (store: HandlerStore, object: object): void => {
-	metadata.set(object, M_IS_HANDLED, true)
-	store[HANDLED_LIST_KEY].push(object)
+  metadata.set(object, M_IS_HANDLED, true)
+  store[HANDLED_LIST_KEY].push(object)
 }
 
 /**
@@ -56,7 +56,7 @@ const handle = (store: HandlerStore, object: object): void => {
  * @interanl
  */
 const isHandled = (object: object): boolean => {
-	return metadata.has(object) ? metadata.get(object, M_IS_HANDLED) : false
+  return metadata.has(object) ? metadata.get(object, M_IS_HANDLED) : false
 }
 
 /**
@@ -67,12 +67,12 @@ const isHandled = (object: object): boolean => {
  * @internal
  */
 const error = (store: HandlerStore, error: GeneralError['error']): void => {
-	const key =
-		store[NESTED_LIST_KEY].length === 0
-			? 'root'
-			: store[NESTED_LIST_KEY].reduce((acc, value) => acc + ('.' + value))
+  const key =
+    store[NESTED_LIST_KEY].length === 0
+      ? 'root'
+      : store[NESTED_LIST_KEY].reduce((acc, value) => acc + ('.' + value))
 
-	store[ERROR_LIST_KEY].push({ key, error })
+  store[ERROR_LIST_KEY].push({ key, error })
 }
 
 /**
@@ -82,7 +82,7 @@ const error = (store: HandlerStore, error: GeneralError['error']): void => {
  * @internal
  */
 const validate = (store: HandlerStore): GeneralError[] => {
-	return store[ERROR_LIST_KEY]
+  return store[ERROR_LIST_KEY]
 }
 
 /**
@@ -92,7 +92,7 @@ const validate = (store: HandlerStore): GeneralError[] => {
  * @internal
  */
 const clear = (store: HandlerStore): void => {
-	store[HANDLED_LIST_KEY].forEach((obj) => metadata.clear(obj))
+  store[HANDLED_LIST_KEY].forEach((obj) => metadata.clear(obj))
 }
 
 /**
@@ -101,11 +101,11 @@ const clear = (store: HandlerStore): void => {
  * @internal
  */
 export function useHandlerStore() {
-	return {
-		[ERROR_LIST_KEY]: [],
-		[NESTED_LIST_KEY]: [],
-		[HANDLED_LIST_KEY]: [],
-	}
+  return {
+    [ERROR_LIST_KEY]: [],
+    [NESTED_LIST_KEY]: [],
+    [HANDLED_LIST_KEY]: [],
+  }
 }
 
 /**
@@ -114,11 +114,11 @@ export function useHandlerStore() {
  * @internal
  */
 export const handler = {
-	set,
-	unset,
-	handle,
-	isHandled,
-	error,
-	validate,
-	clear,
+  set,
+  unset,
+  handle,
+  isHandled,
+  error,
+  validate,
+  clear,
 }

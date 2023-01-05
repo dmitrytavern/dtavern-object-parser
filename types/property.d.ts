@@ -18,10 +18,10 @@
 
 import { Schema, RawSchema, SchemaReturn } from './schema'
 import {
-	Constructor,
-	ArrayConstructor,
-	ConstructorReturn,
-	HaveArrayConstructor,
+  Constructor,
+  ArrayConstructor,
+  ConstructorReturn,
+  HaveArrayConstructor,
 } from './constructors'
 
 /**
@@ -29,22 +29,22 @@ import {
  * @public
  */
 export interface PropertySchemaTemplate<
-	T extends PropertyType | PropertyTypeRaw = any,
-	E extends PropertyElementType | PropertyElementTypeRaw = any,
-	R = any
+  T extends PropertyType | PropertyTypeRaw = any,
+  E extends PropertyElementType | PropertyElementTypeRaw = any,
+  R = any
 > {
-	type?: T
-	element?: E
-	required?: R
-	default?: PropertyDefault<
-		PropertyTypeNormalize<T>,
-		PropertyElementNormalize<E>
-	>
-	validator?: PropertyValidator<
-		PropertyTypeNormalize<T>,
-		PropertyElementNormalize<E>
-	>
-	skipDefaultValidate?: boolean
+  type?: T
+  element?: E
+  required?: R
+  default?: PropertyDefault<
+    PropertyTypeNormalize<T>,
+    PropertyElementNormalize<E>
+  >
+  validator?: PropertyValidator<
+    PropertyTypeNormalize<T>,
+    PropertyElementNormalize<E>
+  >
+  skipDefaultValidate?: boolean
 }
 
 /**
@@ -81,9 +81,9 @@ export interface PropertySchemaTemplate<
  * @public
  */
 export type PropertySchema<
-	T extends PropertyType = any,
-	E extends PropertyElementType = any,
-	R extends PropertyRequired = any
+  T extends PropertyType = any,
+  E extends PropertyElementType = any,
+  R extends PropertyRequired = any
 > = Required<PropertySchemaTemplate<T, E, R>>
 
 /**
@@ -106,9 +106,9 @@ export type PropertySchema<
  * @public
  */
 export type PropertySchemaRaw<
-	TRaw extends PropertyTypeRaw = any,
-	ERaw extends PropertyElementTypeRaw = any,
-	RRaw extends PropertyRequiredRaw = any
+  TRaw extends PropertyTypeRaw = any,
+  ERaw extends PropertyElementTypeRaw = any,
+  RRaw extends PropertyRequiredRaw = any
 > = PropertySchemaTemplate<TRaw, ERaw, RRaw>
 
 /**
@@ -138,10 +138,10 @@ export type PropertyType<T = any> = Constructor<T>[]
  * @public
  */
 export type PropertyTypeRaw<T = any> =
-	| null
-	| undefined
-	| Constructor<T>
-	| Constructor<T>[]
+  | null
+  | undefined
+  | Constructor<T>
+  | Constructor<T>[]
 
 /**
  * Normalize helper for transforming `PropertyTypeRaw` to `PropertyType`.
@@ -156,7 +156,7 @@ export type PropertyTypeRaw<T = any> =
  * @public
  */
 export type PropertyTypeNormalize<TRaw extends PropertyTypeRaw> =
-	TRaw extends any[] ? TRaw : TRaw extends Constructor ? [TRaw] : any
+  TRaw extends any[] ? TRaw : TRaw extends Constructor ? [TRaw] : any
 
 /**
  * Finished type of property `required` key.
@@ -183,7 +183,7 @@ export type PropertyRequiredRaw = null | undefined | boolean
  * @public
  */
 export type PropertyRequiredNormalize<RRaw extends PropertyRequiredRaw> =
-	RRaw extends null | undefined ? false : RRaw
+  RRaw extends null | undefined ? false : RRaw
 
 /**
  * Finished type of property `element` key.
@@ -216,10 +216,10 @@ export type PropertyElementType = PropertySchema | Schema
  * @public
  */
 export type PropertyElementTypeRaw =
-	| PropertyTypeRaw
-	| PropertySchema
-	| RawSchema
-	| Schema
+  | PropertyTypeRaw
+  | PropertySchema
+  | RawSchema
+  | Schema
 
 /**
  * Normalize helper for transforming `PropertyElementTypeRaw` to
@@ -270,33 +270,33 @@ export type PropertyElementTypeRaw =
  * @public
  */
 export type PropertyElementNormalize<ERaw extends PropertyElementTypeRaw> =
-	ERaw extends PropertyTypeRaw
-		? PropertySchema<PropertyTypeNormalize<ERaw>, any, true>
-		: ERaw extends PropertySchema
-		? ERaw
-		: ERaw extends RawSchema
-		? Schema<ERaw>
-		: never
+  ERaw extends PropertyTypeRaw
+    ? PropertySchema<PropertyTypeNormalize<ERaw>, any, true>
+    : ERaw extends PropertySchema
+    ? ERaw
+    : ERaw extends RawSchema
+    ? Schema<ERaw>
+    : never
 
 /**
  * Type of property `default` key.
  * @public
  */
 export type PropertyDefault<
-	T extends PropertyType,
-	E extends PropertyElementType
+  T extends PropertyType,
+  E extends PropertyElementType
 > =
-	| null
-	| PropertyContructorReturn<T, E>
-	| (() => PropertyContructorReturn<T, E>)
+  | null
+  | PropertyContructorReturn<T, E>
+  | (() => PropertyContructorReturn<T, E>)
 
 /**
  * Type of property `validator` key.
  * @public
  */
 export type PropertyValidator<
-	T extends PropertyType,
-	E extends PropertyElementType
+  T extends PropertyType,
+  E extends PropertyElementType
 > = null | ((value: PropertyContructorReturn<T, E>) => boolean)
 
 /**
@@ -323,23 +323,23 @@ export type PropertyValidator<
  * @public
  */
 export type PropertySchemaReturn<P extends PropertySchema> =
-	HaveArrayConstructor<P['type']> extends true
-		? // @ts-ignore
-		  PropertyContructorReturn<P['type'], P['element']>
-		: PropertyContructorReturn<P['type'], never>
+  HaveArrayConstructor<P['type']> extends true
+    ? // @ts-ignore
+      PropertyContructorReturn<P['type'], P['element']>
+    : PropertyContructorReturn<P['type'], never>
 
 /**
  * Returns the property type by types in the property schema.
  * @public
  */
 type PropertyContructorReturn<
-	T extends PropertyType,
-	E extends PropertyElementType
+  T extends PropertyType,
+  E extends PropertyElementType
 > = T extends (infer Type)[]
-	? Type extends ArrayConstructor
-		? PropertyContructorReturnAsArray<E>[]
-		: ConstructorReturn<Type>
-	: never
+  ? Type extends ArrayConstructor
+    ? PropertyContructorReturnAsArray<E>[]
+    : ConstructorReturn<Type>
+  : never
 
 /**
  * Returns type of an array element.
@@ -353,16 +353,16 @@ type PropertyContructorReturn<
  * @public
  */
 type PropertyContructorReturnAsArray<E extends Schema | PropertySchema> =
-	E extends PropertySchema
-		? E['type'] extends (infer Type)[]
-			? Type extends ArrayConstructor
-				? E['required'] extends false
-					? // @ts-ignore
-					  PropertyContructorReturn<E['type'], E['element']> | undefined
-					: // @ts-ignore
-					  PropertyContructorReturn<E['type'], E['element']>
-				: E['required'] extends false
-				? ConstructorReturn<Type> | undefined
-				: ConstructorReturn<Type>
-			: never
-		: SchemaReturn<E>
+  E extends PropertySchema
+    ? E['type'] extends (infer Type)[]
+      ? Type extends ArrayConstructor
+        ? E['required'] extends false
+          ? // @ts-ignore
+            PropertyContructorReturn<E['type'], E['element']> | undefined
+          : // @ts-ignore
+            PropertyContructorReturn<E['type'], E['element']>
+        : E['required'] extends false
+        ? ConstructorReturn<Type> | undefined
+        : ConstructorReturn<Type>
+      : never
+    : SchemaReturn<E>
