@@ -224,5 +224,7 @@ export function parseProperty(
     )
   }
 
-  writableObject[propertyKey] = _propertyValue
+  if (_propertyExists) {
+    writableObject[propertyKey] = _propertyValue
+  }
 }
