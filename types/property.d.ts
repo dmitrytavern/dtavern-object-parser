@@ -324,8 +324,11 @@ export type PropertyValidator<
  */
 export type PropertySchemaReturn<P extends PropertySchema> =
   HaveArrayConstructor<P['type']> extends true
-    ? // @ts-ignore
-      PropertyContructorReturn<P['type'], P['element']>
+    ? P['required'] extends false
+      ? PropertyContructorReturn<P['type'], P['element']> | undefined
+      : PropertyContructorReturn<P['type'], P['element']>
+    : P['required'] extends false
+    ? PropertyContructorReturn<P['type'], never> | undefined
     : PropertyContructorReturn<P['type'], never>
 
 /**
@@ -357,10 +360,8 @@ type PropertyContructorReturnAsArray<E extends Schema | PropertySchema> =
     ? E['type'] extends (infer Type)[]
       ? Type extends ArrayConstructor
         ? E['required'] extends false
-          ? // @ts-ignore
-            PropertyContructorReturn<E['type'], E['element']> | undefined
-          : // @ts-ignore
-            PropertyContructorReturn<E['type'], E['element']>
+          ? PropertyContructorReturn<E['type'], E['element']> | undefined
+          : PropertyContructorReturn<E['type'], E['element']>
         : E['required'] extends false
         ? ConstructorReturn<Type> | undefined
         : ConstructorReturn<Type>
