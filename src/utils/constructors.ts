@@ -188,21 +188,17 @@ export function containsArrayConstructor(arg: ConstructorType): boolean {
 }
 
 /**
- * TODO: Rewrite it.
  * Returns the async function constructor.
  *
  * @public
  */
-export const AsyncFunction: AsyncFunctionConstructor = new Function(
-  `return async () => {}`
-)().constructor
+export const AsyncFunction: AsyncFunctionConstructor = (async () => {})
+  .constructor as AsyncFunctionConstructor
 
 /**
- * TODO: Rewrite it.
  * Returns the generator function constructor.
  *
  * @public
  */
-export const GeneratorFunction: GeneratorFunctionConstructor = new Function(
-  `return function* t() {}`
-)().constructor
+export const GeneratorFunction: GeneratorFunctionConstructor = function* t() {}
+  .constructor as GeneratorFunctionConstructor
