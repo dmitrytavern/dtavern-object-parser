@@ -1,73 +1,75 @@
 {
-	"name": "@dtavern/object-parser",
-	"version": "1.1.0",
-	"description": "Js object validator",
-	"author": {
-		"name": "Dmitry Tavern",
-		"url": "https://github.com/DmitryTavern"
-	},
-	"repository": {
-		"url": "https://github.com/DmitryTavern/dtavern-object-parser"
-	},
-	"bugs": {
-		"url": "https://github.com/DmitryTavern/dtavern-object-parser/issues"
-	},
-	"license": "MIT",
-	"main": "dist/object-parser.js",
-	"module": "dist/object-parser.esm.js",
-	"typings": "dist/object-parser.d.ts",
-	"files": [
-		"dist"
-	],
-	"keywords": [
-		"object-parser",
-		"object-validator",
-		"options",
-		"options-parser",
-		"options-validator",
-		"props",
-		"props-parser",
-		"props-validator"
-	],
-	"scripts": {
-		"dev": "cross-env NODE_ENV=development rollup -w -c rollup.config.js",
-		"build": "npm run build:lib && npm run build:types",
-		"build:lib": "cross-env NODE_ENV=production rollup -c rollup.config.js",
-		"build:types": "tsc --declaration --emitDeclarationOnly --outDir .temp && api-extractor run",
-		"test": "npm run test:unit && npm run test:e2e",
-		"test:unit": "jest test/unit",
-		"test:e2e": "jest test/e2e",
-		"benchmark": "node benchmarks/node.js",
-		"prepare": "husky install"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.18.6",
-		"@babel/preset-env": "^7.18.6",
-		"@microsoft/api-extractor": "^7.33.6",
-		"@rollup/plugin-babel": "^5.3.1",
-		"@rollup/plugin-replace": "^5.0.2",
-		"@rollup/plugin-terser": "^0.1.0",
-		"@rollup/plugin-typescript": "^8.3.3",
-		"@types/jest": "^28.1.3",
-		"@types/node": "^18.0.0",
-		"cross-env": "^7.0.3",
-		"husky": "^8.0.0",
-		"jest": "^28.1.1",
-		"lint-staged": "^13.0.3",
-		"prettier": "^2.7.1",
-		"rollup": "^2.75.7",
-		"ts-jest": "^28.0.5",
-		"tslib": "^2.4.0",
-		"typescript": "^4.7.4"
-	},
-	"lint-staged": {
-		"*.ts": [
-			"prettier --write"
-		]
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	}
+  "name": "@dtavern/object-parser",
+  "version": "1.1.0",
+  "description": "Js object validator",
+  "author": {
+    "name": "Dmitry Tavern",
+    "url": "https://github.com/DmitryTavern"
+  },
+  "repository": {
+    "url": "https://github.com/DmitryTavern/dtavern-object-parser"
+  },
+  "bugs": {
+    "url": "https://github.com/DmitryTavern/dtavern-object-parser/issues"
+  },
+  "license": "MIT",
+  "main": "dist/object-parser.js",
+  "module": "dist/object-parser.esm.js",
+  "typings": "dist/object-parser.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "object-parser",
+    "object-validator",
+    "options",
+    "options-parser",
+    "options-validator",
+    "props",
+    "props-parser",
+    "props-validator"
+  ],
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development rollup -w -c rollup.config.js",
+    "build": "npm run build:lib && npm run build:types",
+    "build:lib": "cross-env NODE_ENV=production rollup -c rollup.config.js",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir .temp && api-extractor run",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "jest test/unit",
+    "test:e2e": "jest test/e2e",
+    "benchmark": "node benchmarks/node.js",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "@babel/preset-env": "^7.18.6",
+    "@microsoft/api-extractor": "^7.33.6",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-terser": "^0.1.0",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "@types/jest": "^28.1.3",
+    "@types/node": "^18.0.0",
+    "cross-env": "^7.0.3",
+    "docpress": "0.8.2",
+    "git-update-ghpages": "1.3.0",
+    "husky": "^8.0.0",
+    "jest": "^28.1.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "rollup": "^2.75.7",
+    "ts-jest": "^28.0.5",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
 }
