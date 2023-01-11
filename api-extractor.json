@@ -5,7 +5,7 @@
     "tsconfigFilePath": "api-extractor.tsconfig.json"
   },
 
-  "mainEntryPointFilePath": "./.temp/index.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/.temp/index.d.ts",
 
   "dtsRollup": {
     "enabled": true,
