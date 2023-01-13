@@ -1,1 +1,0 @@
-import{_ as s,c as a,o as n,a as l}from"./app.403485a4.js";const C=JSON.parse('{"title":".property([options])","description":"","frontmatter":{},"headers":[],"relativePath":"api/property.md","lastUpdated":1673652230000}'),p={name:"api/property.md"},o=l("",8),e=[o];function t(r,c,y,D,A,i){return n(),a("div",null,e)}const d=s(p,[["render",t]]);export{C as __pageData,d as default};
