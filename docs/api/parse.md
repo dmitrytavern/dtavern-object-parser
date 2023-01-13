@@ -1,11 +1,15 @@
 # .parse(object, schema, [options])
 
-Parses the object by the schema. The main function of the package.
+Parses the object by the schema. The core function of the package.
 
 - `object` - parsing target. Can be `null`, `undefined` or `object`.
-- `schema` - schema created via [.schema()](./schema.md) or raw `object`. Note: don't use raw schema, because every function call will re-create a schema.
+- `schema` - schema created via [.schema()](./schema.md) or raw `object`.
 - `[options]` - optional settings:
-  - `clone` - when true, creates a new object and makes a deep clone of the original object. Note: default values from schema write to a new object and ignore the original object.
+  - `clone` - when true, creates a new object and makes a deep clone of the original object.
+
+:::warning Warning!
+Don't use a **raw object** for schema attribute in production, because every function call will re-create a schema and doesn't cache it. **It's very bad for performance**.
+:::
 
 ## General usage
 
@@ -23,37 +27,39 @@ parser.parse(object, schema)
 
 The result of parsing is an object with two properties:
 
-- `value` - the original object if the clone is false or the cloned object if the clone is true.
-- `errors` - the array with parse errors.
+- `value` - **a reference on original object** or **the cloned object** if the clone option is true.
+- `errors` - an array of [GeneralError](./types/general-error.md).
 
-## Optional properties
+## Nested optional properties
 
 When you use nested schema with optional properties, this function creates parent object automaticly.
 
 ```javascript
 const object = { a: 'Hello World' }
 
-const optionalPropertySchema = parser.property({ required: false })
+const optional = parser.property({ required: false })
 
 const schema = parser.schema({
-  a: optionalPropertySchema,
+  a: optional,
   b: {
-    c: optionalPropertySchema,
+    c: {
+      d: optional,
+    },
   },
 })
 
 parser.parse(object, schema)
 // => {
-//   value: { a: 'Hello World', b: {} },
+//   value: { a: 'Hello World', b: { c: {} } },
 //   errors: [],
 // }
 ```
 
-## Clone object
+## Cloning an object
 
-If you don't need changes in the original object or you want to create a clone of the object, use the `clone` option. The function creates a new empty object and recursively copies properties from the original object to the new object.
+If clone option is **true**, the function creates a new empty object and recursively copies properties from the original object to the new object. In this case, the original object will become **readonly**.
 
-With this setting, the original object will be read-only.
+**Simple example with an object cloning:**
 
 ```javascript
 const object = { a: { b: 'Hello World' } }
@@ -71,7 +77,7 @@ console.log(object)
 // => { a: { b: 'Hello World' } }
 ```
 
-The function also can clone arrays:
+**Simple example with array cloning:**
 
 ```javascript
 const object = { a: [1, 2, 3] }
@@ -89,9 +95,7 @@ console.log(object)
 // => { a: [ 1, 2, 3 ] }
 ```
 
-And can even copy arrays with objects:
-
-Note: if the property is an array and contains objects, the property schema must have the "element" key as a schema in property settings. Otherwise, array elements will be not cloned.
+**Harder example with cloning an array of objects:**
 
 ```javascript
 const object = { a: [{ id: 1 }, { id: 2 }, { id: 3 }] }
@@ -115,6 +119,14 @@ console.log(result.value)
 console.log(object)
 // => { a: [ { id: 1 }, { id: 2 }, { id: 3 } ] }
 ```
+
+:::tip Note
+If clone option is **true**, an original object becomes **readonly** and all default values will be put into the cloned object.
+:::
+
+:::tip Note
+If the property is an array and contains objects, the property schema must have the **element** key as a schema in property settings. Otherwise, array elements will be not cloned.
+:::
 
 ## Error handling
 

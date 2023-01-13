@@ -41,5 +41,6 @@ require('./groups/validator')
 require('./groups/clone')
 
 require('./bootstrap')
+require('./markdown')
 
-bootstrap()
+process.argv[2] === '--write' ? markdown() : bootstrap()

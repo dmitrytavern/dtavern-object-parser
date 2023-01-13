@@ -1,17 +1,17 @@
 # .property([options])
 
-Creates a property schema by options.
+Creates a property schema.
 
-- `options` - null, undefined or object with next props:
+- `options` - can be null, undefined or an object with next options:
 
   - `type` - describe a property type.
 
-    - Type: `constructor` | `array of constructors`
+    - Type: [Constructor](./types/constructor.md) | [Constructor[]](./types/constructor.md)
     - Default: `[]`
 
   - `element` - describe a schema of array elements (if the type and the property is `Array`).
 
-    - Type: `null` | `constructor` | `array of constructors` | `schema` | `property schema`
+    - Type: `null` | [Constructor](./types/constructor.md) | [Constructor[]](./types/constructor.md) | [Schema](./types/schema.md) | [PropertySchema](./types/property-schema.md)
     - Default: `null`
 
   - `required` - describe a property requirement in an object.
@@ -78,6 +78,8 @@ parser.property({
 ```
 
 ## Error handling
+
+If the options have an error - it will throw an exception:
 
 ```javascript
 const otherSchema = parser.schema()

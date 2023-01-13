@@ -1,16 +1,20 @@
 # .single()
 
-Parses the property from the object by the property schema. It checks property existence and type, calls a custom validator, and sets the default value.
+Parses the property from the object by the property schema.
 
 The function uses overload and has 3-4 arguments.
 
-Note: for examples in this file, the property schema creator is not used. But in production, use only the [.property()](./property.md) function to describe the property schema.
+:::info Note
+For examples in this file, the property schema creator is not used. But in production, use only the [.property()](./property.md) function to describe the property schema.
+:::
 
 ## .single(object, key, schema)
 
-- `object` - the original object, which uses to read and write a property value.
-- `key` - the property key.
-- `schema` - the property schema or the raw property schema.
+- `object` - an original object, which uses to read and write a property value.
+- `key` - a [PropertyKey](./types/property-key.md) type.
+- `schema` - a [PropertySchema](./types/property-schema.md) or a [PropertySchemaRaw](./types/property-schema-raw.md).
+
+Usage:
 
 ```javascript
 const object = { a: 'Hello World' }
@@ -30,10 +34,12 @@ parser.single(object, 'c', { required: false, default: 'World' })
 
 ## .single(readonly, writable, key, schema)
 
-- `readonly` - the object to read a property value.
-- `writable` - the object to write a property value.
-- `key` - the property key.
-- `schema` - the property schema or the raw property schema.
+- `readonly` - an object to read a property value.
+- `writable` - an object to write a property value.
+- `key` - a [PropertyKey](./types/property-key.md) type.
+- `schema` - a [PropertySchema](./types/property-schema.md) or a [PropertySchemaRaw](./types/property-schema-raw.md).
+
+Usage:
 
 ```javascript
 const readonly = { a: 'Hello World' }
@@ -54,15 +60,21 @@ parser.single(readonly, writable, 'c', { required: false, default: 'World' })
 
 Firstly, the function defines **readonly**, **writable** objects, **key**, and **property schema** from arguments. If something is wrong - throws. Next, calls functions in this order:
 
-1. **The existence checker**. If the property is required and not exists - returns an error.
+1. **The existence checker**. Returns an error when a property is required and not exists.
 
-2. **The default setter**. If the property does not exist, set the default value (if exists).
+2. **The default setter**. Sets a default value when a default setting exists and a property does not exist.
 
-3. **Type checker**. If the property exists (or the value is the default), and the type is not `any` - it compares value constructors with type. If no match is found - returns an error. Note: see [type upcasting](../overview/upcasting.md) for more information on how this checker works.
+3. **Type checker**. Compares value type with a property type setting when a property exists (or a value is a default). If no match is found - returns an error.
 
-4. **Custom validator**. If the validator exists, the function calls it. If the validator throws or returns false - the function returns an error.
+4. **Custom validator**. Returns an error when a validator throws or returns false. If a validator is null - skip this function.
+
+:::tip Note for type checker
+See [type upcasting](../guide/advanced/type-upcasting.md) for more information on how this checker works.
+:::
 
 ## Error handling
+
+If a property is invalid, the function returns an error object. See [PropertyError](./types/property-error.md) type for more details.
 
 ```javascript
 parser.single({}, 'a', { type: String })
@@ -84,10 +96,6 @@ parser.single({}, 'a', { type: String })
 // }
 ```
 
-- `name` - the error name. See [.utils.Errors](./utils/errors.md).
-- `message` - the error message.
-- `exsists` - if true, the property has a value from the object or default value.
-- `value` - the property value from the object or default value.
-- `valueIsDefault` - if true, the property value is the default.
-- `valueConstructors` - an array of value constructors. See [.utils.getConstructors()](./utils/get-constructors.md). Note: if a type in a schema is `any`, an array will be empty.
-- `schema` - the property schema which was used for parse.
+:::tip Note
+If a type in a schema is **any**, an array of `valueConstructors` will be empty.
+:::

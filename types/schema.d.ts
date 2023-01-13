@@ -80,7 +80,7 @@ type SchemaTypeProperty<P> = P extends PropertyTypeRaw
  *  b1: [String, Number],
  *  c1: {
  *    a2: Number,
- *    b2: createPropertySchema(null),
+ *    b2: parser.property(null),
  *    c2: null
  *  }
  * }

@@ -10,10 +10,10 @@
   <img loading="lazy" src="https://badgen.net/github/license/dmitrytavern/dtavern-object-parser" alt="License">
 </a>
 
-A light-weight object parser with next features:
+A simple and easy way to check and parse an object without pain with next features:
 
-- Check the property types
-- Check the property existence
+- Check a property types
+- Check a property existence
 - Default value setter
 - Custom validator
 - No dependencies
@@ -23,11 +23,9 @@ A light-weight object parser with next features:
 ```javascript
 import parser from '@dtavern/object-parser'
 
-const objectSchema = parser.schema({
+const schema = parser.schema({
   name: String,
-
-  age: Number,
-
+  age: [String, Number],
   role: parser.property({
     type: String,
     required: false,
@@ -41,28 +39,28 @@ const objectSchema = parser.schema({
   }),
 })
 
-const targetObject = { name: 'Dmitry', age: 19 }
+const target = { name: 'Dmitry', age: 19 }
 
-const result = parser.parse(targetObject, objectSchema)
+const result = parser.parse(target, schema)
 // => {
 //   value: { name: 'Dmitry', age: 19, role: 'anonymous' }
 //   errors: []
 // }
 ```
 
-What's going on here:
+**What's going on here:**
 
 1. Imported parser.
 2. Created the object schema where:
    - `name` - is required property which can be only String.
-   - `age` - is required property which can be only Number.
+   - `age` - is required property which can be String or Number.
    - `role` - is not required property, which can be only an "anonymous", "user" or "admin" string. Value by default: "anonymous".
 3. Parsed the target object by the object schema.
 
-The result of parsing is an object, where:
+**The result of parsing is an object, where:**
 
-- `value` - parsed object. If your schema contains only required props, the `value` and the original object will be the same. Also, if you use the clone option, the value will be cloned object. See [.parse()](./docs/api/parse.md) docs.
-- `errors` - array of errors. If the target object not conatains errors, the array will be empty.
+- `value` - parsed object. By default is a reference on the original object.
+- `errors` - array of errors. Сontains parsing errors.
 
 ## Installation
 
@@ -78,8 +76,6 @@ Browser/CDN:
 <script src="https://unpkg.com/@dtavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
 ```
 
-Also, you can download ObjectParser from [GitHub assets](https://github.com/dmitrytavern/dtavern-options/releases/tag/v2.0.0).
-
 ## Usage
 
 CommonJS:
@@ -87,9 +83,6 @@ CommonJS:
 ```javascript
 const parser = require('@dtavern/object-parser')
 const { parser } = require('@dtavern/object-parser')
-
-// or
-
 const { parse, schema, property } = require('@dtavern/object-parser')
 ```
 
@@ -98,17 +91,24 @@ ES6:
 ```javascript
 import parser from '@dtavern/object-parser'
 import { parser } from '@dtavern/object-parser'
-
-// or
-
 import { parse, schema, property } from '@dtavern/object-parser'
 ```
 
-You can use the style you prefer.
+Browser:
+
+```html
+<script>
+  const parser = window.objectParser
+  const { parser } = window.objectParser
+  const { parse, schema, property } = window.objectParser
+</script>
+```
+
+You can use the style you prefer. For more information, see [docs](https://dmitrytavern.github.io/dtavern-object-parser/guide/installation).
 
 ## Documentation
 
-Documentation can be found at [dmitrytavern.github.io/dtavern-object-parser](https://dmitrytavern.github.io/dtavern-object-parser/overview/getting-started.html).
+Powerful documentation can be found at [dmitrytavern.github.io/dtavern-object-parser](https://dmitrytavern.github.io/dtavern-object-parser/).
 
 ## License
 

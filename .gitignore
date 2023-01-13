@@ -3,4 +3,5 @@ dist/
 .temp/
 .vs/
 .vscode/
-_docpress/
+.autogenerate/
+cache

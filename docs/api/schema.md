@@ -1,27 +1,36 @@
 # .schema(object)
 
-Creates a schema for parse functions.
+Creates an object schema.
 
-- `object` - the object to create a schema or an array of string.
+- `object` - a raw object or an array of strings. See [RawSchema](./types/raw-schema.md) type.
 
-## Object schema
+## Schema from a raw object
 
-Schema creates by an object, where properies can be: a `constructor`, `array of constructors`, `schema`, `property schema` or `nested object`.
+Schema creates by an object, where properies can be: [Constructor](./types/constructor.md), [Constructor[]](./types/constructor.md), [Schema](./types/schema.md), [PropertySchema](./types/property-schema.md) or **nested object**.
+
+Structure example:
 
 ```
 {
+  // Creates a default property schema
   <property-name>: null
 
+  // Creates a default property schema
   <property-name>: undefined
 
+  // Creates a property schema where type is String
   <property-name>: String
 
+  // Creates a property schema where type is String and Boolean
   <property-name>: [String, Boolean]
 
+  // Uses a created nested schema
   <property-name>: parser.schema()
 
+  // Uses a created property schema
   <property-name>: parser.property()
 
+  // Creates a nested schema
   <property-name>: {
     <property-name>: String
 
@@ -32,31 +41,32 @@ Schema creates by an object, where properies can be: a `constructor`, `array of 
 }
 ```
 
-Examples:
+Code example:
 
 ```javascript
-// Standart schema.
-const schema_1 = parser.schema({
-  a: String,
-
-  b: [String, Boolean],
-
-  c: {
-    d: String.
-  }
-})
-
-// Combination of schemas
-const schema_2 = parser.schema({
-  i: schema_1,
-
-  f: parser.property(null)
+parser.schema({
+  a: null,
+  b: undefined,
+  c: String,
+  d: [String, Boolean],
+  i: parser.schema({}),
+  f: parser.property({}),
+  g: {
+    a: String,
+    b: [String, Boolean],
+  },
 })
 ```
 
-## Array schema
+:::tip Recommendation
+If you are using already created schemes, they will **not be re-created**. Since schemas are immutable, they can be combined to minimize memory usage.
+:::
 
-Schema creates by an array with string.
+## Schema from an array
+
+Schema creates by an array of strings.
+
+Structure example:
 
 ```
 [
@@ -66,21 +76,23 @@ Schema creates by an array with string.
 ]
 ```
 
-Examples:
+Code example:
 
 ```javascript
 parser.schema(['a', 'a.b', 'c.d'])
 // => {
 //   a: {
-//     b: null
+//     b: parser.property(null) // A default schema property
 //   },
 //   c: {
-//     d: null
+//     d: parser.property(null) // A default schema property
 //   }
 // }
 ```
 
 ## Error handling
+
+If the attribute is invalid, the properties of the object will be of the wrong type, or the object will have a circular structure - throws.
 
 ```javascript
 parser.schema(undefined)
