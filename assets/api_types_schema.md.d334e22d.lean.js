@@ -1,0 +1,1 @@
+import{_ as s,c as a,o as n,a as p}from"./app.403485a4.js";const A=JSON.parse('{"title":"Schema type","description":"","frontmatter":{},"headers":[],"relativePath":"api/types/schema.md","lastUpdated":1673650891000}'),o={name:"api/types/schema.md"},l=p("",6),e=[l];function t(c,r,y,D,i,C){return n(),a("div",null,e)}const h=s(o,[["render",t]]);export{A as __pageData,h as default};
