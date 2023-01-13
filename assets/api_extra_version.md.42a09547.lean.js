@@ -1,0 +1,1 @@
+import{_ as e,c as t,o,a as r}from"./app.7155d8bb.js";const v=JSON.parse('{"title":".version","description":"","frontmatter":{},"headers":[],"relativePath":"api/extra/version.md","lastUpdated":1673647589000}'),i={name:"api/extra/version.md"},a=r("",3),n=[a];function s(c,d,_,l,h,p){return o(),t("div",null,n)}const u=e(i,[["render",s]]);export{v as __pageData,u as default};
