@@ -1,1 +1,0 @@
-import{_ as t,c as e,o as a,a as i}from"./app.7155d8bb.js";const f=JSON.parse('{"title":"ObjectParser API","description":"","frontmatter":{},"headers":[],"relativePath":"api/index.md","lastUpdated":1673647589000}'),s={name:"api/index.md"},r=i("",3),n=[r];function o(d,c,_,l,p,u){return a(),e("div",null,n)}const g=t(s,[["render",o]]);export{f as __pageData,g as default};
