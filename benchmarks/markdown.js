@@ -1,10 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const pathFile = path.join(
-  __dirname,
-  '../docs/.autogenerate/benchmarks-results.md'
-)
+const pathDir = path.join(__dirname, '../docs/.autogenerate')
+const pathFile = path.join(pathDir, 'benchmarks-results.md')
 
 globalThis.markdown = function bootstrap() {
   const benchmarks = run()
@@ -12,6 +10,10 @@ globalThis.markdown = function bootstrap() {
 
   for (const key in benchmarks.result)
     markdown += printGroup(benchmarks.result[key]) + '\n'
+
+  if (!fs.existsSync(pathDir)) {
+    fs.mkdirSync(pathDir)
+  }
 
   fs.writeFileSync(pathFile, markdown, { encoding: 'utf-8' })
 
