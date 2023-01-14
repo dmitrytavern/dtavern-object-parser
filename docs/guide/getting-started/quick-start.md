@@ -48,7 +48,7 @@ parser.parse(target, schema)
 **The result of parsing is an object, where:**
 
 - `value` - parsed object. By default **is a reference on the original object**.
-- `errors` - an array of [GeneralError](../types/general-error.md).
+- `errors` - an array of [GeneralError](../../api/types/general-error.md).
 
 ## Error handling
 

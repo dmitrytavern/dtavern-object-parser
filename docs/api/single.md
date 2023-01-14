@@ -69,7 +69,7 @@ Firstly, the function defines **readonly**, **writable** objects, **key**, and *
 4. **Custom validator**. Returns an error when a validator throws or returns false. If a validator is null - skip this function.
 
 :::tip Note for type checker
-See [type upcasting](../guide/advanced/type-upcasting.md) for more information on how this checker works.
+See [type upcasting](../guide/advanced/types-upcasting.md) for more information on how this checker works.
 :::
 
 ## Error handling

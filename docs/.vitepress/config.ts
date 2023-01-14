@@ -158,7 +158,7 @@ export default defineConfig({
       {
         rel: 'apple-touch-icon',
         sizes: '180x180',
-        href: '/.vitepress/assets/apple-touch-icon.png',
+        href: '/object-parser/assets/favicons/apple-touch-icon.png',
       },
     ],
     [
@@ -167,7 +167,7 @@ export default defineConfig({
         rel: 'icon',
         type: 'image/png',
         sizes: '32x32',
-        href: '/.vitepress/assets/favicon-32x32.png',
+        href: '/object-parser/assets/favicons/favicon-32x32.png',
       },
     ],
     [
@@ -176,25 +176,37 @@ export default defineConfig({
         rel: 'icon',
         type: 'image/png',
         sizes: '16x16',
-        href: '/.vitepress/assets/favicon-16x16.png',
+        href: '/object-parser/assets/favicons/favicon-16x16.png',
       },
     ],
-    ['link', { rel: 'manifest', href: '/.vitepress/assets/site.webmanifest' }],
+    [
+      'link',
+      {
+        rel: 'manifest',
+        href: '/object-parser/assets/favicons/site.webmanifest',
+      },
+    ],
     [
       'link',
       {
         rel: 'mask-icon',
-        href: '/.vitepress/assets/safari-pinned-tab.svg',
+        href: '/object-parser/assets/favicons/safari-pinned-tab.svg',
         color: '#4B91F1',
       },
     ],
-    ['link', { rel: 'shortcut icon', href: '/.vitepress/assets/favicon.ico' }],
+    [
+      'link',
+      {
+        rel: 'shortcut icon',
+        href: '/object-parser/assets/favicons/favicon.ico',
+      },
+    ],
     ['meta', { name: 'msapplication-TileColor', content: '#4B91F1' }],
     [
       'meta',
       {
         name: 'msapplication-config',
-        content: '/.vitepress/assets/browserconfig.xml',
+        content: '/object-parser/assets/favicons/browserconfig.xml',
       },
     ],
     ['meta', { name: 'theme-color', content: '#4B91F1' }],
@@ -211,7 +223,7 @@ export default defineConfig({
 
     nav,
 
-    logo: '/.vitepress/assets/android-chrome-192x192.png',
+    logo: '/assets/favicons/android-chrome-192x192.png',
 
     socialLinks: [
       {

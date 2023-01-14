@@ -2,7 +2,12 @@
 
 ## v2.0.0
 
-More changes
+- Add new API.
+- Add support nested objects.
+- Improve typescript support.
+- Improve documentation.
+
+**BREAKING CHANGE:** defineOptions function deleted. Use .parse().
 
 ## v1.1.0
 
