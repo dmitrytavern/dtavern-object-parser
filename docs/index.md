@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started/quick-start
     - theme: alt
       text: View on GitHub
-      link: https://github.com/dmitrytavern/dtavern-object-parser
+      link: https://github.com/dmitrytavern/object-parser
 
 features:
   - title: Very light-weight

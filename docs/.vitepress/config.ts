@@ -144,7 +144,7 @@ export const sidebar = {
 }
 
 export default defineConfig({
-  base: 'dtavern-object-parser',
+  base: '/object-parser',
   lang: 'en-US',
   title: 'ObjectParser',
   description: 'A light-weight object parser',
@@ -216,7 +216,7 @@ export default defineConfig({
     socialLinks: [
       {
         icon: 'github',
-        link: 'https://github.com/dmitrytavern/dtavern-object-parser',
+        link: 'https://github.com/dmitrytavern/object-parser',
       },
     ],
 

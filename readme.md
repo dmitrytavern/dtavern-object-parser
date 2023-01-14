@@ -1,13 +1,13 @@
 # **JavaScript Object Praser**
 
-<a href="https://www.npmjs.com/package/@dtavern/object-parser">
-  <img loading="lazy" src="https://badgen.net/npm/v/@dtavern/object-parser" alt="Version" />
+<a href="https://www.npmjs.com/package/@dmitrytavern/object-parser">
+  <img loading="lazy" src="https://badgen.net/npm/v/@dmitrytavern/object-parser" alt="Version" />
 </a>
-<a href="https://github.com/dmitrytavern/dtavern-object-parser">
-  <img loading="lazy" src="https://badgen.net/github/last-commit/dmitrytavern/dtavern-object-parser" alt="Last commit">
+<a href="https://github.com/dmitrytavern/object-parser">
+  <img loading="lazy" src="https://badgen.net/github/last-commit/dmitrytavern/object-parser" alt="Last commit">
 </a>
-<a href="https://github.com/dmitrytavern/dtavern-object-parser">
-  <img loading="lazy" src="https://badgen.net/github/license/dmitrytavern/dtavern-object-parser" alt="License">
+<a href="https://github.com/dmitrytavern/object-parser">
+  <img loading="lazy" src="https://badgen.net/github/license/dmitrytavern/object-parser" alt="License">
 </a>
 
 A simple and easy way to check and parse an object without pain with next features:
@@ -21,7 +21,7 @@ A simple and easy way to check and parse an object without pain with next featur
 ## A quick example
 
 ```javascript
-import parser from '@dtavern/object-parser'
+import parser from '@dmitrytavern/object-parser'
 
 const schema = parser.schema({
   name: String,
@@ -64,16 +64,16 @@ const result = parser.parse(target, schema)
 
 ## Installation
 
-ObjectParser is available via [npm](https://www.npmjs.com/package/@dtavern/object-parser):
+ObjectParser is available via [npm](https://www.npmjs.com/package/@dmitrytavern/object-parser):
 
 ```
-npm install --save @dtavern/object-parser
+npm install --save @dmitrytavern/object-parser
 ```
 
 Browser/CDN:
 
 ```html
-<script src="https://unpkg.com/@dtavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
+<script src="https://unpkg.com/@dmitrytavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
 ```
 
 ## Usage
@@ -81,17 +81,17 @@ Browser/CDN:
 CommonJS:
 
 ```javascript
-const parser = require('@dtavern/object-parser')
-const { parser } = require('@dtavern/object-parser')
-const { parse, schema, property } = require('@dtavern/object-parser')
+const parser = require('@dmitrytavern/object-parser')
+const { parser } = require('@dmitrytavern/object-parser')
+const { parse, schema, property } = require('@dmitrytavern/object-parser')
 ```
 
 ES6:
 
 ```javascript
-import parser from '@dtavern/object-parser'
-import { parser } from '@dtavern/object-parser'
-import { parse, schema, property } from '@dtavern/object-parser'
+import parser from '@dmitrytavern/object-parser'
+import { parser } from '@dmitrytavern/object-parser'
+import { parse, schema, property } from '@dmitrytavern/object-parser'
 ```
 
 Browser:
@@ -104,11 +104,11 @@ Browser:
 </script>
 ```
 
-You can use the style you prefer. For more information, see [docs](https://dmitrytavern.github.io/dtavern-object-parser/guide/installation).
+You can use the style you prefer. For more information, see [docs](https://dmitrytavern.github.io/object-parser/guide/installation).
 
 ## Documentation
 
-Powerful documentation can be found at [dmitrytavern.github.io/dtavern-object-parser](https://dmitrytavern.github.io/dtavern-object-parser/).
+Powerful documentation can be found at [dmitrytavern.github.io/object-parser](https://dmitrytavern.github.io/object-parser/).
 
 ## License
 

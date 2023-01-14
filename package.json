@@ -1,5 +1,5 @@
 {
-  "name": "@dtavern/object-parser",
+  "name": "@dmitrytavern/object-parser",
   "version": "1.1.0",
   "description": "Js object validator",
   "author": {
@@ -7,10 +7,10 @@
     "url": "https://github.com/DmitryTavern"
   },
   "repository": {
-    "url": "https://github.com/DmitryTavern/dtavern-object-parser"
+    "url": "https://github.com/DmitryTavern/object-parser"
   },
   "bugs": {
-    "url": "https://github.com/DmitryTavern/dtavern-object-parser/issues"
+    "url": "https://github.com/DmitryTavern/object-parser/issues"
   },
   "license": "MIT",
   "main": "dist/object-parser.js",

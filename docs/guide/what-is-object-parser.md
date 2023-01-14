@@ -3,7 +3,7 @@
 A simple and easy way to check and parse an object without pain.
 
 ::: warning
-ObjectParser **is currently untested** on all platforms, all versions of node.js, and all browsers. The library is written without external dependencies and in general, it is implemented quite simply and has testing, so if you have any problems, open an [issue](https://github.com/dmitrytavern/dtavern-object-parser/issues/new).
+ObjectParser **is currently untested** on all platforms, all versions of node.js, and all browsers. The library is written without external dependencies and in general, it is implemented quite simply and has testing, so if you have any problems, open an [issue](https://github.com/dmitrytavern/object-parser/issues/new).
 :::
 
 ## Motivation

@@ -2,24 +2,24 @@
 
 ## Via npm
 
-ObjectParser is available via [npm](https://www.npmjs.com/package/@dtavern/object-parser):
+ObjectParser is available via [npm](https://www.npmjs.com/package/@dmitrytavern/object-parser):
 
 ```
-npm install --save @dtavern/object-parser
+npm install --save @dmitrytavern/object-parser
 ```
 
 Usage:
 
 ```javascript
 // Node.js
-const parser = require('@dtavern/object-parser')
-const { parser } = require('@dtavern/object-parser')
-const { parse, schema, property } = require('@dtavern/object-parser')
+const parser = require('@dmitrytavern/object-parser')
+const { parser } = require('@dmitrytavern/object-parser')
+const { parse, schema, property } = require('@dmitrytavern/object-parser')
 
 // ES6
-import parser from '@dtavern/object-parser'
-import { parser } from '@dtavern/object-parser'
-import { parse, schema, property } from '@dtavern/object-parser'
+import parser from '@dmitrytavern/object-parser'
+import { parser } from '@dmitrytavern/object-parser'
+import { parse, schema, property } from '@dmitrytavern/object-parser'
 ```
 
 ## Browser/CDN
@@ -27,7 +27,7 @@ import { parse, schema, property } from '@dtavern/object-parser'
 To connect ObjectParser to the site, copy and paste this script:
 
 ```html
-<script src="https://unpkg.com/@dtavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
+<script src="https://unpkg.com/@dmitrytavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
 ```
 
 Usage:
