@@ -39,6 +39,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "benchmark": "node benchmarks/node.js",
+		"benchmark:install": "npm ci --prefix ./benchmarks/",
     "benchmark:generate": "node benchmarks/node.js --write",
     "prepare": "husky install"
   },
