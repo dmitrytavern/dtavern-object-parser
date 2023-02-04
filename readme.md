@@ -4,21 +4,26 @@
   <img loading="lazy" src="https://badgen.net/npm/v/@dmitrytavern/object-parser" alt="Version" />
 </a>
 <a href="https://github.com/dmitrytavern/object-parser">
+  <img loading="lazy" src="https://github.com/dmitrytavern/object-parser/actions/workflows/deploy.yml/badge.svg" />
+</a>
+<a href="https://github.com/dmitrytavern/object-parser">
   <img loading="lazy" src="https://badgen.net/github/last-commit/dmitrytavern/object-parser" alt="Last commit">
 </a>
 <a href="https://github.com/dmitrytavern/object-parser">
   <img loading="lazy" src="https://badgen.net/github/license/dmitrytavern/object-parser" alt="License">
 </a>
 
-A simple and easy way to check and parse an object without pain with next features:
+`@dmitrytavern/object-parser` - is a library for object validation that takes the original object and its schema, and then checks all object properties for existence and typing, can call a custom validator and assign a default value.
 
-- Check a property types
-- Check a property existence
-- Default value setter
-- Custom validator
-- No dependencies
+The library **supports typescript** and has smart autocomplete for checked objects.
+
+It has no external dependencies and weighs **~7KiB** compressed without gzip and **~3KiB** with.
 
 ## A quick example
+
+```
+npm install --save @dmitrytavern/object-parser
+```
 
 ```javascript
 import parser from '@dmitrytavern/object-parser'
@@ -73,7 +78,7 @@ npm install --save @dmitrytavern/object-parser
 Browser/CDN:
 
 ```html
-<script src="https://unpkg.com/@dmitrytavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
+<script src="https://unpkg.com/@dmitrytavern/object-parser/dist/object-parser.min.js"></script>
 ```
 
 ## Usage

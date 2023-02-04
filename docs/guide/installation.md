@@ -11,7 +11,7 @@ npm install --save @dmitrytavern/object-parser
 Usage:
 
 ```javascript
-// Node.js
+// CommonJS
 const parser = require('@dmitrytavern/object-parser')
 const { parser } = require('@dmitrytavern/object-parser')
 const { parse, schema, property } = require('@dmitrytavern/object-parser')
@@ -27,7 +27,7 @@ import { parse, schema, property } from '@dmitrytavern/object-parser'
 To connect ObjectParser to the site, copy and paste this script:
 
 ```html
-<script src="https://unpkg.com/@dmitrytavern/object-parser@2.0.0/dist/object-parser.min.js"></script>
+<script src="https://unpkg.com/@dmitrytavern/object-parser/dist/object-parser.min.js"></script>
 ```
 
 Usage:
@@ -39,7 +39,3 @@ Usage:
   const { parse, schema, property } = window.objectParser
 </script>
 ```
-
-## GitHub assets
-
-You can download ObjectParser from [GitHub assets](https://github.com/dmitrytavern/dtavern-options/releases/tag/v2.0.0).

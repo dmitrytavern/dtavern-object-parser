@@ -3,9 +3,9 @@
 ObjectParser is designed to guarantee the structure of the target object according to a certain scheme. This means that the parser will return an object with the properties specified in the schema. which:
 
 - Will be of the specified type.
-- Which will be checked for existence.
-- Which will be checked by a custom validator.
-- Which will have default values in case of absence.
+- Will be checked for existence.
+- Will be checked by a custom validator.
+- Will have default values in case of absence.
 
 Here is a example:
 
