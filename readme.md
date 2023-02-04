@@ -13,6 +13,8 @@
   <img loading="lazy" src="https://badgen.net/github/license/dmitrytavern/object-parser" alt="License">
 </a>
 
+<br/>
+
 `@dmitrytavern/object-parser` - is a library for object validation that takes the original object and its schema, and then checks all object properties for existence and typing, can call a custom validator and assign a default value.
 
 The library **supports typescript** and has smart autocomplete for checked objects.
