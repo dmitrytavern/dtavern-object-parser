@@ -31,9 +31,58 @@ The example above demonstrates what type the parsing result is returned with. **
 
 This feature is optional and is needed for the convenience of using the library.
 
+## Default property
+
+If `required: false` is present in the property schema, the future value will be of the **undefined** type. But if `default` exists, then **undefined** is cancelled. Example:
+
+```typescript
+const a = parser.property({
+  type: Array,
+  required: false,
+  element: Number,
+})
+
+const b = parser.property({
+  type: Array,
+  required: false,
+  element: Number,
+  default: () => [1, 2, 3],
+})
+
+const schema = parser.schema({ a, b })
+
+const { value } = parser.parse({}, schema)
+
+// typeof value.a - number[] | undefined
+// typeof value.b - number[]
+```
+
+This also works with array elements:
+
+```typescript
+const arrayElement = parser.property({
+  type: Number,
+  required: false,
+  default: 0,
+})
+
+const a = parser.property({
+  type: Array,
+  element: arrayElement,
+})
+
+const schema = parser.schema({ a })
+
+const { value } = parser.parse({}, schema)
+
+// typeof value.a - number[]
+```
+
 ## Complex structures
 
-Not correct:
+With these `.property()` and `.schema()` functions you can create complex and nested structures. However, there are some limitations.
+
+Here is an example of incorrect use of functions:
 
 ```typescript
 const schema = parser.schema({
@@ -49,18 +98,16 @@ const { value } = parser.parse({}, schema)
 // typeof value.a - number[]
 ```
 
-Correct:
+An example of the correct use of functions:
 
 ```typescript
-const property = parser.property({
+const a = parser.property({
   type: Array,
   required: false,
   element: Number,
 })
 
-const schema = parser.schema({
-  a: property,
-})
+const schema = parser.schema({ a })
 
 const { value } = parser.parse({}, schema)
 

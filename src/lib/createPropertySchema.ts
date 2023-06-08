@@ -30,6 +30,8 @@ import {
   PropertyElementNormalize,
   PropertyRequiredNormalize,
   PropertySchemaTemplate,
+  PropertyDefaultRaw,
+  PropertyDefaultNormalize,
 } from '@types'
 
 /**
@@ -96,13 +98,15 @@ const allowedKeys = Object.keys(defaultSchema)
 export function createPropertySchema<
   TRaw extends PropertyTypeRaw,
   ERaw extends PropertyElementTypeRaw,
-  RRaw extends PropertyRequiredRaw
+  RRaw extends PropertyRequiredRaw,
+  DRaw extends PropertyDefaultRaw<TRaw, ERaw>
 >(
-  settings: PropertySchemaRaw<TRaw, ERaw, RRaw> | null | undefined
+  settings: PropertySchemaRaw<TRaw, ERaw, RRaw, DRaw> | null | undefined
 ): PropertySchema<
   PropertyTypeNormalize<TRaw>,
   PropertyElementNormalize<ERaw>,
-  PropertyRequiredNormalize<RRaw>
+  PropertyRequiredNormalize<RRaw>,
+  PropertyDefaultNormalize<DRaw>
 > {
   try {
     validateSchemaSettings(settings)
@@ -157,13 +161,15 @@ export function createPropertySchema<
 export function usePropertySchema<
   TRaw extends PropertyTypeRaw,
   ERaw extends PropertyElementTypeRaw,
-  RRaw extends PropertyRequiredRaw
+  RRaw extends PropertyRequiredRaw,
+  DRaw extends PropertyDefaultRaw<TRaw, ERaw>
 >(
-  settings: PropertySchemaRaw<TRaw, ERaw, RRaw>
+  settings: PropertySchemaRaw<TRaw, ERaw, RRaw, DRaw>
 ): PropertySchema<
   PropertyTypeNormalize<TRaw>,
   PropertyElementNormalize<ERaw>,
-  PropertyRequiredNormalize<RRaw>
+  PropertyRequiredNormalize<RRaw>,
+  PropertyDefaultNormalize<DRaw>
 > {
   return isPropertySchema(settings)
     ? (settings as any)

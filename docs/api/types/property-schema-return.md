@@ -12,12 +12,14 @@ const string: PropertySchemaReturn<CustomProperty> = 'str'
 
 // Get property type as an array
 type CustomPropertyType = typeof Array[]
-type CustomPropertySchema = PropertySchema<typeof Number[], any, true>
+type CustomPropertySchema = PropertySchema<typeof Number[], any, true, null>
 type CustomPropertyRequired = true
+type CustomPropertyDefault = null
 type CustomProperty = PropertySchema<
   CustomPropertyType,
   CustomPropertySchema,
-  CustomPropertyRequired
+  CustomPropertyRequired,
+  CustomPropertyDefault
 >
 const array: PropertySchemaReturn<CustomProperty> = [1, 2, 3]
 ```

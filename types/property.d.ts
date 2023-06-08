@@ -10,10 +10,12 @@
  * 	`ERaw` - Raw type of array element (only when type has Array type).
  * 	`R`    - Required type of object property.
  * 	`RRaw` - Raw required type of object property.
+ * 	`D`    - Default type of object property.
+ * 	`DRaw` - Raw default type of object property.
  *
- * Generic order: `<T, E, R>`.
+ * Generic order: `<T, E, R, D>`.
  *
- * Generic default value: `<any, any, any>`.
+ * Generic default value: `<any, any, any, any>`.
  */
 
 import { Schema, RawSchema, SchemaReturn } from './schema'
@@ -31,15 +33,15 @@ import {
 export interface PropertySchemaTemplate<
   T extends PropertyType | PropertyTypeRaw = any,
   E extends PropertyElementType | PropertyElementTypeRaw = any,
-  R = any
+  R = any,
+  D =
+    | PropertyDefault<PropertyTypeNormalize<T>, PropertyElementNormalize<E>>
+    | PropertyDefaultRaw<T, E>
 > {
   type?: T
   element?: E
   required?: R
-  default?: PropertyDefault<
-    PropertyTypeNormalize<T>,
-    PropertyElementNormalize<E>
-  >
+  default?: D
   validator?: PropertyValidator<
     PropertyTypeNormalize<T>,
     PropertyElementNormalize<E>
@@ -53,15 +55,16 @@ export interface PropertySchemaTemplate<
  * When you use functions for creating property schema, you transfer
  * the `PropertySchemaRaw` and get the `PropertySchema` type.
  *
- * Generics: `<Type, ElementType, Required>`.
+ * Generics: `<Type, ElementType, Required, Default>`.
  *
  * ### Example
  *
  * ```typescript
  * const schema: PropertySchema<
  *   typeof Array[],
- *   PropertySchema<typeof String[], null, true>,
+ *   PropertySchema<typeof String[], null, true, null>,
  *   true,
+ *   null,
  * > = {
  *   type: [Array],
  *   element: {
@@ -83,8 +86,9 @@ export interface PropertySchemaTemplate<
 export type PropertySchema<
   T extends PropertyType = any,
   E extends PropertyElementType = any,
-  R extends PropertyRequired = any
-> = Required<PropertySchemaTemplate<T, E, R>>
+  R extends PropertyRequired = any,
+  D extends PropertyDefault<T, E> = any
+> = Required<PropertySchemaTemplate<T, E, R, D>>
 
 /**
  * For creating the `PropertySchema` object you need to pass some options
@@ -92,7 +96,7 @@ export type PropertySchema<
  * where all properties are not required, not readonly, and have `Raw`
  * type versions.
  *
- * Generics: `<TypeRaw, ElementTypeRaw, RequiredRaw>`.
+ * Generics: `<TypeRaw, ElementTypeRaw, RequiredRaw, DefaultRaw>`.
  *
  * ### Example
  *
@@ -108,8 +112,9 @@ export type PropertySchema<
 export type PropertySchemaRaw<
   TRaw extends PropertyTypeRaw = any,
   ERaw extends PropertyElementTypeRaw = any,
-  RRaw extends PropertyRequiredRaw = any
-> = PropertySchemaTemplate<TRaw, ERaw, RRaw>
+  RRaw extends PropertyRequiredRaw = any,
+  DRaw extends PropertyDefaultRaw<TRaw, ERaw> = any
+> = PropertySchemaTemplate<TRaw, ERaw, RRaw, DRaw>
 
 /**
  * Finished type of property `type` key.
@@ -279,7 +284,7 @@ export type PropertyElementNormalize<ERaw extends PropertyElementTypeRaw> =
     : never
 
 /**
- * Type of property `default` key.
+ * Finished type of property `default` key.
  * @public
  */
 export type PropertyDefault<
@@ -289,6 +294,41 @@ export type PropertyDefault<
   | null
   | PropertyContructorReturn<T, E>
   | (() => PropertyContructorReturn<T, E>)
+
+/**
+ * Raw type of property `default` key.
+ * @public
+ */
+export type PropertyDefaultRaw<
+  TRaw extends PropertyTypeRaw,
+  ERaw extends PropertyElementTypeRaw
+> =
+  | null
+  | undefined
+  | PropertyContructorReturn<
+      PropertyTypeNormalize<TRaw>,
+      PropertyElementNormalize<ERaw>
+    >
+  | (() => PropertyContructorReturn<
+      PropertyTypeNormalize<TRaw>,
+      PropertyElementNormalize<ERaw>
+    >)
+
+/**
+ * Normalize helper for transforming `PropertyDefaultRaw` to `PropertyDefault`.
+ *
+ * ### Example
+ *
+ * ```typescript
+ * const rawDefault: PropertyDefaultRaw = undefined
+ * const _default: PropertyDefaultNormalize<typeof _default> = null
+ * ```
+ *
+ * @public
+ */
+export type PropertyDefaultNormalize<
+  DRaw extends PropertyDefaultRaw<any, any>
+> = DRaw extends null | undefined ? null : DRaw
 
 /**
  * Type of property `validator` key.
@@ -314,8 +354,9 @@ export type PropertyValidator<
  * const result: PropertySchemaReturn<
  *   PropertySchema<
  *     typeof Array[],
- *     PropertySchema<typeof Number[], any, true>,
- *     true
+ *     PropertySchema<typeof Number[], any, true, null>,
+ *     true,
+ *     null
  *   >
  * > = [1, 2, 3]
  * ```
@@ -325,10 +366,20 @@ export type PropertyValidator<
 export type PropertySchemaReturn<P extends PropertySchema> =
   HaveArrayConstructor<P['type']> extends true
     ? P['required'] extends false
-      ? PropertyContructorReturn<P['type'], P['element']> | undefined
+      ? P['default'] extends Exclude<
+          PropertyDefault<P['type'], P['element']>,
+          null
+        >
+        ? PropertyContructorReturn<P['type'], P['element']>
+        : PropertyContructorReturn<P['type'], P['element']> | undefined
       : PropertyContructorReturn<P['type'], P['element']>
     : P['required'] extends false
-    ? PropertyContructorReturn<P['type'], never> | undefined
+    ? P['default'] extends Exclude<
+        PropertyDefault<P['type'], P['element']>,
+        null
+      >
+      ? PropertyContructorReturn<P['type'], never>
+      : PropertyContructorReturn<P['type'], never> | undefined
     : PropertyContructorReturn<P['type'], never>
 
 /**
@@ -360,10 +411,20 @@ type PropertyContructorReturnAsArray<E extends Schema | PropertySchema> =
     ? E['type'] extends (infer Type)[]
       ? Type extends ArrayConstructor
         ? E['required'] extends false
-          ? PropertyContructorReturn<E['type'], E['element']> | undefined
+          ? E['default'] extends Exclude<
+              PropertyDefault<E['type'], E['element']>,
+              null
+            >
+            ? PropertyContructorReturn<E['type'], E['element']>
+            : PropertyContructorReturn<E['type'], E['element']> | undefined
           : PropertyContructorReturn<E['type'], E['element']>
         : E['required'] extends false
-        ? ConstructorReturn<Type> | undefined
+        ? E['default'] extends Exclude<
+            PropertyDefault<E['type'], E['element']>,
+            null
+          >
+          ? ConstructorReturn<Type>
+          : ConstructorReturn<Type> | undefined
         : ConstructorReturn<Type>
       : never
     : SchemaReturn<E>
