@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.0.1
+
+This patch fixes the following problem:
+
+- When specifying `required: false` and `default` options for a property schema, after parsing, the returned value type does not contain the **undefined** type.
+- Updated generics for `PropertySchema`, `PropertySchemaRaw` types and `.createPropertySchema()`, `.usePropertySchema()` functions.
+- Added new types `PropertyDefaultRaw` and `PropertyDefaultNormalize`.
+- Updated documentation for the patch. See:
+  - [PropertySchema](api/types/property-schema.md)
+  - [PropertySchemaRaw](api/types/property-schema-raw.md)
+  - [PropertySchemaReturn](api/types/property-schema-return.md)
+  - [TypeScript Support](guide/advanced/typescript.md)
+
 ## v2.0.0
 
 The main goal of this release is to add the ability to validate nested objects. However, almost everything had to be rewritten in the process. From new:
