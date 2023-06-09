@@ -88,7 +88,7 @@ export type PropertySchema<
   E extends PropertyElementType = any,
   R extends PropertyRequired = any,
   D extends PropertyDefault<T, E> = any
-> = Required<PropertySchemaTemplate<T, E, R, D>>
+> = Readonly<Required<PropertySchemaTemplate<T, E, R, D>>>
 
 /**
  * For creating the `PropertySchema` object you need to pass some options

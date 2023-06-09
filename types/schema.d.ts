@@ -44,14 +44,16 @@ import {
  * @public
  */
 export type Schema<SRaw extends RawSchema = any> =
-  SRaw extends RawSchemaAsObject ? SchemaAsObject<SRaw> : SchemaAsAnyObject
+  SRaw extends RawSchemaAsObject
+    ? Readonly<SchemaAsObject<SRaw>>
+    : Readonly<SchemaAsAnyObject>
 
 type SchemaAsObject<SRaw extends RawSchemaAsObject> = {
-  [P in keyof SRaw]: SchemaTypeProperty<SRaw[P]>
+  readonly [P in keyof SRaw]: SchemaTypeProperty<SRaw[P]>
 }
 
 type SchemaAsAnyObject = {
-  [key: string]: Schema | PropertySchema
+  readonly [key: string]: Schema | PropertySchema
 }
 
 type SchemaTypeProperty<P> = P extends PropertyTypeRaw
@@ -132,7 +134,7 @@ export type RawSchemaProperty =
  * @public
  */
 export type SchemaReturn<S extends Schema = any> = {
-  [P in keyof S]: SchemaReturnProperty<S[P]>
+  -readonly [P in keyof S]: SchemaReturnProperty<S[P]>
 }
 
 type SchemaReturnProperty<P extends Schema | PropertySchema | PropertyTypeRaw> =
