@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.2
+
+This patch fixes typing problems. From the updated:
+
+- Added readonly flags to library schemas to prevent them from being edited at the type level.
+
 ## v2.0.1
 
 This patch fixes the following problem:
