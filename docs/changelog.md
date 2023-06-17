@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.3
+
+This patch fixes a security problem. See [#1](https://github.com/dmitrytavern/object-parser/issues/1). Fixes:
+
+- Added a schema property name check for forbidden names.
+
 ## v2.0.2
 
 This patch fixes typing problems. From the updated:
