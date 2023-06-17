@@ -62,7 +62,7 @@ export function createSchema<SRaw extends RawSchema>(
 
   const store = useHandlerStore()
   const _rawSchema = isArray(rawSchema)
-    ? generateRawSchemaByPaths(rawSchema)
+    ? generateRawSchemaByPaths(rawSchema, store)
     : (rawSchema as RawSchemaAsObject)
 
   const result = parseSchemaObject(_rawSchema, store)
@@ -161,6 +161,9 @@ const parseSchemaProperty = (
   key: PropertyKey,
   store: HandlerStore
 ) => {
+  const keyError = validateSchemaPropertyKey(key)
+  if (keyError) return handler.error(store, keyError)
+
   const property = readonlyObject[key]
 
   if (isUndefined(property) || isConstructors(property)) {
@@ -202,7 +205,8 @@ const parseSchemaProperty = (
  * @internal
  */
 const generateRawSchemaByPaths = (
-  rawArraySchema: RawSchemaAsArray
+  rawArraySchema: RawSchemaAsArray,
+  store: HandlerStore
 ): RawSchemaAsObject => {
   const rawObjectSchema = {}
 
@@ -211,14 +215,21 @@ const generateRawSchemaByPaths = (
     let objectLink = rawObjectSchema
 
     for (let i = 0; i < arrayPath.length; i++) {
-      const key = arrayPath[i]
-      const isObj = isObject(objectLink[key])
+      const propertyKey = arrayPath[i]
+      const propertyKeyError = validateSchemaPropertyKey(propertyKey)
+      const isLastProperty = i === arrayPath.length - 1
 
-      if (i === arrayPath.length - 1) {
-        if (!isObj) objectLink[key] = null
-      } else {
-        if (!isObj) objectLink[key] = {}
-        objectLink = objectLink[key]
+      if (propertyKeyError) {
+        handler.error(store, propertyKeyError)
+        break
+      }
+
+      if (!isObject(objectLink[propertyKey])) {
+        objectLink[propertyKey] = isLastProperty ? null : {}
+      }
+
+      if (!isLastProperty) {
+        objectLink = objectLink[propertyKey]
       }
     }
   }
@@ -230,10 +241,36 @@ const generateRawSchemaByPaths = (
  * Validate the schema object by a circular structure.
  *
  * @param schema The schema object.
+ * @returns Object error.
+ * @internal
  */
 const validateSchemaObject = (
   schema: RawSchemaAsObject
 ): ObjectError | undefined => {
   if (handler.isHandled(schema))
     return createObjectError(`detected a circular structure`)
+}
+
+/**
+ * Validate the name of the schema property key.
+ *
+ * When creating a schema, the function needs to check
+ * the keys specified by the user so that they are not
+ * on the list of forbidden simovolves.
+ *
+ * @param schema The schema object.
+ * @returns Object error.
+ * @internal
+ */
+const validateSchemaPropertyKey = (
+  propertyKey: PropertyKey
+): ObjectError | undefined => {
+  if (
+    propertyKey === '__proto__' ||
+    propertyKey === 'constructor' ||
+    propertyKey === 'prototype'
+  )
+    return createObjectError(
+      `The property key has a forbidden name: "__proto__", "constructor" or "prototype".`
+    )
 }

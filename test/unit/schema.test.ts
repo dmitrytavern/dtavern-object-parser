@@ -51,6 +51,8 @@ describe('combine schemas', () => {
 })
 
 describe('error handling', () => {
+  const forbiddenNames = ['__proto__', 'prototype', 'constructor']
+
   it('should throw when detect cycle objects', () => {
     const obj: any = {}
     obj.a1 = obj
@@ -73,4 +75,15 @@ describe('error handling', () => {
     expect(() => delete schema['a1']).toThrow()
     expect(() => Object.defineProperty(schema, 'b1', { value: {} })).toThrow()
   })
+
+  it.each(forbiddenNames)(
+    'should throw when detect forbidden name: %s',
+    (name: string) => {
+      expect(() => schemaFn([`${name}`])).toThrow()
+      expect(() => schemaFn([`a1.${name}`])).toThrow()
+      expect(() => schemaFn([`a1.${name}.b2`])).toThrow()
+      expect(() => schemaFn({ [name]: null })).toThrow()
+      expect(() => schemaFn({ a1: { [name]: null } })).toThrow()
+    }
+  )
 })
